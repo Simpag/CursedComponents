@@ -17,6 +17,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         // blockWithItem(ModBlocks.ITEM_1);
+        blockWithItem(ModBlocks.LUCKY_BLOCK);
 
         // Custom stairs
         // stairsBlock((StairBlock) ModBlocks.BLACK_OPAL_STAIRS.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));

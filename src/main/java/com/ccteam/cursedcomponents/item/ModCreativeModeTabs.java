@@ -27,6 +27,7 @@ public class ModCreativeModeTabs {
 
     // Add your blocks that should appear in the creative tab
     private static final List<DeferredBlock<Block>> MOD_BLOCKS = new ArrayList<>() {{
+        add(ModBlocks.LUCKY_BLOCK);
         //add(ModBlocks.BLOCK1);
     }};
 

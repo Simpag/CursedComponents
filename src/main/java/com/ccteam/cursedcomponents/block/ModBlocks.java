@@ -1,0 +1,51 @@
+package com.ccteam.cursedcomponents.block;
+
+import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.MagicBlock;
+import com.ccteam.cursedcomponents.item.ModItems;
+
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
+
+public class ModBlocks {
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CursedComponentsMod.MOD_ID);
+
+    /*public static final DeferredBlock<Block> BLOCK_1 = registerBlock(
+            "block_1",
+            () -> new Block(
+                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
+            )
+    );
+    public static final DeferredBlock<Block> ORE_BLOCK = registerBlock("ore_block",
+            () -> new DropExperienceBlock(
+                    UniformInt.of(2, 5),
+                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
+            )
+    );*/
+
+
+    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
+        DeferredBlock<T> toReturn = BLOCKS.register(name, block);
+        registerBlockItem(name, toReturn);
+
+        return toReturn;
+    }
+
+    private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block) {
+        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    }
+
+    public static void register(IEventBus eventBus) {
+        BLOCKS.register(eventBus);
+    }
+}

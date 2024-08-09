@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,13 +35,15 @@ public class LuckyBlock extends Block {
         super.playerDestroy(world, player, pos, state, blockEntity, tool);
         Random random = new Random();
 
-        float r = random.nextFloat();
-        if (r < 0.2)
-            dropUnlucky(world, player, pos);
-        else if (r < 0.8)
-            dropNormal(world, pos);
-        else
-            dropVeryLucky(world, pos);
+        spawnLuckyVillager(world, pos);
+
+//        float r = random.nextFloat();
+//        if (r < 0.2)
+//            dropUnlucky(world, player, pos);
+//        else if (r < 0.8)
+//            dropNormal(world, pos);
+//        else
+//            dropVeryLucky(world, pos);
     }
 
     private void dropUnlucky(Level world, Player player, BlockPos pos) {
@@ -65,24 +68,25 @@ public class LuckyBlock extends Block {
     }
 
     private void spawnLuckyVillager(Level world, BlockPos pos) {
-        // FIXME: Offer menu closes immediately
         // TODO: add enchantments
         Villager villager = EntityType.VILLAGER.create(world);
-        if (villager == null)
+        if (villager == null) {
             return;
+        }
+        villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.MASON));
+        villager.setVillagerXp(10000);
 
-        ItemStack enchantedSword = new ItemStack(Items.DIAMOND_SWORD, 1);
+        ItemStack enchantedSword = new ItemStack(Items.DIAMOND_SWORD.asItem(), 1);
 
-        ItemCost itemCost = new ItemCost(Items.EMERALD, 5);
         MerchantOffer offer = new MerchantOffer(
-                itemCost, enchantedSword, 1, 1, 0.05f
+                new ItemCost(Items.EMERALD, 5),
+                enchantedSword,
+                1, 1, 0.05f
         );
 
         MerchantOffers offers = new MerchantOffers();
         offers.add(offer);
         villager.setOffers(offers);
-
-        villager.setVillagerXp(100);
 
         villager.setPos(pos.getX(), pos.getY(), pos.getZ());
         world.addFreshEntity(villager);

@@ -2,8 +2,6 @@ package com.ccteam.cursedcomponents.item;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 
-import com.ccteam.cursedcomponents.item.custom.ChainsawItem;
-import com.ccteam.cursedcomponents.item.custom.FuelItem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

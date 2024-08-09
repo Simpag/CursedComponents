@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.custom.MagicBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import net.minecraft.util.valueproviders.UniformInt;

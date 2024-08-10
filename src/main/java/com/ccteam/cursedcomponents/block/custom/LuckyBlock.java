@@ -2,12 +2,15 @@ package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -28,6 +32,8 @@ public class LuckyBlock extends Block {
 
     @Override
     public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+        if (world.isClientSide())
+            return;
 
         super.playerDestroy(world, player, pos, state, blockEntity, tool);
         Random random = new Random();
@@ -49,24 +55,23 @@ public class LuckyBlock extends Block {
     }
 
     private void dropNormal(Level world, BlockPos pos) {
-        if (new Random().nextInt() % 2 == 0)
+        int r = new Random().nextInt() % 3;
+        if (r == 0)
             dropGoldTools(world, pos);
-        else
+        else if (r == 1)
             dropGoldArmor(world, pos);
+        else
+            dropEnderChest(world, pos);
     }
 
     private void dropVeryLucky(Level world, BlockPos pos) {
-        if (new Random().nextInt() % 2 == 0)
+        int r = new Random().nextInt() % 2;
+        if (r == 0)
             constructBlockTower(world, pos);
-        else
+        else if (r == 1)
             spawnLuckyVillager(world, pos);
-    }
-
-    private void spawnLuckyVillager(Level world, BlockPos pos) {
-        Villager luckyVillager = CustomVillagerManager.createLuckyVillager(world);
-
-        luckyVillager.setPos(pos.getX(), pos.getY(), pos.getZ());
-        world.addFreshEntity(luckyVillager);
+        else
+            hurlBottlesOfEnchanting(world, pos);
     }
 
     private void spawnAnvilTrap(Level world, Player player, BlockPos pos) {
@@ -120,18 +125,48 @@ public class LuckyBlock extends Block {
         });
     }
 
+    private void dropEnderChest(Level world, BlockPos pos) {
+        world.setBlock(pos, Blocks.ENDER_CHEST.defaultBlockState(), 3);
+    }
+
+    private void constructBlockTower(Level world, BlockPos pos) {
+        int height = 30;
+        for (int i = 0; i < height; i++) {
+            BlockPos newPos = pos.above(i + 1);
+            world.setBlock(newPos, Blocks.STONE.defaultBlockState(), 3);
+        }
+        world.setBlock(pos.above(height + 1), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+    }
+
+    private void spawnLuckyVillager(Level world, BlockPos pos) {
+        Villager luckyVillager = CustomVillagerManager.createLuckyVillager(world);
+
+        luckyVillager.setPos(pos.getX(), pos.getY(), pos.getZ());
+        world.addFreshEntity(luckyVillager);
+    }
+
+    private void hurlBottlesOfEnchanting(Level world, BlockPos pos) {
+        Direction facing = Direction.UP;
+        for (int i = 0; i < 50; i++) {
+            double d = world.random.nextDouble();
+            throwExperienceBottle(world, pos, facing, d, 60);
+        }
+    }
+
+    private void throwExperienceBottle(Level world, BlockPos pos, Direction facing, double d, int speed) {
+        ThrownExperienceBottle experienceBottle = new ThrownExperienceBottle(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5);
+        experienceBottle.setDeltaMovement(
+                world.random.triangle((double)facing.getStepX() * d, 0.0172275 * (double)speed),
+                world.random.triangle(0.2, 0.0172275 * (double)speed),
+                world.random.triangle((double)facing.getStepZ() * d, 0.0172275 * (double)speed)
+        );
+        world.addFreshEntity(experienceBottle);
+    }
+
     private void dropItemStacks(Level world, BlockPos pos, ItemStack[] itemStacks) {
         for (ItemStack itemStack : itemStacks) {
             ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), itemStack);
             world.addFreshEntity(itemEntity);
-        }
-    }
-
-    private void constructBlockTower(Level world, BlockPos pos) {
-        Block[] towerBlocks = new Block[] { Blocks.STONE, Blocks.DIRT, Blocks.COBBLESTONE };
-        for (int i = 0; i < towerBlocks.length; i++) {
-            BlockPos newPos = pos.above(i + 1);
-            world.setBlock(newPos, towerBlocks[i].defaultBlockState(), 3);
         }
     }
 

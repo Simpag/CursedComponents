@@ -29,7 +29,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         // These are just nice shorthand functions
         // dropSelf(ModBlocks.ITEM_1.get());
-        dropSelf(ModBlocks.LUCKY_BLOCK.get());
+        this.add(ModBlocks.LUCKY_BLOCK.get(), block -> LootTable.lootTable()); // Lucky block has no drops
 
         // This is how you create a custom drop
         /* this.add(

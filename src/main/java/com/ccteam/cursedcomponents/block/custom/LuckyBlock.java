@@ -1,19 +1,16 @@
 package com.ccteam.cursedcomponents.block.custom;
 
+import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.trading.ItemCost;
-import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -35,15 +32,13 @@ public class LuckyBlock extends Block {
         super.playerDestroy(world, player, pos, state, blockEntity, tool);
         Random random = new Random();
 
-        spawnLuckyVillager(world, pos);
-
-//        float r = random.nextFloat();
-//        if (r < 0.2)
-//            dropUnlucky(world, player, pos);
-//        else if (r < 0.8)
-//            dropNormal(world, pos);
-//        else
-//            dropVeryLucky(world, pos);
+        float r = random.nextFloat();
+        if (r < 0.2)
+            dropUnlucky(world, player, pos);
+        else if (r < 0.8)
+            dropNormal(world, pos);
+        else
+            dropVeryLucky(world, pos);
     }
 
     private void dropUnlucky(Level world, Player player, BlockPos pos) {
@@ -68,28 +63,10 @@ public class LuckyBlock extends Block {
     }
 
     private void spawnLuckyVillager(Level world, BlockPos pos) {
-        // TODO: add enchantments
-        Villager villager = EntityType.VILLAGER.create(world);
-        if (villager == null) {
-            return;
-        }
-        villager.setVillagerData(villager.getVillagerData().setProfession(VillagerProfession.MASON));
-        villager.setVillagerXp(10000);
+        Villager luckyVillager = CustomVillagerManager.createLuckyVillager(world);
 
-        ItemStack enchantedSword = new ItemStack(Items.DIAMOND_SWORD.asItem(), 1);
-
-        MerchantOffer offer = new MerchantOffer(
-                new ItemCost(Items.EMERALD, 5),
-                enchantedSword,
-                1, 1, 0.05f
-        );
-
-        MerchantOffers offers = new MerchantOffers();
-        offers.add(offer);
-        villager.setOffers(offers);
-
-        villager.setPos(pos.getX(), pos.getY(), pos.getZ());
-        world.addFreshEntity(villager);
+        luckyVillager.setPos(pos.getX(), pos.getY(), pos.getZ());
+        world.addFreshEntity(luckyVillager);
     }
 
     private void spawnAnvilTrap(Level world, Player player, BlockPos pos) {

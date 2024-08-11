@@ -1,13 +1,17 @@
 package com.ccteam.cursedcomponents;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
+import com.ccteam.cursedcomponents.block.capabilities.ModBlockCapabilities;
+import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
+import com.ccteam.cursedcomponents.gui.containers.ModContainers;
+import com.ccteam.cursedcomponents.gui.screens.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.api.distmarker.Dist;
@@ -44,6 +48,10 @@ public class CursedComponentsMod {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
 
+        ModBlockEntities.register(modEventBus);
+
+        ModBlockAttachments.register(modEventBus);
+
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
@@ -51,6 +59,15 @@ public class CursedComponentsMod {
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+
+        // Register the block capabilities
+        modEventBus.addListener(ModBlockCapabilities::registerCapabilities);
+
+        // Register Container Menus
+        ModContainers.register(modEventBus);
+
+        // Register Screens
+        modEventBus.addListener(ModScreens::registerScreens);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

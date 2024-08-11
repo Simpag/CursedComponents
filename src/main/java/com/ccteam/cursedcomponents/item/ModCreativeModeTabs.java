@@ -27,7 +27,7 @@ public class ModCreativeModeTabs {
 
     // Add your blocks that should appear in the creative tab
     private static final List<DeferredBlock<Block>> MOD_BLOCKS = new ArrayList<>() {{
-        //add(ModBlocks.BLOCK1);
+        add(ModBlocks.DIMENSIONAL_QUARRY);
     }};
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CursedComponentsMod.MOD_ID);

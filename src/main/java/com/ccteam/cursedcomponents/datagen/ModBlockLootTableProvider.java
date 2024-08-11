@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.datagen;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -29,7 +28,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         // These are just nice shorthand functions
         // dropSelf(ModBlocks.ITEM_1.get());
-        
+
 
         // This is how you create a custom drop
         /* this.add(
@@ -44,6 +43,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
         // Slabs could drop 1 or 2 items
         // this.add(ModBlocks.BLACK_OPAL_SLAB.get(), block -> createSlabItemTable(ModBlocks.BLACK_OPAL_SLAB.get()));
+
+        dropSelf(ModBlocks.DIMENSIONAL_QUARRY.get());
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block block, Item item, float minDrops, float maxDrops) {

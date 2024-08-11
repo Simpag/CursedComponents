@@ -1,15 +1,13 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
-import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -19,18 +17,12 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CursedComponentsMod.MOD_ID);
 
-    /*public static final DeferredBlock<Block> BLOCK_1 = registerBlock(
-            "block_1",
-            () -> new Block(
+    public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
+            "dimensional_quarry",
+            () -> new DimensionalQuarryBlock(
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
             )
     );
-    public static final DeferredBlock<Block> ORE_BLOCK = registerBlock("ore_block",
-            () -> new DropExperienceBlock(
-                    UniformInt.of(2, 5),
-                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
-            )
-    );*/
 
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {

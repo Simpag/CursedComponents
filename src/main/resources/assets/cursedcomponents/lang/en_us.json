@@ -1,3 +1,12 @@
 {
+  "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
 
+  "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
+
+  "tooltip.cursedcomponents.dimensional_quarry.tooltip.1": "Dimensional Quarry go brrr",
+  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Stored:",
+  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption:",
+
+  "menu.cursedcomponents.dimensional_quarry.title": "Dimensional Quarry",
+  "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: "
 }

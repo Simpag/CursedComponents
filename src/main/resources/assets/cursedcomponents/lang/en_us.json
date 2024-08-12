@@ -4,9 +4,16 @@
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.1": "Dimensional Quarry go brrr",
-  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Stored:",
-  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption:",
+  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Capacity: %s FE",
+  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption: %s FE/t",
 
   "menu.cursedcomponents.dimensional_quarry.title": "Dimensional Quarry",
-  "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: "
+  "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: %s",
+  "menu.cursedcomponents.dimensional_quarry.start_button": "Start",
+  "menu.cursedcomponents.dimensional_quarry.stop_button": "Stop",
+
+  "status.cursedcomponents.dimensional_quarry.ok": "OK",
+  "status.cursedcomponents.dimensional_quarry.not_enough_energy": "Not enough energy!",
+  "status.cursedcomponents.dimensional_quarry.no_pickaxe": "Missing §5Netherite§r pickaxe!",
+  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing dimension!"
 }

@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block.attachments;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.attachments.custom.DimensionalQuarryItemStackhandler;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -15,9 +16,11 @@ public class ModBlockAttachments {
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, CursedComponentsMod.MOD_ID);
 
     // Serialization via INBTSerializable
-    public static final Supplier<AttachmentType<ItemStackHandler>> DIMENSIONAL_QUARRY_INV = ATTACHMENT_TYPES.register(
-            "dimensional_quarry_inv", () -> AttachmentType.serializable(
-                    () -> new ItemStackHandler(DimensionalQuarryEntity.INVENTORY_SIZE)).build()
+    public static final Supplier<AttachmentType<DimensionalQuarryItemStackhandler>> DIMENSIONAL_QUARRY_INV = ATTACHMENT_TYPES.register(
+            "dimensional_quarry_inv",
+            () -> AttachmentType.serializable(
+                    () -> new DimensionalQuarryItemStackhandler(DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE)
+            ).build()
     );
     public static final Supplier<AttachmentType<EnergyStorage>> DIMENSIONAL_QUARRY_ENERGY = ATTACHMENT_TYPES.register(
             "dimensional_quarry_energy", () -> AttachmentType.serializable(

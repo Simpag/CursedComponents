@@ -2,39 +2,36 @@ package com.ccteam.cursedcomponents.gui.screens.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
+import com.ccteam.cursedcomponents.gui.GuiUtil;
 import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.font.FontOption;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ColorRGBA;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DimensionalQuarryScreen extends AbstractContainerScreen<DimensionalQuarryContainer> {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");
+    private static final ResourceLocation WARNING_SPRITE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "container/dimensional_quarry/warning_triangle");
     private final int green;
     private final int dark_green;
     private final int red;
 
-    private Button runningButton;
+    private ExtendedButton startRunningButton;
+    private ExtendedButton stopRunningButton;
 
     public DimensionalQuarryScreen(DimensionalQuarryContainer menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -51,17 +48,26 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     protected void init() {
         super.init();
 
-        this.runningButton = new Button.Builder(
-                Component.empty(),
-                (button) -> {
-                    menu.toggleRunning();
-                    updateRunningButtonText();
-                })
-                .bounds(this.leftPos + 98, this.topPos + 56, 50, 15)
-                .build();
+        this.startRunningButton = new ExtendedButton(
+                this.leftPos + 124 - 25,
+                this.topPos + 56 - 16,
+                50,
+                16,
+                Component.translatable("menu.cursedcomponents.dimensional_quarry.start_button"),
+                (button) -> menu.setRunning(true)
+        );
 
-        this.addRenderableWidget(this.runningButton);
-        updateRunningButtonText();
+        this.stopRunningButton = new ExtendedButton(
+                this.leftPos + 124 - 25,
+                this.topPos + 74 - 16,
+                50,
+                16,
+                Component.translatable("menu.cursedcomponents.dimensional_quarry.stop_button"),
+                (button) -> menu.setRunning(false)
+        );
+
+        this.addRenderableWidget(this.startRunningButton);
+        this.addRenderableWidget(this.stopRunningButton);
     }
 
     @Override
@@ -73,6 +79,26 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
+        // Draw warning sprite if needed
+        List<DimensionalQuarryEntity.MiningRequirement> reqs = this.menu.getMiningRequirements();
+        if (reqs.get(0) != DimensionalQuarryEntity.MiningRequirement.ok) {
+            guiGraphics.blitSprite(WARNING_SPRITE, this.leftPos - 26, this.topPos, 26, 26);
+
+            // Render requirement
+            if (mouseX > this.leftPos - 26 && mouseX < this.leftPos
+                    && mouseY > this.topPos && mouseY < this.topPos + 26) {
+
+                var reqs_components = DimensionalQuarryEntity.MiningRequirement.getComponentList(reqs);
+                guiGraphics.renderComponentTooltip(
+                        this.font,
+                        reqs_components,
+                        mouseX,
+                        mouseY);
+            }
+        }
+
+        updateRunningButtons();
+
         // Progress bar
         float bar_progress = (float) this.menu.getCooldown() / DimensionalQuarryEntity.TICKS_PER_BLOCK;
         //int progress_bar_y = (int) ((73f - 21f) * bar_progress + 21f); // downwards
@@ -81,18 +107,16 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
 
         // Energy bar
         float energy_bar_progress = (float) this.menu.getEnergyStored() / DimensionalQuarryEntity.ENERGY_CAPACITY;
-        int energy_bar_x = (int) ((168f - 8f) * energy_bar_progress + 9f);
-        int energy_bar_color = this.menu.getEnergyStored() < DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK ? this.red : this.green;
+        int energy_bar_x = (int) ((168f - 8f) * energy_bar_progress + 8f);
+        int energy_bar_color = this.menu.getEnergyStored() < DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK * DimensionalQuarryEntity.TICKS_PER_BLOCK ? this.red : this.green;
         guiGraphics.fill(this.leftPos + 8, this.topPos + 80, this.leftPos + energy_bar_x, this.topPos + 82, energy_bar_color);
 
-        // Render energy consumption per tick
+        // Render energy consumption per tick tooltip
         if (mouseX > this.leftPos + 8 && mouseX < this.leftPos + 168f
                 && mouseY > this.topPos + 79 && mouseY < this.topPos + 83) {
             List<Component> energy_tooltip = new ArrayList<>();
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1"));
-            energy_tooltip.add(Component.literal(this.menu.getEnergyStored() + " FE"));
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2"));
-            energy_tooltip.add(Component.literal(DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK + " FE/t"));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2", DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK));
 
             guiGraphics.renderComponentTooltip(
                     this.font,
@@ -107,26 +131,19 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         // Draw super class
-        FormattedCharSequence formattedcharsequence = this.title.getVisualOrderText();
-        guiGraphics.drawString(this.font, this.title, this.imageWidth / 2 - font.width(formattedcharsequence) / 2, this.titleLabelY, 4210752, false);
+        GuiUtil.drawCenteredString(guiGraphics, this.font, this.title, this.imageWidth / 2, this.titleLabelY, 4210752, false);
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
 
         // Draw current y level
-        guiGraphics.drawString(
+        GuiUtil.drawScaledString(
                 this.font,
-                Component.translatable("menu.cursedcomponents.dimensional_quarry.current_y_level"),
-                87,
+                guiGraphics,
+                Component.translatable("menu.cursedcomponents.dimensional_quarry.current_y_level", this.menu.getCurrentYLevel()),
+                124 - 30,
                 20,
                 4210752,
-                false
-        );
-        guiGraphics.drawString(
-                this.font,
-                String.valueOf(this.menu.getCurrentYLevel()),
-                90,
-                32,
-                4210752,
-                false
+                false,
+                0.9f
         );
 
         if (this.DEBUG) {
@@ -140,11 +157,13 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         }
     }
 
-    private void updateRunningButtonText() {
-        if (menu.getRunning() == 0) {
-            this.runningButton.setMessage(Component.literal("Stop"));
+    private void updateRunningButtons() {
+        if (this.menu.getRunning() == 1) {
+            this.startRunningButton.active = false;
+            this.stopRunningButton.active = true;
         } else {
-            this.runningButton.setMessage(Component.literal("Run"));
+            this.startRunningButton.active = true;
+            this.stopRunningButton.active = false;
         }
     }
 }

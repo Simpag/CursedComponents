@@ -37,7 +37,7 @@ public class ServerPayloadHandler {
         BlockEntity blockEntity = level.getBlockEntity(pos);
 
         if (blockEntity instanceof DimensionalQuarryEntity quarryEntity) {
-            quarryEntity.toggleRunning();
+            quarryEntity.setRunning(data.state());
         }
     }
 }

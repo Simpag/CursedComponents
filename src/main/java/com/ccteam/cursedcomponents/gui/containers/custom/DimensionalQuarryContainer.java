@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.gui.containers.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.attachments.custom.DimensionalQuarryItemStackhandler;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
@@ -16,6 +17,8 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
+import java.util.List;
+
 public class DimensionalQuarryContainer extends AbstractContainerMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -25,11 +28,11 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
     // Client menu constructor
     public DimensionalQuarryContainer(int containerId, Inventory playerInventory) { // optional FriendlyByteBuf parameter if reading data from server
-        this(containerId, playerInventory, ContainerLevelAccess.NULL, new ItemStackHandler(DimensionalQuarryEntity.INVENTORY_SIZE), new SimpleContainerData(DimensionalQuarryEntity.QUARRY_DATA_SIZE));
+        this(containerId, playerInventory, ContainerLevelAccess.NULL, new DimensionalQuarryItemStackhandler(DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE), new SimpleContainerData(DimensionalQuarryEntity.QUARRY_DATA_SIZE));
     }
 
     // Server menu constructor
-    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler dataInventory, ContainerData quarryData) { // add energy storage using containerdata
+    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler dataInventory, ContainerData quarryData) {
         super(ModContainers.DIMENSIONAL_QUARRY_CONTAINER.get(), containerId);
         this.access = access;
         this.inventory = dataInventory;
@@ -37,22 +40,30 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
         checkContainerDataCount(this.quarryData, DimensionalQuarryEntity.QUARRY_DATA_SIZE);
 
-        if (dataInventory.getSlots() < DimensionalQuarryEntity.INVENTORY_SIZE) {
-            throw new IllegalArgumentException("Container size " + dataInventory.getSlots() + " is smaller than expected " + DimensionalQuarryEntity.INVENTORY_SIZE);
+        if (dataInventory.getSlots() < DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE) {
+            throw new IllegalArgumentException("Container size " + dataInventory.getSlots() + " is smaller than expected " + DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE);
         }
 
+        // Add quarry upgrade slots
+        for (int i = 0; i < 3; i++) {
+            this.addSlot(new SlotItemHandler(dataInventory, i, 66, 19 + i * 20));
+        }
+
+        // Add quarry inventory item buffer
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                this.addSlot(new SlotItemHandler(dataInventory, col + 3 * row, 8 + 18 * col, 21 + row * 18));
+                this.addSlot(new SlotItemHandler(dataInventory, 3 + col + 3 * row, 8 + 18 * col, 21 + row * 18));
             }
         }
 
+        // Add player inventory
         for (int playerInventoryRow = 0; playerInventoryRow < 3; ++playerInventoryRow) {
             for (int playerInventoryCol = 0; playerInventoryCol < 9; playerInventoryCol++) {
                 this.addSlot(new Slot(playerInventory, playerInventoryCol + playerInventoryRow * 9 + 9, 8 + 18 * playerInventoryCol, 99 + playerInventoryRow * 18));
             }
         }
 
+        // Add player hot bar
         for (int hotHarSlot = 0; hotHarSlot < 9; hotHarSlot++) {
             this.addSlot(new Slot(playerInventory, hotHarSlot, 8 + 18 * hotHarSlot, 157));
         }
@@ -74,7 +85,6 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
             Add logic for upgrades so that items cant be moved into that slot except for specials
             See: https://docs.neoforged.net/docs/gui/menus#:~:text=if%20(quickMovedSlotIndex%20%3D%3D%200)%20%7B
              */
-
             if (index < this.inventory.getSlots()) { // From block to player
                 if (!this.moveItemStackTo(rawStack, this.inventory.getSlots(), this.slots.size(), false)) {
                     return ItemStack.EMPTY;
@@ -103,14 +113,22 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     @Override
+    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+        return super.moveItemStackTo(stack, startIndex, endIndex, reverseDirection);
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return AbstractContainerMenu.stillValid(this.access, player, ModBlocks.DIMENSIONAL_QUARRY.get());
     }
 
-    public void toggleRunning() {
+    public void setRunning(boolean state) {
         BlockPos pos = new BlockPos(getPosX(), getPosY(), getPosZ());
-        LOGGER.debug("Sending to pos: " + pos);
-        PacketDistributor.sendToServer(new GUIButtonPayload(GUIButtonPayload.ButtonType.dimensionalQuarryStartToggle, pos));
+        PacketDistributor.sendToServer(new GUIButtonPayload(GUIButtonPayload.ButtonType.dimensionalQuarryStartToggle, pos, state));
+    }
+
+    public List<DimensionalQuarryEntity.MiningRequirement> getMiningRequirements() {
+        return DimensionalQuarryEntity.checkMiningRequirements(this.inventory, this.getEnergyStored());
     }
 
     public int getEnergyStored() {

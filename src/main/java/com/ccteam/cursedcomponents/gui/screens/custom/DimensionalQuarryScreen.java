@@ -5,11 +5,13 @@ import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.FontOption;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
@@ -18,19 +20,21 @@ import net.minecraft.util.ColorRGBA;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DimensionalQuarryScreen extends AbstractContainerScreen<DimensionalQuarryContainer> {
     private static final boolean DEBUG = true;
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");
     private final int green;
     private final int dark_green;
     private final int red;
 
-    private final Button runningButton;
+    private Button runningButton;
 
     public DimensionalQuarryScreen(DimensionalQuarryContainer menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -41,12 +45,23 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         this.green = FastColor.ARGB32.color(255, 31, 125, 0);
         this.dark_green = FastColor.ARGB32.color(255, 18, 74, 0);
         this.red = FastColor.ARGB32.color(255, 135, 0, 14);
+    }
 
-        this.runningButton = new Button.Builder(Component.literal("Button"), (button) -> menu.toggleRunning())
-                .bounds(this.leftPos + 50, this.topPos + 50, 50, 15)
+    @Override
+    protected void init() {
+        super.init();
+
+        this.runningButton = new Button.Builder(
+                Component.empty(),
+                (button) -> {
+                    menu.toggleRunning();
+                    updateRunningButtonText();
+                })
+                .bounds(this.leftPos + 98, this.topPos + 56, 50, 15)
                 .build();
 
         this.addRenderableWidget(this.runningButton);
+        updateRunningButtonText();
     }
 
     @Override
@@ -57,12 +72,6 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        if (menu.getRunning() == 1) {
-            this.runningButton.setMessage(Component.literal("Stop"));
-        } else {
-            this.runningButton.setMessage(Component.literal("Run"));
-        }
 
         // Progress bar
         float bar_progress = (float) this.menu.getCooldown() / DimensionalQuarryEntity.TICKS_PER_BLOCK;
@@ -128,6 +137,14 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
             guiGraphics.drawString(this.font, "Cooldown: " + String.valueOf(this.menu.getCooldown()), -100, 63, ChatFormatting.RED.getColor(), false);
             guiGraphics.drawString(this.font, "progress: " + String.valueOf((float) this.menu.getCooldown() / DimensionalQuarryEntity.TICKS_PER_BLOCK), -100, 73, ChatFormatting.RED.getColor(), false);
             guiGraphics.drawString(this.font, "Running: " + String.valueOf(this.menu.getRunning()), -100, 83, ChatFormatting.RED.getColor(), false);
+        }
+    }
+
+    private void updateRunningButtonText() {
+        if (menu.getRunning() == 0) {
+            this.runningButton.setMessage(Component.literal("Stop"));
+        } else {
+            this.runningButton.setMessage(Component.literal("Run"));
         }
     }
 }

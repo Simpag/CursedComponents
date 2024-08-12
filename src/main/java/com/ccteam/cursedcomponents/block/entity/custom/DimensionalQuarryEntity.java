@@ -28,7 +28,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static final int ENERGY_RECEIVE = 100_000;
     public static final int ENERGY_CONSUMPTION_PER_TICK = 50;
     public static final int INVENTORY_SIZE = 9;
-    public static final int ENERGY_DATA_SIZE = 4;
+    public static final int QUARRY_DATA_SIZE = 7;
 
     private int currentYLevel;
     private int cooldown;
@@ -104,6 +104,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public void decrementCurrentYLevel() {
         this.currentYLevel--;
+        setChanged();
+    }
+
+    public void toggleRunning() {
+        this.running = !this.running;
         setChanged();
     }
 
@@ -184,6 +189,12 @@ public class DimensionalQuarryEntity extends BlockEntity {
                     return cooldown;
                 case 3:
                     return running ? 1 : 0;
+                case 4:
+                    return worldPosition.getX();
+                case 5:
+                    return worldPosition.getY();
+                case 6:
+                    return worldPosition.getZ();
                 default:
                     return 0;
             }
@@ -197,7 +208,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         @Override
         public int getCount() {
-            return ENERGY_DATA_SIZE;
+            return QUARRY_DATA_SIZE;
         }
     };
 }

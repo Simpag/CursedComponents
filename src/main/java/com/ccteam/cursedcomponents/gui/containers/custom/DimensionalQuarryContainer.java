@@ -3,6 +3,9 @@ package com.ccteam.cursedcomponents.gui.containers.custom;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
+import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
+import com.mojang.logging.LogUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -11,25 +14,28 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.slf4j.Logger;
 
 public class DimensionalQuarryContainer extends AbstractContainerMenu {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final ContainerLevelAccess access;
     private final IItemHandler inventory;
-    private final ContainerData energyData;
+    private final ContainerData quarryData;
 
     // Client menu constructor
     public DimensionalQuarryContainer(int containerId, Inventory playerInventory) { // optional FriendlyByteBuf parameter if reading data from server
-        this(containerId, playerInventory, ContainerLevelAccess.NULL, new ItemStackHandler(DimensionalQuarryEntity.INVENTORY_SIZE), new SimpleContainerData(DimensionalQuarryEntity.ENERGY_DATA_SIZE));
+        this(containerId, playerInventory, ContainerLevelAccess.NULL, new ItemStackHandler(DimensionalQuarryEntity.INVENTORY_SIZE), new SimpleContainerData(DimensionalQuarryEntity.QUARRY_DATA_SIZE));
     }
 
     // Server menu constructor
-    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler dataInventory, ContainerData  energyData) { // add energy storage using containerdata
+    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler dataInventory, ContainerData quarryData) { // add energy storage using containerdata
         super(ModContainers.DIMENSIONAL_QUARRY_CONTAINER.get(), containerId);
         this.access = access;
         this.inventory = dataInventory;
-        this.energyData = energyData;
+        this.quarryData = quarryData;
 
-        checkContainerDataCount(this.energyData, DimensionalQuarryEntity.ENERGY_DATA_SIZE);
+        checkContainerDataCount(this.quarryData, DimensionalQuarryEntity.QUARRY_DATA_SIZE);
 
         if (dataInventory.getSlots() < DimensionalQuarryEntity.INVENTORY_SIZE) {
             throw new IllegalArgumentException("Container size " + dataInventory.getSlots() + " is smaller than expected " + DimensionalQuarryEntity.INVENTORY_SIZE);
@@ -51,7 +57,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, hotHarSlot, 8 + 18 * hotHarSlot, 157));
         }
 
-        this.addDataSlots(energyData);
+        this.addDataSlots(quarryData);
     }
 
     @Override
@@ -101,19 +107,37 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
         return AbstractContainerMenu.stillValid(this.access, player, ModBlocks.DIMENSIONAL_QUARRY.get());
     }
 
+    public void toggleRunning() {
+        BlockPos pos = new BlockPos(getPosX(), getPosY(), getPosZ());
+        LOGGER.debug("Sending to pos: " + pos);
+        PacketDistributor.sendToServer(new GUIButtonPayload(GUIButtonPayload.ButtonType.dimensionalQuarryStartToggle, pos));
+    }
+
     public int getEnergyStored() {
-        return this.energyData.get(0);
+        return this.quarryData.get(0);
     }
 
     public int getCurrentYLevel() {
-        return this.energyData.get(1);
+        return this.quarryData.get(1);
     }
 
     public int getCooldown() {
-        return this.energyData.get(2);
+        return this.quarryData.get(2);
     }
 
     public int getRunning() {
-        return this.energyData.get(3);
+        return this.quarryData.get(3);
+    }
+
+    public int getPosX() {
+        return this.quarryData.get(4);
+    }
+
+    public int getPosY() {
+        return this.quarryData.get(5);
+    }
+
+    public int getPosZ() {
+        return this.quarryData.get(6);
     }
 }

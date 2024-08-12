@@ -9,6 +9,7 @@ import com.ccteam.cursedcomponents.gui.screens.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
+import com.ccteam.cursedcomponents.network.PacketHandler;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -68,6 +69,9 @@ public class CursedComponentsMod {
 
         // Register Screens
         modEventBus.addListener(ModScreens::registerScreens);
+
+        // Register packet handler for networking
+        modEventBus.addListener(PacketHandler::register);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

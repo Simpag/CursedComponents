@@ -30,26 +30,15 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static final int INVENTORY_SIZE = 9;
     public static final int ENERGY_DATA_SIZE = 4;
 
-    //private final EnergyStorage energyStorage = new EnergyStorage(ENERGY_CAPACITY, ENERGY_RECEIVE, ENERGY_RECEIVE, 0); // TODO might need to add a function so I can set max extract to 0
-    /*private final ItemStackHandler inventory = new ItemStackHandler(INVENTORY_SIZE) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            setChanged();
-        }
-    }; // Probably need to override onLoad()
-    */
-
     private int currentYLevel;
     private int cooldown;
-    private int energyBuffer;
-    private boolean done;
+    private boolean running;
 
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
-        this.done = false;
+        this.running = false;
         this.currentYLevel = pos.getY() - 1;
         this.cooldown = 0;
-        this.energyBuffer = 0;
     }
 
     public EnergyStorage getEnergyStorage() {
@@ -88,11 +77,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public int getInventorySlotsUsed() {
         int cnt = 0;
-        /*for (int i = 0; i < this.inventory.getSlots(); i++) {
-            if (!this.inventory.getStackInSlot(i).isEmpty()) {
-                cnt++;
-            }
-        }*/
         ItemStackHandler inv = this.getInventory();
         for (int i = 0; i < inv.getSlots(); i++) {
             if (!inv.getStackInSlot(i).isEmpty()) {
@@ -104,11 +88,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public String getInventoryString() {
         StringBuilder ret = new StringBuilder();
-        /*for (int i = 0; i < this.inventory.getSlots(); i++) {
-            if (!this.inventory.getStackInSlot(i).isEmpty()) {
-                ret.append(this.inventory.getStackInSlot(i).toString()).append(", ");
-            }
-        }*/
         ItemStackHandler inv = this.getInventory();
         for (int i = 0; i < inv.getSlots(); i++) {
             if (!inv.getStackInSlot(i).isEmpty()) {
@@ -123,8 +102,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentYLevel;
     }
 
+    public void decrementCurrentYLevel() {
+        this.currentYLevel--;
+        setChanged();
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide && entity.running) {
             doMining(level, pos, state, entity);
         }
     }
@@ -132,12 +116,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static void doMining(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
         EnergyStorage energyStorage = entity.getEnergyStorage();
 
-        if (entity.done || energyStorage.getEnergyStored() < ENERGY_CONSUMPTION_PER_TICK) {
+        if (energyStorage.getEnergyStored() < ENERGY_CONSUMPTION_PER_TICK) {
+            LOGGER.debug("Not enough energy to mine!");
             return;
         }
 
         // Draw energy every tick
-        entity.energyBuffer += energyStorage.extractEnergy(ENERGY_CONSUMPTION_PER_TICK, false);
+        energyStorage.extractEnergy(ENERGY_CONSUMPTION_PER_TICK, false);
 
         entity.cooldown++;
         if (entity.cooldown <= TICKS_PER_BLOCK) {
@@ -145,59 +130,45 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
         entity.cooldown = 0;
 
-        if (entity.energyBuffer >= ENERGY_CONSUMPTION_PER_TICK * TICKS_PER_BLOCK) {
-            if (entity.currentYLevel > level.getMinBuildHeight()) {
-                BlockPos blockToMinePos = new BlockPos(pos.getX(), entity.currentYLevel, pos.getZ());
-                BlockState blockToMineState = level.getBlockState(blockToMinePos);
-                Block block = blockToMineState.getBlock();
+        if (entity.getCurrentYLevel() > level.getMinBuildHeight()) {
+            BlockPos blockToMinePos = new BlockPos(pos.getX(), entity.getCurrentYLevel(), pos.getZ());
+            BlockState blockToMineState = level.getBlockState(blockToMinePos);
+            Block block = blockToMineState.getBlock();
 
-                if (block != Blocks.AIR && blockToMineState.getDestroySpeed(level, blockToMinePos) >= 0) {
-                    // Try to add the mined block to the inventory
-                    ItemStack itemStack = new ItemStack(block);
+            if (block != Blocks.AIR && blockToMineState.getDestroySpeed(level, blockToMinePos) >= 0) {
+                // Try to add the mined block to the inventory
+                ItemStack itemStack = new ItemStack(block);
 
-                    itemStack = ItemHandlerHelper.insertItemStacked(entity.getInventory(), itemStack, false);
+                itemStack = ItemHandlerHelper.insertItemStacked(entity.getInventory(), itemStack, false);
 
 
-                    // If the inventory is full, stop the mining process
-                    if (!itemStack.isEmpty()) {
-                        return;
-                    }
-
-                    // Set the block to air (break the block)
-                    level.setBlock(blockToMinePos, Blocks.AIR.defaultBlockState(), 3);
-
-                    // Consume energy
-                    //energyStorage.extractEnergy(ENERGY_CONSUMPTION_PER_BLOCK, false);
-                    entity.energyBuffer -= ENERGY_CONSUMPTION_PER_TICK * TICKS_PER_BLOCK;
+                // If the inventory is full, stop the mining process
+                if (!itemStack.isEmpty()) {
+                    return;
                 }
 
-                entity.currentYLevel--;
-            } else {
-                entity.done = true;
+                // Set the block to air (break the block)
+                level.setBlock(blockToMinePos, Blocks.AIR.defaultBlockState(), 3);
             }
+
+            entity.decrementCurrentYLevel();
         }
-        //setChanged(level, pos, state);
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("cursedcomponents:current_y_level", this.currentYLevel);
-        tag.putInt("cursedcomponents:energy_buffer", this.energyBuffer);
-        tag.putBoolean("cursedcomponents:done", this.done);
+        tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
+        tag.putBoolean("cursedcomponents:dimensional_quarry_running", this.running);
     }
 
     @Override
     protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(tag, registries);
-        this.done = tag.getBoolean("cursedcomponents:done");
+        this.running = tag.getBoolean("cursedcomponents:dimensional_quarry_running");
 
-        if (tag.contains("cursedcomponents:current_y_level")) {
-            this.currentYLevel = tag.getInt("cursedcomponents:current_y_level");
-        }
-
-        if (tag.contains("cursedcomponents:energy_buffer")) {
-            this.energyBuffer = tag.getInt("cursedcomponents:energy_buffer");
+        if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
+            this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
         }
     }
 
@@ -212,7 +183,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 case 2:
                     return cooldown;
                 case 3:
-                    return done ? 1 : 0;
+                    return running ? 1 : 0;
                 default:
                     return 0;
             }
@@ -220,8 +191,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         @Override
         public void set(int index, int value) {
-            // Not needed as the quarry data is only read-only for the GUI
+            return;
         }
+
 
         @Override
         public int getCount() {

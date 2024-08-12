@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DimensionalQuarryContainer extends AbstractContainerMenu {
     private final ContainerLevelAccess access;
@@ -112,7 +113,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
         return this.energyData.get(2);
     }
 
-    public int getDone() {
+    public int getRunning() {
         return this.energyData.get(3);
     }
 }

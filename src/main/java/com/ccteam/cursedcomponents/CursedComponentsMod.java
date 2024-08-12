@@ -4,6 +4,7 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
+import com.ccteam.cursedcomponents.structures.ModStructures;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -35,7 +36,6 @@ public class CursedComponentsMod {
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public CursedComponentsMod(IEventBus modEventBus, ModContainer modContainer) {
-
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
@@ -43,6 +43,7 @@ public class CursedComponentsMod {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModStructures.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.

@@ -7,6 +7,7 @@ import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -39,9 +40,11 @@ public class LuckyBlock extends Block {
         Random random = new Random();
 
         float r = random.nextFloat();
-        if (r < 0.2)
+        if (r < 1/100.0)
+            carpetBomb(world, player, pos);
+        if (r < 20/100.0)
             dropUnlucky(world, player, pos);
-        else if (r < 0.8)
+        else if (r < 80/100.0)
             dropNormal(world, pos);
         else
             dropVeryLucky(world, pos);
@@ -88,8 +91,22 @@ public class LuckyBlock extends Block {
                 }
             }
         }
+        int dropHeight = 40;
+        for (int y = 1; y < dropHeight; y++) {
+            world.setBlock(playerOnPos.above(y), Blocks.AIR.defaultBlockState(), 3);
+        }
+        world.setBlock(playerOnPos.above(dropHeight), Blocks.ANVIL.defaultBlockState(), 3);
+    }
 
-        world.setBlock(playerOnPos.above(40), Blocks.ANVIL.defaultBlockState(), 3);
+    private void carpetBomb(Level world, Player player, BlockPos pos) {
+        for (int x = -5; x <= 5; x++) {
+            for (int z = -5; z <= 5; z++) {
+                BlockPos newPos = pos.offset(x, 20, z);
+                PrimedTnt tnt = new PrimedTnt(world, newPos.getX(), newPos.getY(), newPos.getZ(), null);
+                tnt.setFuse(60);
+                world.addFreshEntity(tnt);
+            }
+        }
     }
 
     private void spawnSkeletons(Level world, BlockPos pos) {

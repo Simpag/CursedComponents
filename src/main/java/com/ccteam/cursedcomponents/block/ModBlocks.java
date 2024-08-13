@@ -22,7 +22,7 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CursedComponentsMod.MOD_ID);
 
     public static final DeferredBlock<Block> LUCKY_BLOCK = registerBlock("lucky_block",
-            () -> new LuckyBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(2f)));
+            () -> new LuckyBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(1f)));
 
     /*public static final DeferredBlock<Block> BLOCK_1 = registerBlock(
             "block_1",

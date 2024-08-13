@@ -1,6 +1,6 @@
 {
 	"credit": "Made with Blockbench",
-	"render_type": "minecraft_translucent",
+	"render_type": "minecraft_cutout",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "cursedcomponents:block/lucky_block",

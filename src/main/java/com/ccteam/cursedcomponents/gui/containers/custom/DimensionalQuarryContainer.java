@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.slf4j.Logger;
@@ -124,7 +123,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
     public void setRunning(boolean state) {
         BlockPos pos = new BlockPos(getPosX(), getPosY(), getPosZ());
-        PacketDistributor.sendToServer(new GUIButtonPayload(GUIButtonPayload.ButtonType.dimensionalQuarryStartToggle, pos, state));
+        PacketDistributor.sendToServer(new GUIButtonPayload(GUIButtonPayload.ButtonType.dimensionalQuarryRunningState, pos, state));
     }
 
     public List<DimensionalQuarryEntity.MiningRequirement> getMiningRequirements() {

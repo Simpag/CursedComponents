@@ -1,14 +1,26 @@
 package com.ccteam.cursedcomponents.block.entity.custom;
 
+import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
+import com.ccteam.cursedcomponents.block.attachments.custom.DimensionalQuarryItemStackhandler;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
+import com.ccteam.cursedcomponents.item.ModItems;
+import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryDimensionPayload;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -16,11 +28,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.util.FriendlyByteBufUtil;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -41,6 +56,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private int currentYLevel;
     private int cooldown;
     private boolean running;
+    private float miniChunkRotation;
+    private final float miniChunkRotationSpeed = 0.5f;
 
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
@@ -56,16 +73,35 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public EnergyStorage getEnergyStorage(boolean changed) {
         if (changed)
             setChanged();
+
         return this.getData(ModBlockAttachments.DIMENSIONAL_QUARRY_ENERGY);
     }
 
-    public ItemStackHandler getInventory() {
+    public DimensionalQuarryItemStackhandler getInventory() {
         return getInventory(true);
     }
 
-    public ItemStackHandler getInventory(boolean changed) {
-        setChanged();
+    public DimensionalQuarryItemStackhandler getInventory(boolean changed) {
+        if (changed)
+            setChanged();
         return this.getData(ModBlockAttachments.DIMENSIONAL_QUARRY_INV);
+    }
+
+    public ItemStack getPickaxeSlot() {
+        return this.getInventory(false).getStackInSlot(0);
+    }
+
+    public ItemStack getMiniChunkInSlot() {
+        return this.getInventory(false).getStackInSlot(1);
+    }
+
+    public void setMiniChunkSlot(ItemStack item) {
+        setChanged();
+        this.getInventory().setStackInSlot(1, item);
+    }
+
+    public boolean getRunning() {
+        return this.running;
     }
 
     public ContainerData getQuarryData() {
@@ -73,12 +109,12 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public NonNullList<ItemStack> getItemStacks() {
-        ItemStackHandler inv = getInventory(true);
+        ItemStackHandler inv = getInventory(false);
         int size = inv.getSlots();
 
         NonNullList<ItemStack> stacks = NonNullList.withSize(size, ItemStack.EMPTY);
         for (int i = 0; i < size; i++) {
-            stacks.set(i, inv.getStackInSlot(i));
+            stacks.set(i, inv.getStackInSlot(i).copy());
         }
 
         return stacks;
@@ -111,6 +147,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentYLevel;
     }
 
+    public float getMiniChunkRotation() {
+        miniChunkRotation = (miniChunkRotation + miniChunkRotationSpeed) % 360;
+        return miniChunkRotation;
+    }
+
     public static List<MiningRequirement> checkMiningRequirements(IItemHandler inventory, int energyStored) {
         List<MiningRequirement> ret = new ArrayList<>();
 
@@ -118,10 +159,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
             ret.add(MiningRequirement.notEnoughEnergy);
 
         boolean hasPickaxe = inventory.getStackInSlot(0).is(Items.NETHERITE_PICKAXE);
-        boolean hasDimension = false; // TODO CHECK FOR DIMENSIONAL CARD
+        boolean hasDimension = inventory.getStackInSlot(1).is(ModBlocks.MINI_CHUNK_OVERWORLD.asItem());
 
         if (!hasPickaxe)
             ret.add(MiningRequirement.noPickaxe);
+
+        if (!hasDimension)
+            ret.add(MiningRequirement.noDimension);
 
         if (ret.size() == 0)
             ret.add(MiningRequirement.ok);
@@ -197,10 +241,29 @@ public class DimensionalQuarryEntity extends BlockEntity {
     protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(tag, registries);
         this.running = tag.getBoolean("cursedcomponents:dimensional_quarry_running");
-
         if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
             this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
         }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+
+        if (!this.level.isClientSide) {
+            this.getInventory().onChangedCallback = (item) -> PacketDistributor.sendToAllPlayers(new DimensionalQuarryDimensionPayload(item, this.getBlockPos()));
+        }
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
+        return saveWithoutMetadata(pRegistries);
     }
 
     private final ContainerData quarryData = new ContainerData() {

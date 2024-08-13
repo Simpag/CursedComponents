@@ -21,7 +21,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         // Custom stairs
         // stairsBlock((StairBlock) ModBlocks.BLACK_OPAL_STAIRS.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
         // blockItem(ModBlocks.BLACK_OPAL_STAIRS);
-        
+
         // Custom slabs
         // slabBlock((SlabBlock) ModBlocks.BLACK_OPAL_SLAB.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
         // blockItem(ModBlocks.BLACK_OPAL_SLAB);
@@ -38,8 +38,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
         // fenceGateBlock((FenceGateBlock) ModBlocks.BLACK_OPAL_FENCE_GATE.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
         // blockItem(ModBlocks.BLACK_OPAL_FENCE_GATE);
         // wallBlock((WallBlock) ModBlocks.BLACK_OPAL_WALL.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
-
-        blockWithItem(ModBlocks.DIMENSIONAL_QUARRY);
     }
 
     private void blockWithItem(DeferredBlock<Block> deferredBlock) {

@@ -2,12 +2,14 @@ package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
+import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -20,8 +22,13 @@ public class ModBlocks {
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
             "dimensional_quarry",
             () -> new DimensionalQuarryBlock(
-                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
+                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().noOcclusion().pushReaction(PushReaction.IGNORE)
             )
+    );
+
+    public static final DeferredBlock<Block> MINI_CHUNK_OVERWORLD = registerBlock(
+            "mini_chunk_overworld",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.overworld)
     );
 
 

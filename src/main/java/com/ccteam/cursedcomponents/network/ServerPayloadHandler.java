@@ -11,10 +11,12 @@ public class ServerPayloadHandler {
     public static void handleGUIButtonPayload(final GUIButtonPayload data, final IPayloadContext context) {
         // Do something with the data, on the network thread
 
+        // Do things with gui button payloads
         switch (data.buttonType()) {
-            case GUIButtonPayload.ButtonType.dimensionalQuarryStartToggle:
+            case GUIButtonPayload.ButtonType.dimensionalQuarryRunningState:
                 handleDimensionalQuarryPayload(data, context);
                 break;
+            // Can add another button for another block here
             default:
                 break;
         }

@@ -33,7 +33,7 @@ public record GUIButtonPayload(ButtonType buttonType, BlockPos pos, boolean stat
     }
 
     public enum ButtonType {
-        dimensionalQuarryStartToggle;
+        dimensionalQuarryRunningState;
 
         public static final IntFunction<ButtonType> BY_ID = ByIdMap.continuous(ButtonType::ordinal, values(), ByIdMap.OutOfBoundsStrategy.WRAP);
         public static final StreamCodec<ByteBuf, ButtonType> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, ButtonType::ordinal);

@@ -45,6 +45,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         // this.add(ModBlocks.BLACK_OPAL_SLAB.get(), block -> createSlabItemTable(ModBlocks.BLACK_OPAL_SLAB.get()));
 
         dropSelf(ModBlocks.DIMENSIONAL_QUARRY.get());
+        dropSelf(ModBlocks.MINI_CHUNK_OVERWORLD.get());
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block block, Item item, float minDrops, float maxDrops) {

@@ -4,12 +4,14 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
 import com.ccteam.cursedcomponents.block.capabilities.ModBlockCapabilities;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
+import com.ccteam.cursedcomponents.block.entity.renderer.DimensionalQuarryEntityRenderer;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.screens.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import com.ccteam.cursedcomponents.network.PacketHandler;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -107,8 +109,13 @@ public class CursedComponentsMod {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            // LOGGER.info("HELLO FROM CLIENT SETUP");
+            // LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+
+        @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), DimensionalQuarryEntityRenderer::new);
         }
     }
 }

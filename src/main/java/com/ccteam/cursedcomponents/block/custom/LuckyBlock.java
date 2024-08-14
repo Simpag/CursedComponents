@@ -1,9 +1,10 @@
 package com.ccteam.cursedcomponents.block.custom;
 
+import com.ccteam.cursedcomponents.entity.ModEntities;
+import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Position;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -70,13 +69,15 @@ public class LuckyBlock extends Block {
     }
 
     private void dropVeryLucky(Level world, BlockPos pos) {
-        int r = new Random().nextInt() % 2;
+        int r = new Random().nextInt() % 3;
         if (r == 0)
             constructBlockTower(world, pos);
         else if (r == 1)
             spawnLuckyVillager(world, pos);
-        else
+        else if (r == 2)
             hurlBottlesOfEnchanting(world, pos);
+        else
+            spawnLuckyParrot(world, pos);
     }
 
     private void spawnAnvilTrap(Level world, Player player, BlockPos pos) {
@@ -157,9 +158,14 @@ public class LuckyBlock extends Block {
         world.setBlock(pos.above(height + 1), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
     }
 
+    private void spawnLuckyParrot(Level world, BlockPos pos) {
+        LuckyParrot luckyParrot = ModEntities.LUCKY_PARROT.get().create(world);
+        luckyParrot.setPos(pos.getX(), pos.getY(), pos.getZ());
+        world.addFreshEntity(luckyParrot);
+    }
+
     private void spawnLuckyVillager(Level world, BlockPos pos) {
         Villager luckyVillager = CustomVillagerManager.createLuckyVillager(world);
-
         luckyVillager.setPos(pos.getX(), pos.getY(), pos.getZ());
         world.addFreshEntity(luckyVillager);
     }

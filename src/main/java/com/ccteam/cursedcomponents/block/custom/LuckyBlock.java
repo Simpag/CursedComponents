@@ -42,20 +42,20 @@ public class LuckyBlock extends Block {
 
         float r = random.nextFloat();
         if (r < 1/100.0)
-            carpetBomb(world, player, pos);
+            carpetBomb(world, player);
         if (r < 20/100.0)
             dropUnlucky(world, player, pos);
         else if (r < 80/100.0)
             dropNormal(world, pos);
         else
-            dropVeryLucky(world, pos);
+            dropVeryLucky(world, player, pos);
     }
 
     private void dropUnlucky(Level world, Player player, BlockPos pos) {
         if (new Random().nextInt() % 2 == 0)
             spawnSkeletons(world, pos);
         else
-            spawnAnvilTrap(world, player, pos);
+            spawnAnvilTrap(world, player);
     }
 
     private void dropNormal(Level world, BlockPos pos) {
@@ -68,10 +68,10 @@ public class LuckyBlock extends Block {
             dropEnderChest(world, pos);
     }
 
-    private void dropVeryLucky(Level world, BlockPos pos) {
+    private void dropVeryLucky(Level world, Player player, BlockPos pos) {
         int r = new Random().nextInt() % 3;
         if (r == 0)
-            constructBlockTower(world, pos);
+            constructBlockTower(world, player, pos);
         else if (r == 1)
             spawnLuckyVillager(world, pos);
         else if (r == 2)
@@ -80,7 +80,7 @@ public class LuckyBlock extends Block {
             spawnLuckyParrot(world, pos);
     }
 
-    private void spawnAnvilTrap(Level world, Player player, BlockPos pos) {
+    private void spawnAnvilTrap(Level world, Player player) {
         BlockPos playerOnPos = player.getOnPos();
 
         for (int x = -1; x <= 1; x++) {
@@ -101,10 +101,10 @@ public class LuckyBlock extends Block {
         world.setBlock(playerOnPos.above(dropHeight), Blocks.ANVIL.defaultBlockState(), 3);
     }
 
-    private void carpetBomb(Level world, Player player, BlockPos pos) {
+    private void carpetBomb(Level world, Player player) {
         for (int x = -5; x <= 5; x++) {
             for (int z = -5; z <= 5; z++) {
-                BlockPos newPos = pos.offset(x, 20, z);
+                BlockPos newPos = player.getOnPos().offset(x, 20, z);
                 PrimedTnt tnt = new PrimedTnt(world, newPos.getX(), newPos.getY(), newPos.getZ(), null);
                 tnt.setFuse(60);
                 world.addFreshEntity(tnt);
@@ -149,9 +149,11 @@ public class LuckyBlock extends Block {
         world.setBlock(pos, Blocks.ENDER_CHEST.defaultBlockState(), 3);
     }
 
-    private void constructBlockTower(Level world, BlockPos pos) {
+    private void constructBlockTower(Level world, Player player, BlockPos pos) {
         int height = 30;
-        for (int i = 0; i < height; i++) {
+        int startOffset = (player.getOnPos() == pos) ? 2 : 0;
+
+        for (int i = startOffset; i < height; i++) {
             BlockPos newPos = pos.above(i + 1);
             world.setBlock(newPos, Blocks.STONE.defaultBlockState(), 3);
         }
@@ -197,7 +199,7 @@ public class LuckyBlock extends Block {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, java.util.List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(Component.literal("A block of luck"));
+        tooltip.add(Component.literal("You snus you loose"));
     }
 
     @Override

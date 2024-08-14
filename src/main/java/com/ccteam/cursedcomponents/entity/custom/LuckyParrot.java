@@ -186,10 +186,15 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
 
         if (!this.level().isClientSide && this.getOwner() != null) {
             Player player = (Player) this.getOwner();
-            if (player != null && !player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+            if (player != null && getOnShoulder(player) && !player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 10, false, true));
             }
         }
+    }
+
+    private boolean getOnShoulder(Player player) {
+        return player.getShoulderEntityLeft().getString("id").equals(this.getEncodeId())
+                || player.getShoulderEntityRight().getString("id").equals(this.getEncodeId());
     }
 
     @Override

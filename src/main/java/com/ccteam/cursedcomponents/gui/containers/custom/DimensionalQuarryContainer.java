@@ -4,7 +4,7 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
-import com.ccteam.cursedcomponents.util.DimensionalQuarryItemStackHandler;
+import com.ccteam.cursedcomponents.ItemStackHandlers.DimensionalQuarryItemStackHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;

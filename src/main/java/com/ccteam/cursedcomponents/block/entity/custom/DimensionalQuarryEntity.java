@@ -2,7 +2,7 @@ package com.ccteam.cursedcomponents.block.entity.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.util.DimensionalQuarryItemStackHandler;
+import com.ccteam.cursedcomponents.ItemStackHandlers.DimensionalQuarryItemStackHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -22,8 +22,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;

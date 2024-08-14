@@ -5,6 +5,7 @@ import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
 import com.ccteam.cursedcomponents.block.capabilities.ModBlockCapabilities;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.block.entity.renderer.DimensionalQuarryEntityRenderer;
+import com.ccteam.cursedcomponents.codecs.ModCodecs;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.screens.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
@@ -74,6 +75,9 @@ public class CursedComponentsMod {
 
         // Register packet handler for networking
         modEventBus.addListener(PacketHandler::register);
+
+        // Register custom CODECS
+        ModCodecs.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

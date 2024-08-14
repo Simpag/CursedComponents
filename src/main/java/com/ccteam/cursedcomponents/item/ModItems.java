@@ -2,20 +2,19 @@ package com.ccteam.cursedcomponents.item;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import com.ccteam.cursedcomponents.item.custom.Warden_Glue;
+import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.List;
-
 public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CursedComponentsMod.MOD_ID);
 
-    // public static final DeferredItem<Item> ITEM_1 = ITEMS.registerSimpleItem("item_1");
+    public static final DeferredItem<Item> WARDEN_GLUE = ITEMS.registerItem("warden_glue", Warden_Glue::new, new Item.Properties().rarity(Rarity.RARE));
+
+    public static final DeferredItem<SwordItem> DEBUG_STICK = ITEMS.register("debug_stick",
+            () -> new SwordItem(Tiers.NETHERITE, new Item.Properties().attributes(SwordItem.createAttributes(Tiers.NETHERITE, 123456789, -1f))));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

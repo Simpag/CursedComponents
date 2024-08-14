@@ -5,10 +5,7 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -22,7 +19,7 @@ import java.util.function.Supplier;
 public class ModCreativeModeTabs {
     // Add your items that should appear in the creative tab
     private static final List<DeferredItem<Item>> MOD_ITEMS = new ArrayList<>() {{
-        // add(ModItems.ITEM1);
+        add(ModItems.WARDEN_GLUE);
     }};
 
     // Add your blocks that should appear in the creative tab

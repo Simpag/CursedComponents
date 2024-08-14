@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.util;
+package com.ccteam.cursedcomponents.ItemStackHandlers;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import net.minecraft.world.item.ItemStack;
@@ -22,5 +22,13 @@ public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
             default:
                 return true;
         }
+    }
+
+    @Override
+    public int getSlotLimit(int slot) {
+        if (slot == 1)
+            return 1;
+
+        return super.getSlotLimit(slot);
     }
 }

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DimensionalQuarryScreen extends AbstractContainerScreen<DimensionalQuarryContainer> {
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");

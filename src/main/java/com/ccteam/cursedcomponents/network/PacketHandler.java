@@ -1,6 +1,5 @@
 package com.ccteam.cursedcomponents.network;
 
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryDimensionPayload;
 import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -15,11 +14,6 @@ public class PacketHandler {
                 GUIButtonPayload.TYPE,
                 GUIButtonPayload.STREAM_CODEC,
                 ServerPayloadHandler::handleGUIButtonPayload
-        );
-        registrar.playToClient(
-                DimensionalQuarryDimensionPayload.TYPE,
-                DimensionalQuarryDimensionPayload.STREAM_CODEC,
-                ClientPayloadHandler::handleDimensionalQuarryDimensionPayload
         );
     }
 }

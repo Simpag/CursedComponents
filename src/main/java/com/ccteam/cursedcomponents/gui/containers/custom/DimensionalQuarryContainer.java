@@ -1,10 +1,10 @@
 package com.ccteam.cursedcomponents.gui.containers.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.block.attachments.custom.DimensionalQuarryItemStackhandler;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
+import com.ccteam.cursedcomponents.util.DimensionalQuarryItemStackHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,31 +27,31 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
     // Client menu constructor
     public DimensionalQuarryContainer(int containerId, Inventory playerInventory) { // optional FriendlyByteBuf parameter if reading data from server
-        this(containerId, playerInventory, ContainerLevelAccess.NULL, new DimensionalQuarryItemStackhandler(DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE), new SimpleContainerData(DimensionalQuarryEntity.QUARRY_DATA_SIZE));
+        this(containerId, playerInventory, ContainerLevelAccess.NULL, new DimensionalQuarryItemStackHandler(DimensionalQuarryEntity.INVENTORY_SIZE), new SimpleContainerData(DimensionalQuarryEntity.QUARRY_DATA_SIZE));
     }
 
     // Server menu constructor
-    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler dataInventory, ContainerData quarryData) {
+    public DimensionalQuarryContainer(int containerId, Inventory playerInventory, ContainerLevelAccess access, IItemHandler inventory, ContainerData quarryData) {
         super(ModContainers.DIMENSIONAL_QUARRY_CONTAINER.get(), containerId);
         this.access = access;
-        this.inventory = dataInventory;
+        this.inventory = inventory;
         this.quarryData = quarryData;
 
         checkContainerDataCount(this.quarryData, DimensionalQuarryEntity.QUARRY_DATA_SIZE);
 
-        if (dataInventory.getSlots() < DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE) {
-            throw new IllegalArgumentException("Container size " + dataInventory.getSlots() + " is smaller than expected " + DimensionalQuarryEntity.ITEM_STACK_HANDLER_SIZE);
+        if (inventory.getSlots() < DimensionalQuarryEntity.INVENTORY_SIZE) {
+            throw new IllegalArgumentException("Container size " + inventory.getSlots() + " is smaller than expected " + DimensionalQuarryEntity.INVENTORY_SIZE);
         }
 
         // Add quarry upgrade slots
         for (int i = 0; i < 3; i++) {
-            this.addSlot(new SlotItemHandler(dataInventory, i, 66, 19 + i * 20));
+            this.addSlot(new SlotItemHandler(inventory, i, 66, 19 + i * 20));
         }
 
         // Add quarry inventory item buffer
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                this.addSlot(new SlotItemHandler(dataInventory, 3 + col + 3 * row, 8 + 18 * col, 21 + row * 18));
+                this.addSlot(new SlotItemHandler(inventory, 3 + col + 3 * row, 8 + 18 * col, 21 + row * 18));
             }
         }
 
@@ -84,12 +84,13 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
             Add logic for upgrades so that items cant be moved into that slot except for specials
             See: https://docs.neoforged.net/docs/gui/menus#:~:text=if%20(quickMovedSlotIndex%20%3D%3D%200)%20%7B
              */
-            if (index < this.inventory.getSlots()) { // From block to player
-                if (!this.moveItemStackTo(rawStack, this.inventory.getSlots(), this.slots.size(), false)) {
+            int total_quarry_slots = this.inventory.getSlots();
+            if (index < total_quarry_slots) { // From block to player
+                if (!this.moveItemStackTo(rawStack, total_quarry_slots, this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index >= this.inventory.getSlots() && index < this.slots.size()) { // From player to block
-                if (!this.moveItemStackTo(rawStack, 0, this.inventory.getSlots(), false)) {
+            } else if (index < this.slots.size()) { // From player to block
+                if (!this.moveItemStackTo(rawStack, 0, total_quarry_slots, false)) {
                     return ItemStack.EMPTY;
                 }
             }
@@ -127,7 +128,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     public List<DimensionalQuarryEntity.MiningRequirement> getMiningRequirements() {
-        return DimensionalQuarryEntity.checkMiningRequirements(this.inventory, this.getEnergyStored());
+        return DimensionalQuarryEntity.checkMiningRequirements(this.getEnergyStored(), this.inventory, this.getInventoryFull() == 1);
     }
 
     public int getEnergyStored() {
@@ -156,5 +157,9 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
     public int getPosZ() {
         return this.quarryData.get(6);
+    }
+
+    public int getInventoryFull() {
+        return this.quarryData.get(7);
     }
 }

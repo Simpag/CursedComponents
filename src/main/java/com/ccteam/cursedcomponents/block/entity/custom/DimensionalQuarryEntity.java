@@ -1,26 +1,18 @@
 package com.ccteam.cursedcomponents.block.entity.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
-import com.ccteam.cursedcomponents.block.attachments.custom.DimensionalQuarryItemStackhandler;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.item.ModItems;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryDimensionPayload;
+import com.ccteam.cursedcomponents.util.DimensionalQuarryItemStackHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -28,12 +20,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.util.FriendlyByteBufUtil;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,58 +35,46 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public static final int TICKS_PER_BLOCK = 10;
     public static final int ENERGY_CAPACITY = 10000;
-    public static final int ENERGY_RECEIVE = 100_000;
     public static final int ENERGY_CONSUMPTION_PER_TICK = 50;
-    public static final int INVENTORY_SIZE = 9; // TODO CHANGE THIS REFERENCE TO ONE BELOW
-    public static final int UPGRADES_SIZE = 3;
-    public static final int ITEM_STACK_HANDLER_SIZE = INVENTORY_SIZE + UPGRADES_SIZE;
-    public static final int QUARRY_DATA_SIZE = 7;
+    public static final int INVENTORY_SIZE = 9 + 3; // 9 storage slots + 3 upgrade
+    public static final int QUARRY_DATA_SIZE = 8;
 
     private int currentYLevel;
     private int cooldown;
     private boolean running;
+    private boolean inventoryFull;
     private float miniChunkRotation;
     private final float miniChunkRotationSpeed = 0.5f;
+
+    private final DimensionalQuarryItemStackHandler inventory = new DimensionalQuarryItemStackHandler(INVENTORY_SIZE) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            // When anything in the inventory changes
+            if (slot < 3 && !level.isClientSide)
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
+
+            if (slot >= 3 && this.getStackInSlot(slot).isEmpty())
+                inventoryFull = false;
+
+            setChanged();
+        }
+    };
+    private final EnergyStorage energy = new EnergyStorage(ENERGY_CAPACITY);
 
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
         this.running = false;
+        this.inventoryFull = false;
         this.currentYLevel = pos.getY() - 1;
         this.cooldown = 0;
     }
 
-    public EnergyStorage getEnergyStorage() {
-        return getEnergyStorage(true);
-    }
-
-    public EnergyStorage getEnergyStorage(boolean changed) {
-        if (changed)
-            setChanged();
-
-        return this.getData(ModBlockAttachments.DIMENSIONAL_QUARRY_ENERGY);
-    }
-
-    public DimensionalQuarryItemStackhandler getInventory() {
-        return getInventory(true);
-    }
-
-    public DimensionalQuarryItemStackhandler getInventory(boolean changed) {
-        if (changed)
-            setChanged();
-        return this.getData(ModBlockAttachments.DIMENSIONAL_QUARRY_INV);
-    }
-
     public ItemStack getPickaxeSlot() {
-        return this.getInventory(false).getStackInSlot(0);
+        return this.inventory.getStackInSlot(0);
     }
 
     public ItemStack getMiniChunkInSlot() {
-        return this.getInventory(false).getStackInSlot(1);
-    }
-
-    public void setMiniChunkSlot(ItemStack item) {
-        setChanged();
-        this.getInventory().setStackInSlot(1, item);
+        return this.inventory.getStackInSlot(1);
     }
 
     public boolean getRunning() {
@@ -108,13 +85,14 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.quarryData;
     }
 
-    public NonNullList<ItemStack> getItemStacks() {
-        ItemStackHandler inv = getInventory(false);
-        int size = inv.getSlots();
+    public IItemHandler getInventory() {
+        return this.inventory;
+    }
 
-        NonNullList<ItemStack> stacks = NonNullList.withSize(size, ItemStack.EMPTY);
-        for (int i = 0; i < size; i++) {
-            stacks.set(i, inv.getStackInSlot(i).copy());
+    public NonNullList<ItemStack> getAllStacks() {
+        NonNullList<ItemStack> stacks = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
+        for (int i = 0; i < getInventory().getSlots(); i++) {
+            stacks.set(i, getInventory().getStackInSlot(i));
         }
 
         return stacks;
@@ -122,9 +100,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public int getInventorySlotsUsed() {
         int cnt = 0;
-        ItemStackHandler inv = this.getInventory(false);
-        for (int i = 0; i < inv.getSlots(); i++) {
-            if (!inv.getStackInSlot(i).isEmpty()) {
+        for (int i = 0; i < getInventory().getSlots(); i++) {
+            if (!getInventory().getStackInSlot(i).isEmpty()) {
                 cnt++;
             }
         }
@@ -133,10 +110,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public String getInventoryString() {
         StringBuilder ret = new StringBuilder();
-        ItemStackHandler inv = this.getInventory(false);
-        for (int i = 0; i < inv.getSlots(); i++) {
-            if (!inv.getStackInSlot(i).isEmpty()) {
-                ret.append(inv.getStackInSlot(i).toString()).append(", ");
+
+        for (int i = 0; i < getInventory().getSlots(); i++) {
+            if (!getInventory().getStackInSlot(i).isEmpty()) {
+                ret.append(getInventory().getStackInSlot(i).toString()).append(", ");
             }
         }
 
@@ -148,18 +125,27 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public float getMiniChunkRotation() {
+        // maybe change this to use server time
         miniChunkRotation = (miniChunkRotation + miniChunkRotationSpeed) % 360;
         return miniChunkRotation;
     }
 
-    public static List<MiningRequirement> checkMiningRequirements(IItemHandler inventory, int energyStored) {
+    public EnergyStorage getEnergy() {
+        return energy;
+    }
+
+    public int getEnergyStored() {
+        return energy.getEnergyStored();
+    }
+
+    public static List<MiningRequirement> checkMiningRequirements(int energyStore, IItemHandler inv, boolean inventoryFull) {
         List<MiningRequirement> ret = new ArrayList<>();
 
-        if (energyStored < ENERGY_CONSUMPTION_PER_TICK)
+        if (energyStore < ENERGY_CONSUMPTION_PER_TICK)
             ret.add(MiningRequirement.notEnoughEnergy);
 
-        boolean hasPickaxe = inventory.getStackInSlot(0).is(Items.NETHERITE_PICKAXE);
-        boolean hasDimension = inventory.getStackInSlot(1).is(ModBlocks.MINI_CHUNK_OVERWORLD.asItem());
+        boolean hasPickaxe = inv.getStackInSlot(0).is(Items.NETHERITE_PICKAXE);
+        boolean hasDimension = inv.getStackInSlot(1).is(ModBlocks.MINI_CHUNK_OVERWORLD.asItem()); // TODO, maybe use tags
 
         if (!hasPickaxe)
             ret.add(MiningRequirement.noPickaxe);
@@ -167,7 +153,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (!hasDimension)
             ret.add(MiningRequirement.noDimension);
 
-        if (ret.size() == 0)
+        if (inventoryFull)
+            ret.add(MiningRequirement.inventoryFull);
+
+        if (ret.isEmpty())
             ret.add(MiningRequirement.ok);
 
         return ret;
@@ -184,29 +173,26 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
-        if (!level.isClientSide && checkMiningRequirements(entity.getInventory(false), entity.getEnergyStorage(false).getEnergyStored()).get(0) == MiningRequirement.ok && entity.running) {
-            doMining(level, pos, state, entity);
+        if (!level.isClientSide &&
+                checkMiningRequirements(entity.getEnergyStored(), entity.inventory, entity.inventoryFull).getFirst() == MiningRequirement.ok &&
+                entity.running &&
+                !entity.inventoryFull) {
+            entity.doMining(level, pos);
         }
     }
 
-    public static void doMining(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
-        EnergyStorage energyStorage = entity.getEnergyStorage();
-
-        //if (energyStorage.getEnergyStored() < ENERGY_CONSUMPTION_PER_TICK) {
-        //    return;
-        //}
-
+    public void doMining(Level level, BlockPos pos) {
         // Draw energy every tick
-        energyStorage.extractEnergy(ENERGY_CONSUMPTION_PER_TICK, false);
+        energy.extractEnergy(ENERGY_CONSUMPTION_PER_TICK, false);
 
-        entity.cooldown++;
-        if (entity.cooldown <= TICKS_PER_BLOCK) {
+        this.cooldown++;
+        if (this.cooldown <= TICKS_PER_BLOCK) {
             return;
         }
-        entity.cooldown = 0;
+        this.cooldown = 0;
 
-        if (entity.getCurrentYLevel() > level.getMinBuildHeight()) {
-            BlockPos blockToMinePos = new BlockPos(pos.getX(), entity.getCurrentYLevel(), pos.getZ());
+        if (this.getCurrentYLevel() > level.getMinBuildHeight()) {
+            BlockPos blockToMinePos = new BlockPos(pos.getX(), this.getCurrentYLevel(), pos.getZ());
             BlockState blockToMineState = level.getBlockState(blockToMinePos);
             Block block = blockToMineState.getBlock();
 
@@ -214,11 +200,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 // Try to add the mined block to the inventory
                 ItemStack itemStack = new ItemStack(block);
 
-                itemStack = ItemHandlerHelper.insertItemStacked(entity.getInventory(false), itemStack, false);
-
+                itemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
 
                 // If the inventory is full, stop the mining process
                 if (!itemStack.isEmpty()) {
+                    inventoryFull = true;
                     return;
                 }
 
@@ -226,7 +212,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 level.setBlock(blockToMinePos, Blocks.AIR.defaultBlockState(), 3);
             }
 
-            entity.decrementCurrentYLevel();
+            this.decrementCurrentYLevel();
         }
     }
 
@@ -235,23 +221,19 @@ public class DimensionalQuarryEntity extends BlockEntity {
         super.saveAdditional(tag, registries);
         tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
         tag.putBoolean("cursedcomponents:dimensional_quarry_running", this.running);
+        tag.putBoolean("cursedcomponents:dimensional_quarry_inventory_full", inventoryFull);
+        CompoundTag upgradesTag = inventory.serializeNBT(registries);
+        tag.put("cursedcomponents:dimensional_quarry_inventory", upgradesTag);
     }
 
     @Override
     protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(tag, registries);
         this.running = tag.getBoolean("cursedcomponents:dimensional_quarry_running");
+        this.inventoryFull = tag.getBoolean("cursedcomponents:dimensional_quarry_inventory_full");
+        this.inventory.deserializeNBT(registries, (CompoundTag) tag.get("cursedcomponents:dimensional_quarry_inventory"));
         if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
             this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
-        }
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-
-        if (!this.level.isClientSide) {
-            this.getInventory().onChangedCallback = (item) -> PacketDistributor.sendToAllPlayers(new DimensionalQuarryDimensionPayload(item, this.getBlockPos()));
         }
     }
 
@@ -271,7 +253,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         public int get(int index) {
             switch (index) {
                 case 0:
-                    return getEnergyStorage(false).getEnergyStored();
+                    return energy.getEnergyStored();
                 case 1:
                     return currentYLevel;
                 case 2:
@@ -284,6 +266,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
                     return worldPosition.getY();
                 case 6:
                     return worldPosition.getZ();
+                case 7:
+                    return inventoryFull ? 1 : 0;
                 default:
                     return 0;
             }
@@ -305,7 +289,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
         ok(Component.translatable("status.cursedcomponents.dimensional_quarry.ok")),
         notEnoughEnergy(Component.translatable("status.cursedcomponents.dimensional_quarry.not_enough_energy")),
         noPickaxe(Component.translatable("status.cursedcomponents.dimensional_quarry.no_pickaxe")),
-        noDimension(Component.translatable("status.cursedcomponents.dimensional_quarry.no_dimension"));
+        noDimension(Component.translatable("status.cursedcomponents.dimensional_quarry.no_dimension")),
+        inventoryFull(Component.translatable(("status.cursedcomponents.dimensional_quarry.inventory_full")));
 
         public final Component status;
 

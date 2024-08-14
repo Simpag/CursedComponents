@@ -25,6 +25,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -74,7 +76,7 @@ public class DimensionalQuarryBlock extends BaseEntityBlock {
         if (state.getBlock() != newState.getBlock()) {
             if (level.getBlockEntity(pos) instanceof DimensionalQuarryEntity dimensionalQuarryEntity) {
                 // Drop items stored inside of inventory
-                Containers.dropContents(level, pos, dimensionalQuarryEntity.getItemStacks());
+                Containers.dropContents(level, pos, dimensionalQuarryEntity.getAllStacks());
                 level.updateNeighbourForOutputSignal(pos, this);
             }
         }
@@ -123,12 +125,12 @@ public class DimensionalQuarryBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected float getShadeBrightness(BlockState p_308911_, BlockGetter p_308952_, BlockPos p_308918_) {
+    protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
         return 1.0f;
     }
 
     @Override
-    protected boolean propagatesSkylightDown(BlockState p_309084_, BlockGetter p_309133_, BlockPos p_309097_) {
+    protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
 }

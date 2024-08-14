@@ -15,5 +15,6 @@
   "status.cursedcomponents.dimensional_quarry.ok": "OK",
   "status.cursedcomponents.dimensional_quarry.not_enough_energy": "Not enough energy!",
   "status.cursedcomponents.dimensional_quarry.no_pickaxe": "Missing §5Netherite§r pickaxe!",
-  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing dimension!"
+  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing dimension!",
+  "status.cursedcomponents.dimensional_quarry.inventory_full": "Inventory is full!"
 }

@@ -19,7 +19,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 public class LuckyParrotOnShoulderLayer<T extends Player> extends RenderLayer<T, PlayerModel<T>> {
     private final LuckyParrotModel model;
 
-    public LuckyParrotOnShoulderLayer(RenderLayerParent<T, PlayerModel<T>> renderer, EntityModelSet modelSet) { //, EntityRendererProvider.Context pContext) {
+    public LuckyParrotOnShoulderLayer(RenderLayerParent<T, PlayerModel<T>> renderer, EntityModelSet modelSet) {
         super(renderer);
         this.model = new LuckyParrotModel(modelSet.bakeLayer(ModModelLayers.LUCKY_PARROT));
     }

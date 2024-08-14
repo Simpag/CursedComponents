@@ -49,7 +49,7 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     private float flapping = 1.0F;
     private float nextFlap = 1.0F;
 
-    public LuckyParrot(EntityType<? extends ShoulderRidingEntity> pEntityType, Level pLevel) {
+    public LuckyParrot(EntityType<? extends LuckyParrot> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 

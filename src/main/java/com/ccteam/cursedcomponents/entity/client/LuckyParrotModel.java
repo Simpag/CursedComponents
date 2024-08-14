@@ -4,10 +4,14 @@ import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.ParrotModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public class LuckyParrotModel extends HierarchicalModel<LuckyParrot> {
     private final ModelPart luckyParrot;
 
@@ -37,5 +41,22 @@ public class LuckyParrotModel extends HierarchicalModel<LuckyParrot> {
     @Override
     public ModelPart root() {
         return luckyParrot;
+    }
+
+    public void renderOnShoulder(
+            PoseStack poseStack,
+            VertexConsumer buffer,
+            int packedLight,
+            int packedOverlay,
+            float limbSwing,
+            float limbSwingAmount,
+            float netHeadYaw,
+            float headPitch,
+            int tickCount
+    ) {
+        //this.prepare(ParrotModel.State.ON_SHOULDER);
+        //this.setupAnim(ParrotModel.State.ON_SHOULDER, tickCount, limbSwing, limbSwingAmount, 0.0F, netHeadYaw, headPitch);
+        //this.root.render(poseStack, buffer, packedLight, packedOverlay);
+        this.luckyParrot.render(poseStack, buffer, packedLight, packedOverlay);
     }
 }

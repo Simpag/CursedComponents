@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class LuckyParrotRenderer extends MobRenderer<LuckyParrot, LuckyParrotModel> {
 
-    private static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/entity/lucky_parrot/lucky_parrot.png");
+    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/entity/lucky_parrot/lucky_parrot.png");
 
     public LuckyParrotRenderer(EntityRendererProvider.Context pContext) {
         super(pContext, new LuckyParrotModel(pContext.bakeLayer(ModModelLayers.LUCKY_PARROT)), 0.2f);

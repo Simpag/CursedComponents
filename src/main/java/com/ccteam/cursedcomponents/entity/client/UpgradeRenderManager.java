@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.entity.client;
 
 
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -9,8 +8,9 @@ import javax.annotation.Nonnull;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.mojang.logging.LogUtils;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -42,24 +42,12 @@ public final class UpgradeRenderManager {
 
     private static void addLuckyParrotShoulderLayer(@Nonnull PlayerRenderer playerRenderer) {
         try {
-//            List<RenderLayer<?, ?>> value =
-//                    ObfuscationReflectionHelper.getPrivateValue(LivingEntityRenderer.class, playerRenderer, "layers");
-//
-//            if (value != null) {
-//                RenderLayer<?, ?> luckyParrotShoulderLayer = null;
-//                for (RenderLayer<?, ?> layerRenderer : value) {
-//                    if (layerRenderer instanceof LuckyParrotOnShoulderLayer<?>) {
-//                        luckyParrotShoulderLayer = layerRenderer;
-//                        break;
-//                    }
-//                }
-//                if (luckyParrotShoulderLayer != null) {
-//                    LogUtils.getLogger().info("Adding LuckyParrotShoulderLayer");
-//                    playerRenderer.addLayer(new LuckyParrotOnShoulderLayer<>(playerRenderer));
-//                    value.remove(luckyParrotShoulderLayer);
-//                }
-//            }
-            playerRenderer.addLayer(new LuckyParrotOnShoulderLayer<>(playerRenderer));
+            EntityRenderDispatcher entityRenderDispatcher = ObfuscationReflectionHelper
+                    .getPrivateValue(EntityRenderer.class, playerRenderer, "entityRenderDispatcher");
+            EntityModelSet entityModelSet = ObfuscationReflectionHelper
+                    .getPrivateValue(EntityRenderDispatcher.class, entityRenderDispatcher, "entityModels");
+
+            playerRenderer.addLayer(new LuckyParrotOnShoulderLayer<>(playerRenderer, entityModelSet));
         } catch (ObfuscationReflectionHelper.UnableToAccessFieldException e) {
             LogUtils.getLogger().warn("Unable to access PlayerRenderer.layers, reason: {}", String.valueOf(e));
         }

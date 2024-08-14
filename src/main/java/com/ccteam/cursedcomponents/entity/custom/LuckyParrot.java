@@ -60,9 +60,9 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.0, 5.0F, 1.0F));
+        this.goalSelector.addGoal(2, new ParrotWanderGoal(this, 1.0));
         this.goalSelector.addGoal(3, new LandOnOwnersShoulderGoal(this));
         this.goalSelector.addGoal(3, new FollowMobGoal(this, 1.0, 3.0F, 7.0F));
-        this.goalSelector.addGoal(4, new ParrotWanderGoal(this, 1.0));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -111,8 +111,8 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     }
 
     static class ParrotWanderGoal extends WaterAvoidingRandomFlyingGoal {
-        public ParrotWanderGoal(PathfinderMob p_186224_, double p_186225_) {
-            super(p_186224_, p_186225_);
+        public ParrotWanderGoal(PathfinderMob mob, double d) {
+            super(mob, d);
         }
 
         @javax.annotation.Nullable
@@ -186,7 +186,7 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
             Player player = (Player) this.getOwner();
             if (player != null && getOnShoulder(player)) {
                 player.addEffect(new MobEffectInstance(
-                        MobEffects.MOVEMENT_SPEED, 100, 10, false, false));
+                        MobEffects.SLOW_FALLING, 100, 10, false, false));
             }
         }
     }

@@ -79,10 +79,8 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
                 this.setOrderedToSit(!this.isOrderedToSit());
             } else {
                 this.tame(player);
-                this.level().broadcastEntityEvent(this, (byte)7);
+                this.level().broadcastEntityEvent(this, EntityEvent.TAMING_SUCCEEDED);
             }
-        } else {
-            this.level().broadcastEntityEvent(this, (byte)6);
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
     }

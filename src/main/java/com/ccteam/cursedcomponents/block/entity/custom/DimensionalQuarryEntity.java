@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -20,6 +21,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -44,7 +49,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private boolean running;
     private boolean inventoryFull;
     private float miniChunkRotation;
-    private final float miniChunkRotationSpeed = 0.5f;
+    private static final float miniChunkRotationSpeed = 0.5f;
 
     private final DimensionalQuarryItemStackHandler inventory = new DimensionalQuarryItemStackHandler(INVENTORY_SIZE) {
         @Override
@@ -198,14 +203,26 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
             if (block != Blocks.AIR && blockToMineState.getDestroySpeed(level, blockToMinePos) >= 0) {
                 // Try to add the mined block to the inventory
-                ItemStack itemStack = new ItemStack(block);
+                LootParams.Builder params = new LootParams.Builder((ServerLevel) level);
+                params = params.withOptionalParameter(LootContextParams.ORIGIN, blockToMinePos.getCenter());
+                params = params.withOptionalParameter(LootContextParams.TOOL, getPickaxeSlot());
 
-                itemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
+                List<ItemStack> itemStacks = blockToMineState.getDrops(params);
 
-                // If the inventory is full, stop the mining process
-                if (!itemStack.isEmpty()) {
-                    inventoryFull = true;
-                    return;
+                // Check if we can insert all drops
+                for (ItemStack itemStack : itemStacks) {
+                    ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
+
+                    // If the inventory is full, stop the mining process
+                    if (!simItemStack.isEmpty()) {
+                        inventoryFull = true;
+                        return;
+                    }
+                }
+
+                // Insert the items
+                for (ItemStack itemStack : itemStacks) {
+                    ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
                 }
 
                 // Set the block to air (break the block)

@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import net.minecraft.world.item.BlockItem;
@@ -18,7 +19,7 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CursedComponentsMod.MOD_ID);
 
     public static final DeferredBlock<Block> LUCKY_BLOCK = registerBlock("lucky_block",
-            () -> new Block(BlockBehaviour.Properties.of()
+            () -> new LuckyBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_YELLOW)
                     .strength(1f)
                     .lightLevel((s) -> 15)

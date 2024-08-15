@@ -128,7 +128,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     public List<DimensionalQuarryEntity.MiningRequirement> getMiningRequirements() {
-        return DimensionalQuarryEntity.checkMiningRequirements(this.getEnergyStored(), this.inventory, this.getInventoryFull() == 1);
+        return DimensionalQuarryEntity.checkMiningRequirements(this.getEnergyStored(), this.getEnergyConsumption(), this.inventory, this.getInventoryFull() == 1);
     }
 
     public int getEnergyStored() {
@@ -161,5 +161,13 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
 
     public int getInventoryFull() {
         return this.quarryData.get(7);
+    }
+
+    public int getEnergyConsumption() {
+        return this.quarryData.get(8);
+    }
+
+    public int getTicksPerBlock() {
+        return this.quarryData.get(9);
     }
 }

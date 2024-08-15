@@ -100,7 +100,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         updateRunningButtons();
 
         // Progress bar
-        float bar_progress = (float) this.menu.getCooldown() / DimensionalQuarryEntity.TICKS_PER_BLOCK;
+        float bar_progress = (float) this.menu.getCooldown() / this.menu.getTicksPerBlock();
         //int progress_bar_y = (int) ((73f - 21f) * bar_progress + 21f); // downwards
         int progress_bar_y = (int) (73f - (73f - 21f) * bar_progress); // upwards
         guiGraphics.fillGradient(this.leftPos + 166, this.topPos + progress_bar_y, this.leftPos + 168, this.topPos + 73, this.green, this.dark_green);
@@ -108,7 +108,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         // Energy bar
         float energy_bar_progress = (float) this.menu.getEnergyStored() / DimensionalQuarryEntity.ENERGY_CAPACITY;
         int energy_bar_x = (int) ((168f - 8f) * energy_bar_progress + 8f);
-        int energy_bar_color = this.menu.getEnergyStored() < DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK * DimensionalQuarryEntity.TICKS_PER_BLOCK ? this.red : this.green;
+        int energy_bar_color = this.menu.getEnergyStored() < this.menu.getEnergyConsumption() * this.menu.getTicksPerBlock() ? this.red : this.green;
         guiGraphics.fill(this.leftPos + 8, this.topPos + 80, this.leftPos + energy_bar_x, this.topPos + 82, energy_bar_color);
 
         // Render energy consumption per tick tooltip
@@ -116,7 +116,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
                 && mouseY > this.topPos + 79 && mouseY < this.topPos + 83) {
             List<Component> energy_tooltip = new ArrayList<>();
             energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2", DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2", this.menu.getEnergyConsumption()));
 
             guiGraphics.renderComponentTooltip(
                     this.font,
@@ -147,13 +147,15 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         );
 
         if (this.DEBUG) {
-            guiGraphics.drawString(this.font, "Stored: " + String.valueOf(this.menu.getEnergyStored()), -100, 23, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Capacity: " + String.valueOf(DimensionalQuarryEntity.ENERGY_CAPACITY), -100, 33, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Consumption Rate (FE/t): " + String.valueOf(DimensionalQuarryEntity.ENERGY_CONSUMPTION_PER_TICK), -100, 43, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Y: " + String.valueOf(this.menu.getCurrentYLevel()), -100, 53, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Cooldown: " + String.valueOf(this.menu.getCooldown()), -100, 63, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "progress: " + String.valueOf((float) this.menu.getCooldown() / DimensionalQuarryEntity.TICKS_PER_BLOCK), -100, 73, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Running: " + String.valueOf(this.menu.getRunning()), -100, 83, ChatFormatting.RED.getColor(), false);
+            int debugXOffset = -125;
+            guiGraphics.drawString(this.font, "Stored: " + String.valueOf(this.menu.getEnergyStored()), debugXOffset, 23, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Capacity: " + String.valueOf(DimensionalQuarryEntity.ENERGY_CAPACITY), debugXOffset, 33, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Consumption Rate (FE/t): " + String.valueOf(this.menu.getEnergyConsumption()), debugXOffset, 43, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Y: " + String.valueOf(this.menu.getCurrentYLevel()), debugXOffset, 53, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Cooldown: " + String.valueOf(this.menu.getCooldown()), debugXOffset, 63, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "progress: " + String.valueOf((float) this.menu.getCooldown() / this.menu.getTicksPerBlock()), debugXOffset, 73, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Running: " + String.valueOf(this.menu.getRunning()), debugXOffset, 83, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "TPB: " + this.menu.getTicksPerBlock(), debugXOffset, 93, ChatFormatting.RED.getColor(), false);
         }
     }
 

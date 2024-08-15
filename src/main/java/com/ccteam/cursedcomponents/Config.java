@@ -2,10 +2,13 @@ package com.ccteam.cursedcomponents;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import net.minecraft.commands.arguments.RangeArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.InclusiveRange;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -18,43 +21,68 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-            .comment("Whether to log the dirt block on common setup")
-            .define("logDirtBlock", true);
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_CONSUMPTION_BASE = BUILDER
+            .comment("Dimensional Quarry Settings")
+            .push("dimensional_quarry")
+            .comment("Energy Consumption")
+            .push("consumption")
+            .comment("How much FE/t the dimensional quarry uses")
+            .defineInRange("base", 40_000, 0, Integer.MAX_VALUE);
 
-    private static final ModConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-            .comment("A magic number")
-            .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_CONSUMPTION_1 = BUILDER
+            .defineInRange("unbreakingI", 35_000, 0, Integer.MAX_VALUE);
 
-    public static final ModConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-            .comment("What you want the introduction message to be for the magic number")
-            .define("magicNumberIntroduction", "The magic number is... ");
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_CONSUMPTION_2 = BUILDER
+            .defineInRange("unbreakingII", 30_000, 0, Integer.MAX_VALUE);
 
-    // a list of strings that are treated as resource locations for items
-    private static final ModConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
-            .comment("A list of items to log on common setup.")
-            .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_CONSUMPTION_3 = BUILDER
+            .defineInRange("unbreakingIII", 25_000, 0, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_BASE = BUILDER
+            .pop()
+            .comment("Quarry speed (Block/Tick)")
+            .push("speed")
+            .comment("How many ticks between each block mined")
+            .defineInRange("base", 20, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_1 = BUILDER
+            .defineInRange("efficiencyI", 17, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_2 = BUILDER
+            .defineInRange("efficiencyII", 14, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_3 = BUILDER
+            .defineInRange("efficiencyIII", 11, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_4 = BUILDER
+            .defineInRange("efficiencyIV", 8, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_5 = BUILDER
+            .defineInRange("efficiencyV", 5, 1, Integer.MAX_VALUE);
+
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
-
-    private static boolean validateItemName(final Object obj) {
-        return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
-    }
+    /* CONFIG VALUES */
+    public static List<Integer> dimensionalQuarryConsumptions;
+    public static List<Integer> dimensionalQuarrySpeed;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
+        dimensionalQuarryConsumptions = List.of(
+                DIMENSIONAL_QUARRY_CONSUMPTION_BASE.get(),
+                DIMENSIONAL_QUARRY_CONSUMPTION_1.get(),
+                DIMENSIONAL_QUARRY_CONSUMPTION_2.get(),
+                DIMENSIONAL_QUARRY_CONSUMPTION_3.get()
+        );
 
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream()
-                .map(itemName -> BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemName)))
-                .collect(Collectors.toSet());
+        dimensionalQuarrySpeed = List.of(
+                DIMENSIONAL_QUARRY_TPB_BASE.get(),
+                DIMENSIONAL_QUARRY_TPB_1.get(),
+                DIMENSIONAL_QUARRY_TPB_2.get(),
+                DIMENSIONAL_QUARRY_TPB_3.get(),
+                DIMENSIONAL_QUARRY_TPB_4.get(),
+                DIMENSIONAL_QUARRY_TPB_5.get()
+        );
     }
 }

@@ -1,15 +1,16 @@
 package com.ccteam.cursedcomponents.entity.custom;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
+import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.ShoulderRidingEntity;
@@ -31,10 +31,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
 
 public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     private static final EntityDataAccessor<Integer> VARIANT =
@@ -60,8 +60,8 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.0, 5.0F, 1.0F));
-        this.goalSelector.addGoal(2, new ParrotWanderGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new LandOnOwnersShoulderGoal(this));
+        this.goalSelector.addGoal(2, new LuckyParrotWanderGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new LuckyParrotLandOnShoulderGoal(this));
         this.goalSelector.addGoal(3, new FollowMobGoal(this, 1.0, 3.0F, 7.0F));
     }
 
@@ -83,6 +83,56 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
             }
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
+    }
+
+    @Override
+    public boolean setEntityOnShoulder(ServerPlayer player) {
+        // TODO: replace with own functionality so we can decide when to dismount
+        //super.setEntityOnShoulder(player);
+        if (player.isPassenger() || !player.onGround() || player.isInWater() || player.isInPowderSnow) {
+            return false;
+        } else if (player.getData(ModEntityAttachments.entityPlayerAttachment).isEmpty()) {
+            LogUtils.getLogger().info("Set parrot on shoulder");
+            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void dismountFromShoulder(ServerPlayer player) {
+        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) {
+            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if(this.level().isClientSide()) {
+            this.setupAnimationStates();
+        }
+
+        if (!this.level().isClientSide && this.getOwner() != null) {
+            ServerPlayer player = (ServerPlayer) this.getOwner();
+            if (player != null && isOnShoulder(player)) {
+                player.addEffect(new MobEffectInstance(
+                        MobEffects.SLOW_FALLING, 100, 10, false, false));
+            }
+            dismountFromShoulder(player);
+        }
+    }
+
+    private boolean isOnShoulder(Player player) {
+        return player.getData(ModEntityAttachments.entityPlayerAttachment).equals(this.getUUID().toString());
+    }
+
+    /* COPY PASTA */
+
+    @Override
+    public void playerTouch(Player player) {
+        super.playerTouch(player);
     }
 
     @Override
@@ -110,55 +160,6 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         return new Vec3(0.0, (double)(0.5F * this.getEyeHeight()), (double)(this.getBbWidth() * 0.4F));
     }
 
-    static class ParrotWanderGoal extends WaterAvoidingRandomFlyingGoal {
-        public ParrotWanderGoal(PathfinderMob mob, double d) {
-            super(mob, d);
-        }
-
-        @javax.annotation.Nullable
-        @Override
-        protected Vec3 getPosition() {
-            Vec3 vec3 = null;
-            if (this.mob.isInWater()) {
-                vec3 = LandRandomPos.getPos(this.mob, 15, 15);
-            }
-
-            if (this.mob.getRandom().nextFloat() >= this.probability) {
-                vec3 = this.getTreePos();
-            }
-
-            return vec3 == null ? super.getPosition() : vec3;
-        }
-
-        @javax.annotation.Nullable
-        private Vec3 getTreePos() {
-            BlockPos blockpos = this.mob.blockPosition();
-            BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-            BlockPos.MutableBlockPos blockpos$mutableblockpos1 = new BlockPos.MutableBlockPos();
-
-            for (BlockPos blockpos1 : BlockPos.betweenClosed(
-                    Mth.floor(this.mob.getX() - 3.0),
-                    Mth.floor(this.mob.getY() - 6.0),
-                    Mth.floor(this.mob.getZ() - 3.0),
-                    Mth.floor(this.mob.getX() + 3.0),
-                    Mth.floor(this.mob.getY() + 6.0),
-                    Mth.floor(this.mob.getZ() + 3.0)
-            )) {
-                if (!blockpos.equals(blockpos1)) {
-                    BlockState blockstate = this.mob.level().getBlockState(blockpos$mutableblockpos1.setWithOffset(blockpos1, Direction.DOWN));
-                    boolean flag = blockstate.getBlock() instanceof LeavesBlock || blockstate.is(BlockTags.LOGS);
-                    if (flag
-                            && this.mob.level().isEmptyBlock(blockpos1)
-                            && this.mob.level().isEmptyBlock(blockpos$mutableblockpos.setWithOffset(blockpos1, Direction.UP))) {
-                        return Vec3.atBottomCenterOf(blockpos1);
-                    }
-                }
-            }
-
-            return null;
-        }
-    }
-
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
@@ -172,28 +173,6 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         } else {
             --this.idleAnimationTimeout;
         }
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        if(this.level().isClientSide()) {
-            this.setupAnimationStates();
-        }
-
-        if (!this.level().isClientSide && this.getOwner() != null) {
-            Player player = (Player) this.getOwner();
-            if (player != null && getOnShoulder(player)) {
-                player.addEffect(new MobEffectInstance(
-                        MobEffects.SLOW_FALLING, 100, 10, false, false));
-            }
-        }
-    }
-
-    private boolean getOnShoulder(Player player) {
-        return player.getShoulderEntityLeft().getString("id").equals(this.getEncodeId())
-                || player.getShoulderEntityRight().getString("id").equals(this.getEncodeId());
     }
 
     @Override
@@ -263,7 +242,6 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     }
 
     /* SOUNDS */
-
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {

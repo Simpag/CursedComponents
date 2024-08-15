@@ -2,12 +2,15 @@ package com.ccteam.cursedcomponents;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.entity.ModEntities;
+import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
 import com.ccteam.cursedcomponents.entity.client.LuckyParrotRenderer;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
+import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
 import com.ccteam.cursedcomponents.structures.ModStructures;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
@@ -48,6 +51,7 @@ public class CursedComponentsMod {
         ModBlocks.register(modEventBus);
         ModStructures.register(modEventBus);
         ModEntities.register(modEventBus);
+        ModEntityAttachments.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -90,11 +94,12 @@ public class CursedComponentsMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-
             EntityRenderers.register(ModEntities.LUCKY_PARROT.get(), LuckyParrotRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerBindings(RegisterKeyMappingsEvent event) {
+            ModKeyBinds.register(event);
         }
     }
 

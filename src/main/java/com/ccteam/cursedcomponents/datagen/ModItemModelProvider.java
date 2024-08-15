@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.datagen;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +16,9 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        basicItem(ModItems.WARDEN_GLUE.get());
+        basicItem(ModItems.WARDEN_INFUSION.get());
         basicItem(ModItems.DIMENSIONAL_CORE.get());
+        basicItem(ModItems.WARDEN_INFUSED_DIAMOND.get());
 
         // buttonItem(ModBlocks.BLACK_OPAL_BUTTON, ModBlocks.BLACK_OPAL_BLOCK);
         // fenceItem(ModBlocks.BLACK_OPAL_FENCE, ModBlocks.BLACK_OPAL_BLOCK);

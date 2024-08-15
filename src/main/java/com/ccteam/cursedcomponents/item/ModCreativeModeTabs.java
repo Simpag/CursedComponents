@@ -19,8 +19,9 @@ import java.util.function.Supplier;
 public class ModCreativeModeTabs {
     // Add your items that should appear in the creative tab
     private static final List<DeferredItem<Item>> MOD_ITEMS = new ArrayList<>() {{
-        add(ModItems.WARDEN_GLUE);
+        add(ModItems.WARDEN_INFUSION);
         add(ModItems.DIMENSIONAL_CORE);
+        add(ModItems.WARDEN_INFUSED_DIAMOND);
     }};
 
     // Add your blocks that should appear in the creative tab

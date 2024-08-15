@@ -8,18 +8,18 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
-public class Warden_Glue extends Item {
-    public Warden_Glue(Properties properties) {
+public class Warden_Infusion extends Item {
+    public Warden_Infusion(Properties properties) {
         super(properties);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
-            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_glue.1"));
-            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_glue.2"));
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_infusion.1"));
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_infusion.2"));
         } else {
-            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_glue.shift"));
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_infusion.shift"));
         }
 
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);

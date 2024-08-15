@@ -5,7 +5,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -30,8 +29,8 @@ public class WardenGlobalLootModifier extends LootModifier {
 
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        int glue_drop_count = context.getRandom().nextIntBetweenInclusive(min_items, max_items);
-        generatedLoot.add(ModItems.WARDEN_GLUE.toStack(glue_drop_count));
+        int drop_count = context.getRandom().nextIntBetweenInclusive(min_items, max_items);
+        generatedLoot.add(ModItems.WARDEN_INFUSION.toStack(drop_count));
         return generatedLoot;
     }
 

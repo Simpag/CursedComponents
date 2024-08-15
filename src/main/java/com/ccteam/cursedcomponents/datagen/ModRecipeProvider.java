@@ -10,7 +10,6 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.List;
@@ -31,30 +30,42 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("SSS")
                 .define('G', Items.GRASS_BLOCK)
                 .define('D', Items.DIRT)
-                .define('W', ModItems.WARDEN_GLUE.get())
+                .define('W', ModItems.WARDEN_INFUSION.get())
                 .define('S', Items.STONE)
-                .unlockedBy("has_warden_glue", has(ModItems.WARDEN_GLUE.get())
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIMENSIONAL_CORE.get())
-                .pattern("GRG")
-                .pattern("RWR")
-                .pattern("GRG")
-                .define('G', ModItems.WARDEN_GLUE.get())
-                .define('R', Items.END_ROD)
-                .define('W', Items.NETHER_STAR)
-                .unlockedBy("has_nether_star", has(Items.NETHER_STAR)
+                .pattern("WEW")
+                .pattern("GNG")
+                .pattern("WTW")
+                .define('W', ModItems.WARDEN_INFUSION.get())
+                .define('E', Items.ENDER_EYE)
+                .define('G', Items.GOLD_INGOT)
+                .define('T', Items.GHAST_TEAR)
+                .define('N', Items.NETHER_STAR)
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WARDEN_INFUSED_DIAMOND.get())
+                .pattern(" W ")
+                .pattern("WDW")
+                .pattern(" W ")
+                .define('W', ModItems.WARDEN_INFUSION.get())
+                .define('D', Items.DIAMOND)
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.DIMENSIONAL_QUARRY.get())
                 .pattern("NEN")
-                .pattern("OCO")
+                .pattern("DCD")
                 .pattern("NON")
                 .define('E', Items.ENDER_CHEST)
                 .define('C', ModItems.DIMENSIONAL_CORE.get())
                 .define('N', Items.NETHERITE_INGOT)
                 .define('O', Items.OBSIDIAN)
-                .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE)
+                .define('D', ModItems.WARDEN_INFUSED_DIAMOND.get())
+                .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE.get())
                 ).save(recipeOutput);
 
         /* ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BLACK_OPAL_BLOCK.get())

@@ -1,6 +1,7 @@
 {
   "item.cursedcomponents.debug_stick": "Debug Stick",
   "item.cursedcomponents.warden_glue": "Warden Glue",
+  "item.cursedcomponents.dimensional_core": "Dimensional Core",
 
   "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
   "block.cursedcomponents.mini_chunk_overworld": "Mini Chunk Overworld",
@@ -22,6 +23,6 @@
   "status.cursedcomponents.dimensional_quarry.ok": "OK",
   "status.cursedcomponents.dimensional_quarry.not_enough_energy": "Not enough energy!",
   "status.cursedcomponents.dimensional_quarry.no_pickaxe": "Missing §5Netherite§r pickaxe!",
-  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing dimension!",
+  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing §5Mini Chunk§r!",
   "status.cursedcomponents.dimensional_quarry.inventory_full": "Inventory is full!"
 }

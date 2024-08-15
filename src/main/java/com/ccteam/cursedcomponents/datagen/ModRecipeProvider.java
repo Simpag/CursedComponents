@@ -7,8 +7,10 @@ import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.List;
@@ -22,6 +24,39 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
         // Build recipies
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MINI_CHUNK_OVERWORLD.get())
+                .pattern("GGG")
+                .pattern("DWD")
+                .pattern("SSS")
+                .define('G', Items.GRASS_BLOCK)
+                .define('D', Items.DIRT)
+                .define('W', ModItems.WARDEN_GLUE.get())
+                .define('S', Items.STONE)
+                .unlockedBy("has_warden_glue", has(ModItems.WARDEN_GLUE.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIMENSIONAL_CORE.get())
+                .pattern("GRG")
+                .pattern("RWR")
+                .pattern("GRG")
+                .define('G', ModItems.WARDEN_GLUE.get())
+                .define('R', Items.END_ROD)
+                .define('W', Items.NETHER_STAR)
+                .unlockedBy("has_nether_star", has(Items.NETHER_STAR)
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.DIMENSIONAL_QUARRY.get())
+                .pattern("NEN")
+                .pattern("OCO")
+                .pattern("NON")
+                .define('E', Items.ENDER_CHEST)
+                .define('C', ModItems.DIMENSIONAL_CORE.get())
+                .define('N', Items.NETHERITE_INGOT)
+                .define('O', Items.OBSIDIAN)
+                .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE)
+                ).save(recipeOutput);
+
         /* ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BLACK_OPAL_BLOCK.get())
                 .pattern("BBB")
                 .pattern("BBB")

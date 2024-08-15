@@ -20,6 +20,7 @@ public class ModCreativeModeTabs {
     // Add your items that should appear in the creative tab
     private static final List<DeferredItem<Item>> MOD_ITEMS = new ArrayList<>() {{
         add(ModItems.WARDEN_GLUE);
+        add(ModItems.DIMENSIONAL_CORE);
     }};
 
     // Add your blocks that should appear in the creative tab

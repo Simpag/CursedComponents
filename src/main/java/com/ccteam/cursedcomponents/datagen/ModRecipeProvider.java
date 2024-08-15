@@ -47,12 +47,9 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WARDEN_INFUSED_DIAMOND.get())
-                .pattern(" W ")
-                .pattern("WDW")
-                .pattern(" W ")
-                .define('W', ModItems.WARDEN_INFUSION.get())
-                .define('D', Items.DIAMOND)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.WARDEN_INFUSED_DIAMOND.get(), 1)
+                .requires(ModItems.WARDEN_INFUSION.get(), 1)
+                .requires(Items.DIAMOND, 1)
                 .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 

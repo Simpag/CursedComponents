@@ -44,14 +44,14 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
         }
 
         // Add quarry upgrade slots
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < DimensionalQuarryEntity.UPGRADE_SLOTS; i++) {
             this.addSlot(new SlotItemHandler(inventory, i, 66, 19 + i * 20));
         }
 
         // Add quarry inventory item buffer
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                this.addSlot(new SlotItemHandler(inventory, 3 + col + 3 * row, 8 + 18 * col, 21 + row * 18));
+                this.addSlot(new SlotItemHandler(inventory, DimensionalQuarryEntity.UPGRADE_SLOTS + col + 3 * row, 8 + 18 * col, 21 + row * 18));
             }
         }
 

@@ -2,12 +2,16 @@ package com.ccteam.cursedcomponents.entity;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
+import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
+import com.ccteam.cursedcomponents.network.toServer.KeyPressPayload;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Optional;
 
@@ -35,6 +39,13 @@ public class ModEntityEventHooks {
                     LuckyParrot.tickOnShoulder(player);
                 }
             });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onKeyInput(ClientTickEvent.Post event) {
+        while (ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().consumeClick()) {
+            PacketDistributor.sendToServer(new KeyPressPayload(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().getKey().getValue()));
         }
     }
 

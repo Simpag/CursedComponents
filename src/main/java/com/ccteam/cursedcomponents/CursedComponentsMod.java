@@ -3,26 +3,20 @@ package com.ccteam.cursedcomponents;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
-import com.ccteam.cursedcomponents.entity.client.LuckyParrotRenderer;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
-import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
+import com.ccteam.cursedcomponents.network.PacketHandler;
 import com.ccteam.cursedcomponents.structures.ModStructures;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -56,6 +50,8 @@ public class CursedComponentsMod {
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
 
+        modEventBus.addListener(PacketHandler::register);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
@@ -86,19 +82,4 @@ public class CursedComponentsMod {
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
-
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @EventBusSubscriber(modid = MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(ModEntities.LUCKY_PARROT.get(), LuckyParrotRenderer::new);
-        }
-
-        @SubscribeEvent
-        public static void registerBindings(RegisterKeyMappingsEvent event) {
-            ModKeyBinds.register(event);
-        }
-    }
-
 }

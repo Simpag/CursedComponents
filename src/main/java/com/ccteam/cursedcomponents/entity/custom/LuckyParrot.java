@@ -1,7 +1,5 @@
 package com.ccteam.cursedcomponents.entity.custom;
 
-import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
-import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -33,8 +31,6 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     private static final EntityDataAccessor<Integer> VARIANT =
@@ -93,20 +89,6 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         return wasSuccess;
     }
 
-    public boolean dismountFromShoulder(Player player) {
-        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) { // FIXME: Not recognizing key action
-//            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
-            try {
-                LogUtils.getLogger().info("Dismounting from shoulder");
-                ObfuscationReflectionHelper.findMethod(Player.class, "removeEntitiesOnShoulder").invoke(player);
-                return true;
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return false;
-    }
-
     @Override
     public void tick() {
         super.tick();
@@ -117,17 +99,11 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     }
 
     public static void tickOnShoulder(Player owner) {
-        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) {
-            try {
-                if (!owner.level().isClientSide)
-                    ObfuscationReflectionHelper.findMethod(Player.class, "removeEntitiesOnShoulder").invoke(owner);
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            if (!owner.level().isClientSide)
-                owner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 10, false, false));
+        if (!owner.level().isClientSide) {
+            return;
         }
+
+        owner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 10, false, false));
     }
 
     /* COPY PASTA */

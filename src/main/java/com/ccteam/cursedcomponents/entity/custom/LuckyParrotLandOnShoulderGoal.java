@@ -15,11 +15,11 @@ public class LuckyParrotLandOnShoulderGoal extends Goal {
     @Override
     public boolean canUse() {
         ServerPlayer serverplayer = (ServerPlayer)this.entity.getOwner();
-        boolean flag = serverplayer != null
-                && !serverplayer.isSpectator()
-                && !serverplayer.getAbilities().flying
-                && !serverplayer.isInWater()
-                && !serverplayer.isInPowderSnow;
+        boolean flag = serverplayer != null;
+//                && !serverplayer.isSpectator()
+//                && !serverplayer.getAbilities().flying
+//                && !serverplayer.isInWater()
+//                && !serverplayer.isInPowderSnow;
         return !this.entity.isOrderedToSit() && flag && this.entity.canSitOnShoulder();
     }
 

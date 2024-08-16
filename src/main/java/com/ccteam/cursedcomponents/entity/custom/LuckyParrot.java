@@ -1,6 +1,5 @@
 package com.ccteam.cursedcomponents.entity.custom;
 
-import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
 import com.ccteam.cursedcomponents.keybinds.ModKeyBinds;
 import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -32,9 +31,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+import java.lang.reflect.InvocationTargetException;
 
 public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     private static final EntityDataAccessor<Integer> VARIANT =
@@ -80,6 +80,7 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
             } else {
                 this.tame(player);
                 this.level().broadcastEntityEvent(this, EntityEvent.TAMING_SUCCEEDED);
+
             }
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
@@ -87,23 +88,23 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
 
     @Override
     public boolean setEntityOnShoulder(ServerPlayer player) {
-        // TODO: replace with own functionality so we can decide when to dismount
-        //super.setEntityOnShoulder(player);
-        if (player.isPassenger() || !player.onGround() || player.isInWater() || player.isInPowderSnow) {
-            return false;
-        } else if (player.getData(ModEntityAttachments.entityPlayerAttachment).isEmpty()) {
-            LogUtils.getLogger().info("Set parrot on shoulder");
-            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
-            return true;
-        } else {
-            return false;
-        }
+        boolean wasSuccess = super.setEntityOnShoulder(player);
+        ObfuscationReflectionHelper.setPrivateValue(Entity.class, player, 0f, "fallDistance");
+        return wasSuccess;
     }
 
-    public void dismountFromShoulder(ServerPlayer player) {
-        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) {
-            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
+    public boolean dismountFromShoulder(Player player) {
+        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) { // FIXME: Not recognizing key action
+//            player.setData(ModEntityAttachments.entityPlayerAttachment, this.getUUID().toString());
+            try {
+                LogUtils.getLogger().info("Dismounting from shoulder");
+                ObfuscationReflectionHelper.findMethod(Player.class, "removeEntitiesOnShoulder").invoke(player);
+                return true;
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return false;
     }
 
     @Override
@@ -113,19 +114,20 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
         if(this.level().isClientSide()) {
             this.setupAnimationStates();
         }
-
-        if (!this.level().isClientSide && this.getOwner() != null) {
-            ServerPlayer player = (ServerPlayer) this.getOwner();
-            if (player != null && isOnShoulder(player)) {
-                player.addEffect(new MobEffectInstance(
-                        MobEffects.SLOW_FALLING, 100, 10, false, false));
-            }
-            dismountFromShoulder(player);
-        }
     }
 
-    private boolean isOnShoulder(Player player) {
-        return player.getData(ModEntityAttachments.entityPlayerAttachment).equals(this.getUUID().toString());
+    public static void tickOnShoulder(Player owner) {
+        if(ModKeyBinds.LUCKY_ANIMAL_DISMOUNT.get().isDown()) {
+            try {
+                if (!owner.level().isClientSide)
+                    ObfuscationReflectionHelper.findMethod(Player.class, "removeEntitiesOnShoulder").invoke(owner);
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            if (!owner.level().isClientSide)
+                owner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 10, false, false));
+        }
     }
 
     /* COPY PASTA */

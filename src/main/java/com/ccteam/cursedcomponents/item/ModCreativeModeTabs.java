@@ -8,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -35,7 +34,7 @@ public class ModCreativeModeTabs {
 
     public static final Supplier<CreativeModeTab> CURSED_COMPONENTS_ITEMS_TAB = CREATIVE_MODE_TABS.register("cursed_components_item_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.cursedcomponents.cursed_components_item_tab"))
-            .icon(() -> new ItemStack(Items.STONE))
+            .icon(() -> new ItemStack(ModItems.ICON.get()))
             .displayItems((parameters, output) -> {
                 for (var item : MOD_ITEMS) {
                     output.accept(item);

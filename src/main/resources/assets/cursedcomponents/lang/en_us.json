@@ -1,4 +1,5 @@
 {
   "block.cursedcomponents.lucky_block": "Lucky Block",
-  "entity.cursedcomponents.lucky_parrot": "Lucky Parrot"
+  "entity.cursedcomponents.lucky_parrot": "Lucky Parrot",
+  "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components"
 }

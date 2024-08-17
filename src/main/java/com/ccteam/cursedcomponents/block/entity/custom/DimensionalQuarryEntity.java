@@ -1,34 +1,43 @@
 package com.ccteam.cursedcomponents.block.entity.custom;
 
 import com.ccteam.cursedcomponents.Config;
+import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.ItemStackHandlers.DimensionalQuarryItemStackHandler;
+import com.ccteam.cursedcomponents.itemStackHandlers.DimensionalQuarryItemStackHandler;
 
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.property.Properties;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -39,9 +48,12 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class DimensionalQuarryEntity extends BlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    private static final float miniChunkRotationSpeed = 0.5f; // For rotating the rendered minichunk inside the quarry
 
     public static final int EJECTION_COOLDOWN = 20;
     public static final int ENERGY_CAPACITY = 1_000_000;
@@ -49,7 +61,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static final int INVENTORY_SIZE = 9 + UPGRADE_SLOTS; // 9 storage slots + 3 upgrade
     public static final int QUARRY_DATA_SIZE = 10;
 
-    private int currentYLevel;
     private int miningCooldown;
     private int ejectCooldown;
     private int currentEnergyConsumption;
@@ -57,7 +68,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private boolean running;
     private float miniChunkRotation;
     private ItemStack overflowingItemStack;
-    private static final float miniChunkRotationSpeed = 0.5f;
+
+    private ChunkPos currentChunkPos;
+    private BlockPos currentMiningPos;
+    private ServerLevel currentDimension;
 
     private final DimensionalQuarryItemStackHandler inventory = new DimensionalQuarryItemStackHandler(INVENTORY_SIZE) {
         @Override
@@ -65,8 +79,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
             // Update slots to client when upgrades change
             if (!level.isClientSide) {
                 if (slot == 0) {
-                    updateEnergyConsumption();
-                    updateTicksPerBlock();
+                    // Pickaxe slot, update the upgrades
+                    updateUpgrades();
+                } else if (slot == 1) {
+                    // Dimension slot, update the mining dimension
+                    updateDimension((ServerLevel) level);
                 }
 
                 if (slot < 3) {
@@ -86,10 +103,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
         this.running = false;
-        this.currentYLevel = pos.getY() - 1;
         this.miningCooldown = 0;
         this.ejectCooldown = 0;
         this.overflowingItemStack = null;
+        currentMiningPos = null;
+        currentChunkPos = null;
     }
 
     @Override
@@ -99,8 +117,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.updateEnergyConsumption();
         this.updateTicksPerBlock();
 
-        if (level != null && !level.isClientSide)
+        if (level != null && !level.isClientSide) {
             createItemHandlerCapCaches((ServerLevel) level);
+        }
     }
 
     public ItemStack getPickaxeSlot() {
@@ -154,10 +173,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return ret.toString();
     }
 
-    public int getCurrentYLevel() {
-        return this.currentYLevel;
-    }
-
     public float getMiniChunkRotation() {
         // maybe change this to use server time
         miniChunkRotation = (miniChunkRotation + miniChunkRotationSpeed) % 360;
@@ -176,7 +191,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentEnergyConsumption;
     }
 
-    public void updateEnergyConsumption() {
+    private void updateEnergyConsumption() {
         ItemStack pick = this.getPickaxeSlot();
 
         if (pick.isEmpty()) {
@@ -200,7 +215,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentTicksPerBlock;
     }
 
-    public void updateTicksPerBlock() {
+    private void updateTicksPerBlock() {
         ItemStack pick = this.getPickaxeSlot();
 
         if (pick.isEmpty()) {
@@ -218,6 +233,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
             // If any mods add higher unbreaking levels
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.getLast();
         }
+    }
+
+    private void updateUpgrades() {
+        updateEnergyConsumption();
+        updateTicksPerBlock();
     }
 
     public static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, IItemHandler inv, boolean inventoryFull) {
@@ -253,10 +273,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     }
 
-    public void decrementCurrentYLevel() {
-        this.currentYLevel--;
-    }
-
     public void setRunning(boolean state) {
         this.running = state;
     }
@@ -266,13 +282,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return;
 
         if (entity.running && checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)).getFirst() == MiningRequirement.ok) {
-            entity.doMining(level, pos);
+            entity.mineNextBlock((ServerLevel) level);
         }
 
         entity.tryEject(level, pos);
     }
 
-    public void doMining(Level level, BlockPos pos) {
+    public void mineNextBlock(ServerLevel level) {
         // Draw energy every tick
         energy.extractEnergy(this.getEnergyConsumptionPerTick(), false);
 
@@ -282,43 +298,36 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
         this.miningCooldown = 0;
 
-        if (this.getCurrentYLevel() > level.getMinBuildHeight()) {
-            BlockPos blockToMinePos = new BlockPos(pos.getX(), this.getCurrentYLevel(), pos.getZ());
-            BlockState blockToMineState = level.getBlockState(blockToMinePos);
-            Block block = blockToMineState.getBlock();
+        BlockState blockToMineState = getNextToMineState(level);
 
-            if (block != Blocks.AIR && blockToMineState.getDestroySpeed(level, blockToMinePos) >= 0) {
-                // Try to add the mined block to the inventory
-                LootParams.Builder params = new LootParams.Builder((ServerLevel) level);
-                params = params.withOptionalParameter(LootContextParams.ORIGIN, blockToMinePos.getCenter());
-                params = params.withOptionalParameter(LootContextParams.TOOL, getPickaxeSlot());
+        if (blockToMineState == null)
+            return;
 
-                List<ItemStack> itemStacks = blockToMineState.getDrops(params);
+        if (!blockToMineState.isEmpty() && blockToMineState.getDestroySpeed(this.currentDimension, this.currentMiningPos) >= 0) {
+            // Try to add the mined block to the inventory
+            LootParams.Builder params = new LootParams.Builder(this.currentDimension);
+            params = params.withOptionalParameter(LootContextParams.ORIGIN, this.currentMiningPos.getCenter());
+            params = params.withOptionalParameter(LootContextParams.TOOL, getPickaxeSlot());
 
-                // Check if we can insert all drops
-                for (ItemStack itemStack : itemStacks) {
-                    ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
+            List<ItemStack> itemStacks = blockToMineState.getDrops(params);
 
-                    // If the inventory is full, stop the mining process
-                    if (!simItemStack.isEmpty()) {
-                        this.overflowingItemStack = simItemStack;
-                        return;
-                    }
+            // Check if we can insert all drops
+            for (ItemStack itemStack : itemStacks) {
+                ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
 
-                    if (this.overflowingItemStack != null)
-                        this.overflowingItemStack = null;
+                // If the inventory is full, stop the mining process
+                if (!simItemStack.isEmpty()) {
+                    this.overflowingItemStack = simItemStack;
+                    return;
+                } else {
+                    this.overflowingItemStack = null;
                 }
-
-                // Insert the items
-                for (ItemStack itemStack : itemStacks) {
-                    ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
-                }
-
-                // Set the block to air (break the block)
-                level.setBlock(blockToMinePos, Blocks.AIR.defaultBlockState(), 3);
             }
 
-            this.decrementCurrentYLevel();
+            // Insert the items
+            for (ItemStack itemStack : itemStacks) {
+                ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
+            }
         }
     }
 
@@ -372,6 +381,107 @@ public class DimensionalQuarryEntity extends BlockEntity {
         });
 
         return attachedStorages;
+    }
+
+    private void updateDimension(ServerLevel level) {
+        this.currentDimension = null;
+        ResourceKey<Level> dim = this.getMiniChunkDimension();
+
+        if (dim == null) {
+            LOGGER.debug("Mini Chunk Dimension is null!");
+            return;
+        }
+
+        this.currentDimension = level.getServer().getLevel(dim);
+    }
+
+    private boolean updateSamplingChunk(ServerLevel level) {
+        if (this.currentDimension == null) {
+            LOGGER.debug("Target dimension is null!");
+            return false;
+        }
+
+        Random random = new Random();
+        int randomX = random.nextInt(-1_000_000, 1_000_000);
+        int randomZ = random.nextInt(-1_000_000, 1_000_000);
+        ChunkPos chunkPos = new ChunkPos(randomX, randomZ);
+
+        Integer startingY = this.getFirstNonEmptyYLayer(this.currentDimension, chunkPos);
+
+        if (startingY == null) {
+            LOGGER.debug("Starting Y position in dimension is null!");
+            return false;
+        }
+
+        this.currentChunkPos = chunkPos;
+        this.currentMiningPos = chunkPos.getBlockAt(0, startingY, 0);
+
+        return true;
+    }
+
+    private Integer getFirstNonEmptyYLayer(ServerLevel world, ChunkPos chunkPos) {
+        // Gets a rough estimate of the first breakable block
+        int x = chunkPos.getMinBlockX();
+        int z = chunkPos.getMinBlockZ();
+        for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y -= 5) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState state = world.getBlockState(pos);
+
+            if (!state.isEmpty() && state.getDestroySpeed(world, pos) > 0)
+                return y;
+        }
+
+        return null;
+    }
+
+    private BlockState getNextToMineState(ServerLevel level) {
+        if (this.currentDimension == null)
+            this.updateDimension(level);
+
+        if (this.currentChunkPos == null || this.currentMiningPos == null) {
+            if (!this.updateSamplingChunk(level))
+                return null;
+        }
+
+        // Move +x once
+        var nextPos = this.currentMiningPos.east();
+        if (nextPos.getX() >= this.currentChunkPos.getMaxBlockX()) {
+            // If we reach the end of x, move in +z once
+            nextPos = new BlockPos(this.currentChunkPos.getMinBlockX(), this.currentMiningPos.getY(), this.currentMiningPos.getZ() + 1);
+        }
+
+        // If we reached the end of z, move -y once
+        if (nextPos.getZ() >= this.currentChunkPos.getMaxBlockZ()) {
+            nextPos = new BlockPos(this.currentChunkPos.getMinBlockX(), this.currentMiningPos.getY() - 1, this.currentChunkPos.getMinBlockZ());
+        }
+
+        // If we reached the end of y, re-generate the chunk
+        if (nextPos.getY() <= this.currentDimension.getMinBuildHeight() + 1) {
+            this.currentChunkPos = null;
+            return getNextToMineState(level);
+        }
+
+        this.currentMiningPos = nextPos;
+        return this.currentDimension.getBlockState(nextPos);
+    }
+
+    private ResourceKey<Level> getMiniChunkDimension() {
+        ItemStack miniChunk = this.getMiniChunkInSlot();
+
+        if (miniChunk.isEmpty())
+            return null;
+
+        if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
+            switch (block.chunkType) {
+                case MiniChunkBlock.MiniChunkType.overworld:
+                    return CursedComponentsMod.OVERWORLD_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.nether:
+                    return Level.NETHER;
+                case MiniChunkBlock.MiniChunkType.end:
+                    return Level.END;
+            }
+        }
+        return null;
     }
 
     public static boolean isStorageFull(IItemHandler storage, int from, int to, ItemStack overflowingItem) {
@@ -441,10 +551,15 @@ public class DimensionalQuarryEntity extends BlockEntity {
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
         tag.putBoolean("cursedcomponents:dimensional_quarry_running", this.running);
         CompoundTag inventoryTag = inventory.serializeNBT(registries);
         tag.put("cursedcomponents:dimensional_quarry_inventory", inventoryTag);
+
+        if (this.currentChunkPos != null)
+            tag.putLong("cursedcomponents:dimensional_quarry_chunk", this.currentChunkPos.toLong());
+
+        if (this.currentMiningPos != null)
+            tag.putLong("cursedcomponents:dimensional_quarry_mine_pos", this.currentMiningPos.asLong());
         //tag.put("cursedcomponents:dimensional_quarry_overflowItem", overflowingItemStack.save(registries));
     }
 
@@ -452,15 +567,22 @@ public class DimensionalQuarryEntity extends BlockEntity {
     protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.loadAdditional(tag, registries);
         this.running = tag.getBoolean("cursedcomponents:dimensional_quarry_running");
-        this.inventory.deserializeNBT(registries, (CompoundTag) tag.get("cursedcomponents:dimensional_quarry_inventory"));
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_inventory")) {
+            Tag inv_tag = tag.get("cursedcomponents:dimensional_quarry_inventory");
+            if (inv_tag instanceof CompoundTag inv_compound_tag)
+                this.inventory.deserializeNBT(registries, inv_compound_tag);
+        }
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
+            this.currentChunkPos = new ChunkPos(tag.getLong("cursedcomponents:dimensional_quarry_chunk"));
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_mine_pos"))
+            this.currentMiningPos = BlockPos.of(tag.getLong("cursedcomponents:dimensional_quarry_mine_pos"));
 
         /*if (tag.contains("cursedcomponents:dimensional_quarry_overflowItem")) {
             ItemStack.parse(registries, tag.get("cursedcomponents:dimensional_quarry_overflowItem")).ifPresent(stack -> this.overflowingItemStack = stack);
         }*/
-
-        if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
-            this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
-        }
     }
 
     @Nullable
@@ -477,30 +599,19 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private final ContainerData quarryData = new ContainerData() {
         @Override
         public int get(int index) {
-            switch (index) {
-                case 0:
-                    return energy.getEnergyStored();
-                case 1:
-                    return currentYLevel;
-                case 2:
-                    return miningCooldown;
-                case 3:
-                    return running ? 1 : 0;
-                case 4:
-                    return worldPosition.getX();
-                case 5:
-                    return worldPosition.getY();
-                case 6:
-                    return worldPosition.getZ();
-                case 7:
-                    return isStorageFull(inventory, 3, getInventorySlots(), overflowingItemStack) ? 1 : 0;
-                case 8:
-                    return getEnergyConsumptionPerTick();
-                case 9:
-                    return getTicksPerBlock();
-                default:
-                    return 0;
-            }
+            return switch (index) {
+                case 0 -> energy.getEnergyStored();
+                case 1 -> currentMiningPos != null ? currentMiningPos.getY() : 0;
+                case 2 -> miningCooldown;
+                case 3 -> running ? 1 : 0;
+                case 4 -> worldPosition.getX();
+                case 5 -> worldPosition.getY();
+                case 6 -> worldPosition.getZ();
+                case 7 -> isStorageFull(inventory, 3, getInventorySlots(), overflowingItemStack) ? 1 : 0;
+                case 8 -> getEnergyConsumptionPerTick();
+                case 9 -> getTicksPerBlock();
+                default -> 0;
+            };
         }
 
         @Override

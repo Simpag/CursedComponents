@@ -12,11 +12,14 @@ import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
 import com.ccteam.cursedcomponents.network.PacketHandler;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,6 +40,9 @@ public class CursedComponentsMod {
     public static final String MOD_ID = "cursedcomponents";
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    // Mining dimension sampling dimensions
+    public static final ResourceKey<Level> OVERWORLD_SAMPLE_DIMENSION_KEY = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(MOD_ID, "overworld_sampling_dimension"));
 
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.

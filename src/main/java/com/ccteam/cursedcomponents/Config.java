@@ -43,22 +43,22 @@ public class Config {
             .comment("Quarry speed (Block/Tick)")
             .push("speed")
             .comment("How many ticks between each block mined")
-            .defineInRange("base", 20, 1, Integer.MAX_VALUE);
+            .defineInRange("base", 15, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_1 = BUILDER
-            .defineInRange("efficiencyI", 17, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyI", 13, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_2 = BUILDER
-            .defineInRange("efficiencyII", 14, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyII", 10, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_3 = BUILDER
-            .defineInRange("efficiencyIII", 11, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyIII", 8, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_4 = BUILDER
-            .defineInRange("efficiencyIV", 8, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyIV", 5, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_5 = BUILDER
-            .defineInRange("efficiencyV", 5, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyV", 2, 1, Integer.MAX_VALUE);
 
 
     static final ModConfigSpec SPEC = BUILDER.build();

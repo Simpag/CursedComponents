@@ -13,7 +13,7 @@ public class MiniChunkBlock extends Block {
             box(5, 0, 5, 11, 6, 11),
             box(6, 6, 7, 9, 10, 10)
     );
-    private final MiniChunkType chunkType;
+    public final MiniChunkType chunkType;
 
     public MiniChunkBlock(Properties properties, MiniChunkType chunkType) {
         super(properties);

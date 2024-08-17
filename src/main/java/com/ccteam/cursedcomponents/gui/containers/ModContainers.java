@@ -2,13 +2,11 @@ package com.ccteam.cursedcomponents.gui.containers;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
@@ -17,7 +15,7 @@ public class ModContainers {
 
     public static final Supplier<MenuType<DimensionalQuarryContainer>> DIMENSIONAL_QUARRY_CONTAINER = CONTAINERS.register(
             "dimensional_quarry_container",
-            () -> new MenuType(DimensionalQuarryContainer::new, FeatureFlags.DEFAULT_FLAGS)
+            () -> new MenuType<>(DimensionalQuarryContainer::new, FeatureFlags.DEFAULT_FLAGS)
     );
 
     /*public static final Supplier<MenuType<DimensionalQuarryContiner>> DIMENSIONAL_QUARRY_CONTAINER = CONTAINERS.register(

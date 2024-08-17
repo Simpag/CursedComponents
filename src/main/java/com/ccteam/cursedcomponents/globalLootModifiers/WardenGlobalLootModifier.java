@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.GlobalLootModifiers;
+package com.ccteam.cursedcomponents.globalLootModifiers;
 
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.mojang.serialization.Codec;

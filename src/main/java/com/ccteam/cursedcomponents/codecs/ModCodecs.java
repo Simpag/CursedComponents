@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.codecs;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.GlobalLootModifiers.WardenGlobalLootModifier;
+import com.ccteam.cursedcomponents.globalLootModifiers.WardenGlobalLootModifier;
 import com.mojang.serialization.MapCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;

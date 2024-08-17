@@ -1,6 +1,7 @@
-package com.ccteam.cursedcomponents.ItemStackHandlers;
+package com.ccteam.cursedcomponents.itemStackHandlers;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.ItemStackHandler;

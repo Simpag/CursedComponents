@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.DimensionTester;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.item.ModItems;

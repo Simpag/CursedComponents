@@ -7,8 +7,13 @@ import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.itemStackHandlers.DimensionalQuarryItemStackHandler;
 
+import com.ccteam.cursedcomponents.threads.DimensionalQuarrySearcher;
 import com.mojang.logging.LogUtils;
 
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -69,8 +74,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private float miniChunkRotation;
     private ItemStack overflowingItemStack;
 
-    private ChunkPos currentChunkPos;
-    private BlockPos currentMiningPos;
+    private Long2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> blockStatesToMine = new Long2ObjectOpenHashMap<>();
+    private ObjectIterator<Long2ObjectMap.Entry<DimensionalQuarrySearcher.BlockStateInfo>> blockStatesToMineIt;
+    private DimensionalQuarrySearcher searcher = new DimensionalQuarrySearcher(this);
+    private boolean searching;
+    private Integer currentYLevel;
     private ServerLevel currentDimension;
 
     private final DimensionalQuarryItemStackHandler inventory = new DimensionalQuarryItemStackHandler(INVENTORY_SIZE) {
@@ -103,11 +111,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
         this.running = false;
+        this.searching = false;
         this.miningCooldown = 0;
         this.ejectCooldown = 0;
         this.overflowingItemStack = null;
-        currentMiningPos = null;
-        currentChunkPos = null;
+        this.currentYLevel = null;
     }
 
     @Override
@@ -132,6 +140,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public ContainerData getQuarryData() {
         return this.quarryData;
+    }
+
+    public DimensionalQuarrySearcher getSearcher() {
+        return this.searcher;
     }
 
     public DimensionalQuarryItemStackHandler getInventory() {
@@ -215,6 +227,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentTicksPerBlock;
     }
 
+    public void updateBlockStatesToMine(Long2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> info) {
+        this.blockStatesToMine = info;
+        this.blockStatesToMineIt = this.blockStatesToMine.long2ObjectEntrySet().iterator();
+        this.searching = false;
+        LOGGER.debug("Got blocks: " + this.blockStatesToMine.size());
+    }
+
     private void updateTicksPerBlock() {
         ItemStack pick = this.getPickaxeSlot();
 
@@ -281,7 +300,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (level.isClientSide)
             return;
 
-        if (entity.running && checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)).getFirst() == MiningRequirement.ok) {
+        if (!entity.searching && entity.running && checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)).getFirst() == MiningRequirement.ok) {
             entity.mineNextBlock((ServerLevel) level);
         }
 
@@ -289,6 +308,15 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public void mineNextBlock(ServerLevel level) {
+        if (this.blockStatesToMineIt == null || !this.blockStatesToMineIt.hasNext()) {
+            this.generateBlockStatesToMine(level);
+            return;
+        }
+
+        // Don't draw energy while searching for blocks
+        if (this.searcher.getCurrentState() == DimensionalQuarrySearcher.State.RUNNING)
+            return;
+
         // Draw energy every tick
         energy.extractEnergy(this.getEnergyConsumptionPerTick(), false);
 
@@ -298,40 +326,40 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
         this.miningCooldown = 0;
 
-        BlockState blockToMineState = getNextToMineState(level);
+        var it = this.blockStatesToMineIt.next();
+        BlockState blockToMineState = it.getValue().state;
+        BlockPos pos = BlockPos.of(it.getLongKey());
+        this.currentYLevel = pos.getY();
 
-        if (blockToMineState == null)
-            return;
+        // Try to add the mined block to the inventory
+        LootParams.Builder params = new LootParams.Builder(this.currentDimension);
+        params = params.withOptionalParameter(LootContextParams.ORIGIN, pos.getCenter());
+        params = params.withOptionalParameter(LootContextParams.TOOL, getPickaxeSlot());
 
-        if (!blockToMineState.isEmpty() && blockToMineState.getDestroySpeed(this.currentDimension, this.currentMiningPos) >= 0) {
-            // Try to add the mined block to the inventory
-            LootParams.Builder params = new LootParams.Builder(this.currentDimension);
-            params = params.withOptionalParameter(LootContextParams.ORIGIN, this.currentMiningPos.getCenter());
-            params = params.withOptionalParameter(LootContextParams.TOOL, getPickaxeSlot());
+        List<ItemStack> itemStacks = blockToMineState.getDrops(params);
 
-            List<ItemStack> itemStacks = blockToMineState.getDrops(params);
+        // Check if we can insert all drops
+        for (ItemStack itemStack : itemStacks) {
+            ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
 
-            // Check if we can insert all drops
-            for (ItemStack itemStack : itemStacks) {
-                ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
-
-                // If the inventory is full, stop the mining process
-                if (!simItemStack.isEmpty()) {
-                    this.overflowingItemStack = simItemStack;
-                    return;
-                } else {
-                    this.overflowingItemStack = null;
-                }
-            }
-
-            // Insert the items
-            for (ItemStack itemStack : itemStacks) {
-                ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
+            // If the inventory is full, stop the mining process
+            if (!simItemStack.isEmpty()) {
+                this.overflowingItemStack = simItemStack;
+                return;
+            } else {
+                this.overflowingItemStack = null;
             }
         }
+
+        // Insert the items
+        for (ItemStack itemStack : itemStacks) {
+            ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
+        }
+
     }
 
     public void tryEject(Level level, BlockPos pos) {
+        // TODO update this, cache the eject inventory and only look for more if the inventory is full or gets destroyed
         this.ejectCooldown++;
         if (this.ejectCooldown <= EJECTION_COOLDOWN) {
             return;
@@ -383,6 +411,18 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return attachedStorages;
     }
 
+    private void generateBlockStatesToMine(ServerLevel level) {
+        if (searcher.getCurrentState() == DimensionalQuarrySearcher.State.IDLE) {
+            if (this.currentDimension == null)
+                this.updateDimension(level);
+
+            LOGGER.debug("Starting search for: " + worldPosition);
+            this.searching = true;
+            searcher.setDimension(this.currentDimension);
+            searcher.start();
+        }
+    }
+
     private void updateDimension(ServerLevel level) {
         this.currentDimension = null;
         ResourceKey<Level> dim = this.getMiniChunkDimension();
@@ -393,76 +433,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         this.currentDimension = level.getServer().getLevel(dim);
-    }
-
-    private boolean updateSamplingChunk(ServerLevel level) {
-        if (this.currentDimension == null) {
-            LOGGER.debug("Target dimension is null!");
-            return false;
-        }
-
-        Random random = new Random();
-        int randomX = random.nextInt(-1_000_000, 1_000_000);
-        int randomZ = random.nextInt(-1_000_000, 1_000_000);
-        ChunkPos chunkPos = new ChunkPos(randomX, randomZ);
-
-        Integer startingY = this.getFirstNonEmptyYLayer(this.currentDimension, chunkPos);
-
-        if (startingY == null) {
-            LOGGER.debug("Starting Y position in dimension is null!");
-            return false;
-        }
-
-        this.currentChunkPos = chunkPos;
-        this.currentMiningPos = chunkPos.getBlockAt(0, startingY, 0);
-
-        return true;
-    }
-
-    private Integer getFirstNonEmptyYLayer(ServerLevel world, ChunkPos chunkPos) {
-        // Gets a rough estimate of the first breakable block
-        int x = chunkPos.getMinBlockX();
-        int z = chunkPos.getMinBlockZ();
-        for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y -= 5) {
-            BlockPos pos = new BlockPos(x, y, z);
-            BlockState state = world.getBlockState(pos);
-
-            if (!state.isEmpty() && state.getDestroySpeed(world, pos) > 0)
-                return y;
-        }
-
-        return null;
-    }
-
-    private BlockState getNextToMineState(ServerLevel level) {
-        if (this.currentDimension == null)
-            this.updateDimension(level);
-
-        if (this.currentChunkPos == null || this.currentMiningPos == null) {
-            if (!this.updateSamplingChunk(level))
-                return null;
-        }
-
-        // Move +x once
-        var nextPos = this.currentMiningPos.east();
-        if (nextPos.getX() >= this.currentChunkPos.getMaxBlockX()) {
-            // If we reach the end of x, move in +z once
-            nextPos = new BlockPos(this.currentChunkPos.getMinBlockX(), this.currentMiningPos.getY(), this.currentMiningPos.getZ() + 1);
-        }
-
-        // If we reached the end of z, move -y once
-        if (nextPos.getZ() >= this.currentChunkPos.getMaxBlockZ()) {
-            nextPos = new BlockPos(this.currentChunkPos.getMinBlockX(), this.currentMiningPos.getY() - 1, this.currentChunkPos.getMinBlockZ());
-        }
-
-        // If we reached the end of y, re-generate the chunk
-        if (nextPos.getY() <= this.currentDimension.getMinBuildHeight() + 1) {
-            this.currentChunkPos = null;
-            return getNextToMineState(level);
-        }
-
-        this.currentMiningPos = nextPos;
-        return this.currentDimension.getBlockState(nextPos);
     }
 
     private ResourceKey<Level> getMiniChunkDimension() {
@@ -555,11 +525,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
         CompoundTag inventoryTag = inventory.serializeNBT(registries);
         tag.put("cursedcomponents:dimensional_quarry_inventory", inventoryTag);
 
-        if (this.currentChunkPos != null)
+        /*if (this.currentChunkPos != null)
             tag.putLong("cursedcomponents:dimensional_quarry_chunk", this.currentChunkPos.toLong());
 
         if (this.currentMiningPos != null)
-            tag.putLong("cursedcomponents:dimensional_quarry_mine_pos", this.currentMiningPos.asLong());
+            tag.putLong("cursedcomponents:dimensional_quarry_mine_pos", this.currentMiningPos.asLong());*/
         //tag.put("cursedcomponents:dimensional_quarry_overflowItem", overflowingItemStack.save(registries));
     }
 
@@ -574,11 +544,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 this.inventory.deserializeNBT(registries, inv_compound_tag);
         }
 
-        if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
+        /*if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
             this.currentChunkPos = new ChunkPos(tag.getLong("cursedcomponents:dimensional_quarry_chunk"));
 
         if (tag.contains("cursedcomponents:dimensional_quarry_mine_pos"))
-            this.currentMiningPos = BlockPos.of(tag.getLong("cursedcomponents:dimensional_quarry_mine_pos"));
+            this.currentMiningPos = BlockPos.of(tag.getLong("cursedcomponents:dimensional_quarry_mine_pos"));*/
 
         /*if (tag.contains("cursedcomponents:dimensional_quarry_overflowItem")) {
             ItemStack.parse(registries, tag.get("cursedcomponents:dimensional_quarry_overflowItem")).ifPresent(stack -> this.overflowingItemStack = stack);
@@ -601,7 +571,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         public int get(int index) {
             return switch (index) {
                 case 0 -> energy.getEnergyStored();
-                case 1 -> currentMiningPos != null ? currentMiningPos.getY() : 0;
+                case 1 -> currentYLevel != null ? currentYLevel : 0;
                 case 2 -> miningCooldown;
                 case 3 -> running ? 1 : 0;
                 case 4 -> worldPosition.getX();

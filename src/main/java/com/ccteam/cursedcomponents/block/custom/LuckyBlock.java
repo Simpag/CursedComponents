@@ -5,7 +5,9 @@ import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
@@ -16,6 +18,7 @@ import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -24,6 +27,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class LuckyBlock extends Block {
@@ -52,32 +57,38 @@ public class LuckyBlock extends Block {
     }
 
     private void dropUnlucky(Level world, Player player, BlockPos pos) {
-        if (new Random().nextInt() % 2 == 0)
-            spawnSkeletons(world, pos);
-        else
-            spawnAnvilTrap(world, player);
+        List<Runnable> dropTasks = Arrays.asList(
+                () -> spawnSkeletons(world, pos),
+                () -> spawnAnvilTrap(world, player)
+        );
+        int r = new Random().nextInt(dropTasks.size());
+        dropTasks.get(r).run();
     }
 
     private void dropNormal(Level world, BlockPos pos) {
-        int r = new Random().nextInt() % 3;
-        if (r == 0)
-            dropGoldTools(world, pos);
-        else if (r == 1)
-            dropGoldArmor(world, pos);
-        else
-            dropEnderChest(world, pos);
+        List<Runnable> dropTasks = Arrays.asList(
+                () -> dropGoldTools(world, pos),
+                () -> dropGoldArmor(world, pos),
+                () -> dropEnderChest(world, pos),
+                () -> dropSaddles(world, pos),
+                () -> dropPotatoes(world, pos),
+                () -> dropFishingEquipment(world, pos),
+                () -> dropBooks(world, pos),
+                () -> dropBuckets(world, pos)
+        );
+        int r = new Random().nextInt(dropTasks.size());
+        dropTasks.get(r).run();
     }
 
     private void dropVeryLucky(Level world, Player player, BlockPos pos) {
-        int r = new Random().nextInt() % 3;
-        if (r == 0)
-            constructBlockTower(world, player, pos);
-        else if (r == 1)
-            spawnLuckyVillager(world, pos);
-        else if (r == 2)
-            hurlBottlesOfEnchanting(world, pos);
-        else
-            spawnLuckyParrot(world, pos);
+        List<Runnable> dropTasks = Arrays.asList(
+                () -> constructBlockTower(world, player, pos),
+                () -> spawnLuckyVillager(world, pos),
+                () -> hurlBottlesOfEnchanting(world, pos),
+                () -> spawnLuckyParrot(world, pos)
+        );
+        int r = new Random().nextInt(dropTasks.size());
+        dropTasks.get(r).run();
     }
 
     private void spawnAnvilTrap(Level world, Player player) {
@@ -147,6 +158,51 @@ public class LuckyBlock extends Block {
 
     private void dropEnderChest(Level world, BlockPos pos) {
         world.setBlock(pos, Blocks.ENDER_CHEST.defaultBlockState(), 3);
+    }
+
+    private void dropSaddles(Level world, BlockPos pos) {
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.SADDLE),
+                new ItemStack(Items.SADDLE)
+        });
+    }
+
+    private void dropPotatoes(Level world, BlockPos pos) {
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.POTATO, 32),
+                new ItemStack(Items.BAKED_POTATO, 16),
+                new ItemStack(Items.POISONOUS_POTATO, 4),
+        });
+    }
+
+    private void dropFishingEquipment(Level world, BlockPos pos) {
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.FISHING_ROD, 1),
+                new ItemStack(Items.COD_BUCKET, 1),
+                new ItemStack(Items.COOKED_SALMON, 16),
+                new ItemStack(Items.PUFFERFISH, 4),
+        });
+    }
+
+    private void dropBooks(Level world, BlockPos pos) {
+        ItemStack enchantedBook = new ItemStack(Items.ENCHANTED_BOOK);
+        EnchantmentHelper.enchantItem(world.random, enchantedBook, 12, world.registryAccess(),
+                world.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
+                        .getTag(EnchantmentTags.IN_ENCHANTING_TABLE));
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.BOOKSHELF, 7),
+                new ItemStack(Items.BOOK, 32),
+                enchantedBook
+        });
+    }
+
+    private void dropBuckets(Level world, BlockPos pos) {
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.BUCKET, 3),
+                new ItemStack(Items.WATER_BUCKET, 1),
+                new ItemStack(Items.LAVA_BUCKET, 1),
+                new ItemStack(Items.MILK_BUCKET, 1)
+        });
     }
 
     private void constructBlockTower(Level world, Player player, BlockPos pos) {

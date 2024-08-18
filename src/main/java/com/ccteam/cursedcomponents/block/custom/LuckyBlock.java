@@ -1,5 +1,6 @@
 package com.ccteam.cursedcomponents.block.custom;
 
+import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
@@ -8,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
@@ -43,7 +45,7 @@ public class LuckyBlock extends Block {
             return;
 
         super.playerDestroy(world, player, pos, state, blockEntity, tool);
-        Random random = new Random();
+        RandomSource random = world.getRandom();
 
         float r = random.nextFloat();
         if (r < 1/100.0)
@@ -85,7 +87,9 @@ public class LuckyBlock extends Block {
                 () -> constructBlockTower(world, player, pos),
                 () -> spawnLuckyVillager(world, pos),
                 () -> hurlBottlesOfEnchanting(world, pos),
-                () -> spawnLuckyParrot(world, pos)
+                () -> spawnLuckyParrot(world, pos),
+                () -> dropEndPortalFrames(world, pos),
+                () -> spawnLuckyPyramid(world, player, pos)
         );
         int r = new Random().nextInt(dropTasks.size());
         dropTasks.get(r).run();
@@ -214,6 +218,8 @@ public class LuckyBlock extends Block {
             world.setBlock(newPos, Blocks.STONE.defaultBlockState(), 3);
         }
         world.setBlock(pos.above(height + 1), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+        world.setBlock(pos.above(height + 2), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        world.setBlock(pos.above(height + 3), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
     }
 
     private void spawnLuckyParrot(Level world, BlockPos pos) {
@@ -244,6 +250,48 @@ public class LuckyBlock extends Block {
                 world.random.triangle((double)facing.getStepZ() * d, 0.0172275 * (double)speed)
         );
         world.addFreshEntity(experienceBottle);
+    }
+
+    private void dropEndPortalFrames(Level world, BlockPos pos) {
+        int numFrames = world.random.nextInt(5) + 2;
+        dropItemStacks(world, pos, new ItemStack[] {
+                new ItemStack(Items.END_PORTAL_FRAME, 12)
+        });
+    }
+
+    private void spawnLuckyPyramid(Level world, Player player, BlockPos pos) {
+        int baseSize = 5;
+        int height = baseSize / 2 + 1;
+
+        BlockPos playerPos = player.blockPosition();
+        int offsetX = pos.getX() - playerPos.getX();
+        offsetX += (offsetX >= 0) ? 2 : 0;
+        int offsetZ = pos.getZ() - playerPos.getZ();
+        offsetZ += (offsetZ >= 0) ? 2 : 0;
+
+        // Adjust the starting position of the pyramid to avoid overlapping the player
+        BlockPos pyramidStartPos = pos.offset(offsetX, 0, offsetZ);
+
+        for (int y = 0; y < height; y++) {
+            int layerSize = baseSize - 2 * y;
+
+            for (int x = 0; x < layerSize; x++) {
+                for (int z = 0; z < layerSize; z++) {
+                    BlockPos newPos = pyramidStartPos.offset(x + y, y, z + y);
+
+                    // Center block at each layer
+                    if (x == layerSize / 2 && z == layerSize / 2) {
+                        world.setBlock(newPos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState(), 3);
+                    } // Edge blocks at the base layer
+                    else if (y == 0 && (x == 0 || z == 0 || x == layerSize - 1 || z == layerSize - 1)) {
+                        world.setBlock(newPos, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+                    }
+                    else {
+                        world.setBlock(newPos, Blocks.SANDSTONE.defaultBlockState(), 3);
+                    }
+                }
+            }
+        }
     }
 
     private void dropItemStacks(Level world, BlockPos pos, ItemStack[] itemStacks) {

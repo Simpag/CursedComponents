@@ -26,19 +26,27 @@ public class CustomVillagerManager {
         villager.setVillagerXp(10000);
 
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD.asItem(), 1);
+        ItemStack pickaxe = new ItemStack(Items.DIAMOND_PICKAXE.asItem(), 1);
 
         EnchantmentHelper.enchantItem(world.random, sword, 30, world.registryAccess(),
                 world.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
                         .getTag(EnchantmentTags.DAMAGE_EXCLUSIVE));
 
-        MerchantOffer offer = new MerchantOffer(
-                new ItemCost(Items.WHEAT, 16),
-                sword,
-                2, 9, 0.05f
-        );
+        EnchantmentHelper.enchantItem(world.random, pickaxe, 30, world.registryAccess(),
+                world.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
+                        .getTag(EnchantmentTags.MINING_EXCLUSIVE));
 
         MerchantOffers offers = new MerchantOffers();
-        offers.add(offer);
+        offers.add(new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1),
+                sword,
+                1, 9, 0.05f
+        ));
+        offers.add(new MerchantOffer(
+                new ItemCost(Items.EMERALD, 1),
+                pickaxe,
+                1, 9, 0.05f
+        ));
         villager.setOffers(offers);
         return villager;
     }

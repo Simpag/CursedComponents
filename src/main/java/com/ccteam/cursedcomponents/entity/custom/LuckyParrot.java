@@ -1,5 +1,6 @@
 package com.ccteam.cursedcomponents.entity.custom;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -31,6 +32,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.util.ObfuscationReflectionHelper;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     private static final EntityDataAccessor<Integer> VARIANT =
@@ -99,11 +102,22 @@ public class LuckyParrot extends ShoulderRidingEntity implements FlyingAnimal {
     }
 
     public static void tickOnShoulder(Player owner) {
+        ObfuscationReflectionHelper.setPrivateValue(Player.class, owner, Long.MAX_VALUE - 100L, "timeEntitySatOnShoulder");
         if (!owner.level().isClientSide) {
             return;
         }
+        owner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 50, 0, false, true, true));
+    }
 
-        owner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 10, false, false));
+    public static void dismountFromShoulder(Player owner) {
+        if (!owner.level().isClientSide) {
+            try {
+                ObfuscationReflectionHelper.setPrivateValue(Player.class, owner, Long.MIN_VALUE, "timeEntitySatOnShoulder");
+                ObfuscationReflectionHelper.findMethod(Player.class, "removeEntitiesOnShoulder").invoke(owner);
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /* COPY PASTA */

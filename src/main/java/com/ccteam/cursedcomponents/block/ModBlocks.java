@@ -36,6 +36,8 @@ public class ModBlocks {
             new Item.Properties().rarity(Rarity.RARE)
     );
 
+    public static final DeferredBlock<Block> DimTester = registerBlock("dim_tester", () -> new DimensionTester(BlockBehaviour.Properties.of().strength(2f)));
+
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn, new Item.Properties());

@@ -28,10 +28,13 @@ public class DimensionalQuarrySearcher extends Thread {
     private Int2ObjectMap<BlockStateInfo> blockStatesToMine = new Int2ObjectOpenHashMap<>();
     private ChunkPos chunkPos;
     private int startY;
+    private Random rng;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
         super("Dimensional Quarry Searcher: " + entity.getBlockPos());
         this.quarryEntity = entity;
+        this.rng = new Random();
+        this.rng.setSeed(System.nanoTime());
         setDaemon(true);
     }
 
@@ -46,18 +49,21 @@ public class DimensionalQuarrySearcher extends Thread {
     @Override
     public void run() {
         this.state = State.RUNNING;
-        if (!this.updateSamplingChunk())
+        if (!this.updateSamplingChunk()) {
+            this.state = State.ERROR;
             return;
+        }
 
         this.blockStatesToMine.clear();
         Reference2BooleanMap<Block> acceptedBlocks = new Reference2BooleanOpenHashMap<>();
 
-        for (int y=this.startY; y > this.dimension.getMinBuildHeight(); y--) {
+        for (int y = this.startY; y > this.dimension.getMinBuildHeight(); y--) {
             for (int x = this.chunkPos.getMinBlockX(); x <= this.chunkPos.getMaxBlockX(); x++) {
                 for (int z = this.chunkPos.getMinBlockZ(); z <= this.chunkPos.getMaxBlockZ(); z++) {
-                    if (quarryEntity.isRemoved()) {
+                    if (quarryEntity.isRemoved() || quarryEntity.getSearcher() != this) {
                         // Stop if the quarry is destroyed
                         LOGGER.debug("Stopping, quarry got destroyed...");
+                        this.state = State.ERROR;
                         return;
                     }
 
@@ -71,23 +77,21 @@ public class DimensionalQuarrySearcher extends Thread {
 
                     if (!acceptedBlocks.containsKey(blockToMine)) {
                         // Check blacklist filters here and such....
+                        // Remove always setting true...
                         acceptedBlocks.put(blockToMine, true);
-                    } else {
-                        acceptedBlocks.put(blockToMine, false);
                     }
 
                     if (acceptedBlocks.getBoolean(blockToMine)) {
                         this.blockStatesToMine.computeIfAbsent(y, k -> new BlockStateInfo()).increment(blockToMineState);
-                        LOGGER.debug("Added block; " + blockToMine);
                     }
                 }
             }
         }
 
-        this.state = State.FINISHED;
+        this.state = State.IDLE;
         this.chunkPos = null;
-        LOGGER.debug("Sending data: " + this.blockStatesToMine.size());
-        if (quarryEntity.getSearcher() == this) {
+
+        if (!quarryEntity.isRemoved() && quarryEntity.getSearcher() == this) {
             //Only update search if we are still valid
             quarryEntity.updateBlockStatesToMine(this.blockStatesToMine);
         }
@@ -99,9 +103,8 @@ public class DimensionalQuarrySearcher extends Thread {
             return false;
         }
 
-        Random random = new Random();
-        int randomX = random.nextInt(-1_000_000, 1_000_000);
-        int randomZ = random.nextInt(-1_000_000, 1_000_000);
+        int randomX = this.rng.nextInt(-1_000_000, 1_000_000);
+        int randomZ = this.rng.nextInt(-1_000_000, 1_000_000);
         ChunkPos chunkPos = new ChunkPos(randomX, randomZ);
 
         BlockPos startPos = this.getFirstPos(chunkPos);
@@ -120,13 +123,11 @@ public class DimensionalQuarrySearcher extends Thread {
     private boolean isMineable(BlockState blockToMineState, Block blockToMine, BlockPos pos) {
         if (blockToMineState.isEmpty() || blockToMineState.getDestroySpeed(this.dimension, pos) <= 0) {
             // Skip air and unbreakable blocks
-            LOGGER.debug("Block is air, insta-break or unbreakable.." + blockToMineState.getBlock().getName());
             return false;
         }
 
         if (blockToMine instanceof LiquidBlock || blockToMine instanceof BubbleColumnBlock) {
             // Skip liquids
-            LOGGER.debug("Block is liquid...");
             return false;
         }
 
@@ -152,16 +153,13 @@ public class DimensionalQuarrySearcher extends Thread {
         IDLE,
         RUNNING,
         ERROR,
-        FINISHED,
     }
 
     public class BlockStateInfo {
         public Object2IntMap<BlockState> blockStates;
-        private Random rng;
 
         public BlockStateInfo() {
             this.blockStates = new Object2IntOpenHashMap<>();
-            this.rng = new Random();
         }
 
         public void increment(BlockState state) {
@@ -173,7 +171,7 @@ public class DimensionalQuarrySearcher extends Thread {
         }
 
         public BlockState getRandomState() {
-            int r = this.rng.nextInt(this.blockStates.size()-1);
+            int r = rng.nextInt(this.blockStates.size());
             var it = this.blockStates.keySet().iterator();
             it.skip(r);
 

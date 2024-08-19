@@ -160,20 +160,6 @@
 				"up": {"uv": [1.5, 8.5, 1, 4.5], "texture": "#0"},
 				"down": {"uv": [4, 4.5, 3.5, 8.5], "texture": "#0"}
 			}
-		},
-		{
-			"name": "dice",
-			"from": [5, 5, 5],
-			"to": [11, 11, 11],
-			"rotation": {"angle": 0, "axis": "y", "origin": [6, 6, 4]},
-			"faces": {
-				"north": {"uv": [0, 0, 1.5, 1.5], "texture": "#0"},
-				"east": {"uv": [0, 1.5, 1.5, 3], "texture": "#0"},
-				"south": {"uv": [1.5, 0, 3, 1.5], "texture": "#0"},
-				"west": {"uv": [1.5, 1.5, 3, 3], "texture": "#0"},
-				"up": {"uv": [1.5, 4.5, 0, 3], "texture": "#0"},
-				"down": {"uv": [4.5, 0, 3, 1.5], "texture": "#0"}
-			}
 		}
 	],
 	"display": {
@@ -213,12 +199,6 @@
 			"origin": [0, 0, 0],
 			"color": 0,
 			"children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-		},
-		{
-			"name": "inner",
-			"origin": [0, 0, 0],
-			"color": 0,
-			"children": [12]
 		}
 	]
 }

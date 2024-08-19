@@ -1,9 +1,11 @@
 package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -23,8 +25,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -33,10 +36,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class LuckyBlock extends Block {
+public class LuckyBlock extends BaseEntityBlock {
+
+    private static MapCodec<? extends BaseEntityBlock> CODEC = simpleCodec(LuckyBlock::new);
 
     public LuckyBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
@@ -314,5 +324,15 @@ public class LuckyBlock extends Block {
     @Override
     protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
         return 1f;
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new LuckyBlockEntity(pos, state);
+    }
+
+    @Override
+    protected RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 }

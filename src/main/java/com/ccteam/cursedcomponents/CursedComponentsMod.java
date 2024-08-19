@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
@@ -44,6 +45,7 @@ public class CursedComponentsMod {
         ModStructures.register(modEventBus);
         ModEntities.register(modEventBus);
         ModEntityAttachments.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.

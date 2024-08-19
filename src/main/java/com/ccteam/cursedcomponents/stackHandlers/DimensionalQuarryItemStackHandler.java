@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.itemStackHandlers;
+package com.ccteam.cursedcomponents.stackHandlers;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 

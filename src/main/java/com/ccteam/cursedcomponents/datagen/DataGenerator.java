@@ -5,6 +5,7 @@ import com.ccteam.cursedcomponents.CursedComponentsMod;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -30,10 +31,15 @@ public class DataGenerator {
                 List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
 
         BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(packOutput, lookupProvider, existingFileHelper);
+        EntityTypeTagsProvider entityTypeTagsProvider = new ModEntityTypeTagProvider(packOutput, lookupProvider, CursedComponentsMod.MOD_ID, existingFileHelper);
+
         gen.addProvider(event.includeServer(), blockTagsProvider);
+        gen.addProvider(event.includeServer(), entityTypeTagsProvider);
         gen.addProvider(event.includeServer(), new ModItemTagProvider(packOutput, lookupProvider, blockTagsProvider.contentsGetter(), existingFileHelper));
 
         gen.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
         gen.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
+
+        gen.addProvider(event.includeServer(), new ModWorldGenProvider(packOutput, lookupProvider));
     }
 }

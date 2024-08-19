@@ -1,3 +1,6 @@
 {
-
+  "block.cursedcomponents.lucky_block": "Lucky Block",
+  "entity.cursedcomponents.lucky_parrot": "Lucky Parrot",
+  "key.cursedcomponents.lucky_animal_dismount": "Dismount Lucky Animal",
+  "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components"
 }

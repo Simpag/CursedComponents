@@ -17,6 +17,8 @@ public class ModItems {
 
     // public static final DeferredItem<Item> ITEM_1 = ITEMS.registerSimpleItem("item_1");
 
+    public static final DeferredItem<Item> ICON = ITEMS.registerSimpleItem("icon");
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

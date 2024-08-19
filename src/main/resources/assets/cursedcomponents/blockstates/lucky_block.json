@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "cursedcomponents:block/lucky_block"
+    }
+  }
+}

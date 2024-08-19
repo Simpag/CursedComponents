@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
@@ -12,6 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
@@ -29,7 +31,10 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -50,6 +55,11 @@ public class LuckyBlock extends BaseEntityBlock {
     }
 
     @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
+        return createTickerHelper(blockEntityType, ModBlockEntities.LUCKY_BLOCK_BE.get(), LuckyBlockEntity::tick);
+    }
+
+    @Override
     public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         if (world.isClientSide())
             return;
@@ -66,6 +76,15 @@ public class LuckyBlock extends BaseEntityBlock {
             dropNormal(world, pos);
         else
             dropVeryLucky(world, player, pos);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof LuckyBlockEntity luckyBlockEntity) {
+            luckyBlockEntity.startSpinning(player);
+        }
+        return InteractionResult.SUCCESS;
     }
 
     private void dropUnlucky(Level world, Player player, BlockPos pos) {

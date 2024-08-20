@@ -21,7 +21,7 @@ public class ModBlocks {
     public static final DeferredBlock<Block> LUCKY_BLOCK = registerBlock("lucky_block",
             () -> new LuckyBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_YELLOW)
-                    .strength(5f)
+                    .strength(8f)
                     .lightLevel((s) -> 15)
                     .noOcclusion()
             ));

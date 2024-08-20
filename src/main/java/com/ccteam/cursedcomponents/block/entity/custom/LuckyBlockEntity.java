@@ -1,5 +1,6 @@
 package com.ccteam.cursedcomponents.block.entity.custom;
 
+import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +40,11 @@ public class LuckyBlockEntity extends BlockEntity {
             entity.spinTicks--;
             if (entity.isSpinning && entity.spinTicks <= 0) {
                 entity.isSpinning = false;
-                level.destroyBlock(pos, false, entity.activatingPlayer);
+                BlockState luckyBlock = level.getBlockState(pos);
+                if (luckyBlock.getBlock() instanceof LuckyBlock) {
+                    luckyBlock.getBlock().playerDestroy(level, entity.activatingPlayer, pos, luckyBlock, null, entity.activatingPlayer.getMainHandItem());
+                    level.destroyBlock(pos, false, entity.activatingPlayer);
+                }
             }
         }
     }

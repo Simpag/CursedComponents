@@ -27,13 +27,13 @@ public class ModBlocks {
             () -> new DimensionalQuarryBlock(
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().noOcclusion().pushReaction(PushReaction.IGNORE)
             ),
-            new Item.Properties().rarity(Rarity.RARE)
+            new Item.Properties().rarity(Rarity.EPIC)
     );
 
     public static final DeferredBlock<Block> MINI_CHUNK_OVERWORLD = registerBlock(
             "mini_chunk_overworld",
             () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.overworld),
-            new Item.Properties().rarity(Rarity.RARE)
+            new Item.Properties().rarity(Rarity.EPIC)
     );
 
     public static final DeferredBlock<Block> DimTester = registerBlock("dim_tester", () -> new DimensionTester(BlockBehaviour.Properties.of().strength(2f)));

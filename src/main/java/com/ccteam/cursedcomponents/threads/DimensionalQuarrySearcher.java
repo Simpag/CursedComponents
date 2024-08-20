@@ -1,12 +1,17 @@
 package com.ccteam.cursedcomponents.threads;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
+import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
+import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
+import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.world.level.block.Block;
@@ -17,9 +22,10 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+
 
 public class DimensionalQuarrySearcher extends Thread {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -32,12 +38,23 @@ public class DimensionalQuarrySearcher extends Thread {
     private ChunkAccess chunkAccess;
     private Integer startY;
     private Random rng;
+    private Set<Item> blackList;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
         super("Dimensional Quarry Searcher: " + entity.getBlockPos());
         this.quarryEntity = entity;
         this.rng = new Random();
         this.rng.setSeed(System.nanoTime());
+        this.blackList = new HashSet<>();
+
+        ItemFilterItemStackHandler inv = this.quarryEntity.getItemFilterSlot().getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.quarryEntity.getLevel().registryAccess());
+        for (int i = 0; i < inv.getSlots(); i++) {
+            ItemStack stack = inv.getStackInSlot(i);
+            if (stack.isEmpty())
+                return;
+            this.blackList.add(stack.getItem());
+        }
+
         setDaemon(true);
     }
 
@@ -99,8 +116,10 @@ public class DimensionalQuarrySearcher extends Thread {
             if (this.isMineable(blockState, blockToMine)) {
                 if (!acceptedBlocks.containsKey(blockToMine)) {
                     // Check blacklist filters here and such....
-                    // Remove always setting true...
-                    acceptedBlocks.put(blockToMine, true);
+                    if (this.blackList.contains(blockToMine.asItem()))
+                        acceptedBlocks.put(blockToMine, false);
+                    else
+                        acceptedBlocks.put(blockToMine, true);
                 }
 
                 if (acceptedBlocks.getBoolean(blockToMine)) {

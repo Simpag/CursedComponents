@@ -22,6 +22,7 @@ public class ModCreativeModeTabs {
         add(ModItems.WARDEN_INFUSION);
         add(ModItems.DIMENSIONAL_CORE);
         add(ModItems.WARDEN_INFUSED_DIAMOND);
+        add(ModItems.ITEM_FILTER);
     }};
 
     // Add your blocks that should appear in the creative tab

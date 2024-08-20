@@ -8,8 +8,8 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
-public class Warden_Infusion extends Item {
-    public Warden_Infusion(Properties properties) {
+public class WardenInfusion extends Item {
+    public WardenInfusion(Properties properties) {
         super(properties);
     }
 

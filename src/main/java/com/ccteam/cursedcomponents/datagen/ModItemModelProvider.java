@@ -19,6 +19,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.WARDEN_INFUSION.get());
         basicItem(ModItems.DIMENSIONAL_CORE.get());
         basicItem(ModItems.WARDEN_INFUSED_DIAMOND.get());
+        basicItem(ModItems.ITEM_FILTER.get());
 
         // buttonItem(ModBlocks.BLACK_OPAL_BUTTON, ModBlocks.BLACK_OPAL_BLOCK);
         // fenceItem(ModBlocks.BLACK_OPAL_FENCE, ModBlocks.BLACK_OPAL_BLOCK);

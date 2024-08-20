@@ -3,6 +3,7 @@
   "item.cursedcomponents.warden_infusion": "Warden Infusion",
   "item.cursedcomponents.dimensional_core": "Dimensional Core",
   "item.cursedcomponents.warden_infused_diamond": "Warden Infused Diamond",
+  "item.cursedcomponents.item_filter": "Item Filter",
 
   "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
   "block.cursedcomponents.mini_chunk_overworld": "Mini Chunk Overworld",
@@ -13,13 +14,17 @@
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Capacity: %s FE",
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption: %s FE/t",
   "tooltip.cursedcomponents.warden_infusion.shift": "Press §eShift§r for more Information",
-  "tooltip.cursedcomponents.warden_infusion.1": "You can obtain §5Warden Infusion§r by killing the warden",
+  "tooltip.cursedcomponents.warden_infusion.1": "You can obtain §dWarden Infusion§r by killing the warden",
   "tooltip.cursedcomponents.warden_infusion.2": "Drops 1-3 pieces",
+  "tooltip.cursedcomponents.item_filter.1": "Blacklists items from being mined in the §dDimensional Quarry§r",
+  "tooltip.cursedcomponents.item_filter.2": "Currently blacklisted items:",
+  "tooltip.cursedcomponents.item_filter.empty": "  - None",
 
   "menu.cursedcomponents.dimensional_quarry.title": "Dimensional Quarry",
   "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: %s",
   "menu.cursedcomponents.dimensional_quarry.start_button": "Start",
   "menu.cursedcomponents.dimensional_quarry.stop_button": "Stop",
+  "menu.cursedcomponents.item_filter.title": "Blacklist",
 
   "status.cursedcomponents.dimensional_quarry.ok": "OK",
   "status.cursedcomponents.dimensional_quarry.not_enough_energy": "Not enough energy!",

@@ -39,6 +39,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.openjdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -125,6 +126,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public ItemStack getMiniChunkInSlot() {
         return this.inventory.getStackInSlot(1).copy();
+    }
+
+    public ItemStack getItemFilterSlot() {
+        return this.inventory.getStackInSlot(2).copy();
     }
 
     public ContainerData getQuarryData() {
@@ -447,9 +452,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 case MiniChunkBlock.MiniChunkType.overworld:
                     return CursedComponentsMod.OVERWORLD_SAMPLE_DIMENSION_KEY;
                 case MiniChunkBlock.MiniChunkType.nether:
-                    return Level.NETHER;
+                    throw new ValueException("Youre stupid!");
+                    //return Level.NETHER;
                 case MiniChunkBlock.MiniChunkType.end:
-                    return Level.END;
+                    throw new ValueException("Youre stupid!");
+                    //return Level.END;
             }
         }
         return null;

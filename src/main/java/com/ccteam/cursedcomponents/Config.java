@@ -46,19 +46,19 @@ public class Config {
             .defineInRange("base", 15, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_1 = BUILDER
-            .defineInRange("efficiencyI", 13, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyI", 12, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_2 = BUILDER
-            .defineInRange("efficiencyII", 10, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyII", 9, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_3 = BUILDER
-            .defineInRange("efficiencyIII", 8, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyIII", 6, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_4 = BUILDER
-            .defineInRange("efficiencyIV", 5, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyIV", 3, 1, Integer.MAX_VALUE);
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_5 = BUILDER
-            .defineInRange("efficiencyV", 2, 1, Integer.MAX_VALUE);
+            .defineInRange("efficiencyV", 1, 1, Integer.MAX_VALUE);
 
 
     static final ModConfigSpec SPEC = BUILDER.build();

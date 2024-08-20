@@ -8,10 +8,13 @@ import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BubbleColumnBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -26,8 +29,8 @@ public class DimensionalQuarrySearcher extends Thread {
     private ServerLevel dimension;
 
     private Int2ObjectMap<BlockStateInfo> blockStatesToMine = new Int2ObjectOpenHashMap<>();
-    private ChunkPos chunkPos;
-    private int startY;
+    private ChunkAccess chunkAccess;
+    private Integer startY;
     private Random rng;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
@@ -42,54 +45,71 @@ public class DimensionalQuarrySearcher extends Thread {
         return state;
     }
 
-    public void setDimension(ServerLevel dimension) {
+    public ChunkPos getChunkPosition() {
+        if (this.chunkAccess == null)
+            return null;
+
+        return this.chunkAccess.getPos();
+    }
+
+    public void updateSettings(ServerLevel dimension, ChunkPos chunk, Integer startY) {
         this.dimension = dimension;
+
+        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        LOGGER.debug("Got: " + chunk + " and " + startY);
+        if (chunk == null || startY == null)
+            return;
+
+        this.chunkAccess = this.dimension.getChunk(chunk.x, chunk.z);
+        this.startY = startY;
+
+        LOGGER.debug("Got chunk: " + chunk + ", starting y pos: " + startY);
     }
 
     @Override
     public void run() {
         this.state = State.RUNNING;
-        if (!this.updateSamplingChunk()) {
-            this.state = State.ERROR;
-            return;
+        if (this.chunkAccess == null) {
+            if (!this.updateSamplingChunk()) {
+                this.state = State.ERROR;
+                return;
+            }
         }
 
         this.blockStatesToMine.clear();
         Reference2BooleanMap<Block> acceptedBlocks = new Reference2BooleanOpenHashMap<>();
 
-        for (int y = this.startY; y > this.dimension.getMinBuildHeight(); y--) {
-            for (int x = this.chunkPos.getMinBlockX(); x <= this.chunkPos.getMaxBlockX(); x++) {
-                for (int z = this.chunkPos.getMinBlockZ(); z <= this.chunkPos.getMaxBlockZ(); z++) {
-                    if (quarryEntity.isRemoved() || quarryEntity.getSearcher() != this) {
-                        // Stop if the quarry is destroyed
-                        LOGGER.debug("Stopping, quarry got destroyed...");
-                        this.state = State.ERROR;
-                        return;
-                    }
+        AABB area = AABB.encapsulatingFullBlocks(
+                this.chunkAccess.getPos().getBlockAt(0, this.chunkAccess.getMinBuildHeight(), 0),
+                this.chunkAccess.getPos().getBlockAt(15, this.startY - 1, 15)
+        );
 
-                    BlockPos pos = new BlockPos(x, y, z);
-                    BlockState blockToMineState = this.dimension.getBlockState(pos);
-                    Block blockToMine = blockToMineState.getBlock();
+        BlockPos.betweenClosedStream(area).forEach(pos -> {
+            if (quarryEntity.isRemoved() || quarryEntity.getSearcher() != this) {
+                // Stop if the quarry is destroyed
+                LOGGER.debug("Stopping, quarry got destroyed...");
+                this.state = State.ERROR;
+                return;
+            }
 
-                    // Filters here
-                    if (!this.isMineable(blockToMineState, blockToMine, pos))
-                        continue;
+            BlockState blockState = this.chunkAccess.getBlockState(pos);
+            Block blockToMine = blockState.getBlock();
 
-                    if (!acceptedBlocks.containsKey(blockToMine)) {
-                        // Check blacklist filters here and such....
-                        // Remove always setting true...
-                        acceptedBlocks.put(blockToMine, true);
-                    }
+            // Filters here
+            if (this.isMineable(blockState, blockToMine)) {
+                if (!acceptedBlocks.containsKey(blockToMine)) {
+                    // Check blacklist filters here and such....
+                    // Remove always setting true...
+                    acceptedBlocks.put(blockToMine, true);
+                }
 
-                    if (acceptedBlocks.getBoolean(blockToMine)) {
-                        this.blockStatesToMine.computeIfAbsent(y, k -> new BlockStateInfo()).increment(blockToMineState);
-                    }
+                if (acceptedBlocks.getBoolean(blockToMine)) {
+                    this.blockStatesToMine.computeIfAbsent(pos.getY(), k -> new BlockStateInfo()).increment(blockState);
                 }
             }
-        }
+        });
 
         this.state = State.IDLE;
-        this.chunkPos = null;
 
         if (!quarryEntity.isRemoved() && quarryEntity.getSearcher() == this) {
             //Only update search if we are still valid
@@ -114,14 +134,14 @@ public class DimensionalQuarrySearcher extends Thread {
             return false;
         }
 
-        this.chunkPos = chunkPos;
+        this.chunkAccess = this.dimension.getChunk(chunkPos.x, chunkPos.z);
         this.startY = startPos.getY();
 
         return true;
     }
 
-    private boolean isMineable(BlockState blockToMineState, Block blockToMine, BlockPos pos) {
-        if (blockToMineState.isEmpty() || blockToMineState.getDestroySpeed(this.dimension, pos) <= 0) {
+    private boolean isMineable(BlockState blockToMineState, Block blockToMine) {
+        if (blockToMineState.isEmpty() || blockToMine.defaultDestroyTime() <= 0) {
             // Skip air and unbreakable blocks
             return false;
         }
@@ -142,7 +162,7 @@ public class DimensionalQuarrySearcher extends Thread {
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = this.dimension.getBlockState(pos);
 
-            if (isMineable(state, state.getBlock(), pos))
+            if (isMineable(state, state.getBlock()))
                 return pos;
         }
 

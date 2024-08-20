@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -48,7 +49,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final float miniChunkRotationSpeed = 0.5f; // For rotating the rendered minichunk inside the quarry
-
     public static final int EJECTION_COOLDOWN = 20;
     public static final int EJECTION_ATTEMPTS_PER_CYCLE = 3;
     public static final int ENERGY_CAPACITY = 1_000_000;
@@ -67,7 +67,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> blockStatesToMine;
     private Integer currentYLevel;
     private Integer minYLevel;
-    private DimensionalQuarrySearcher searcher;
+    private DimensionalQuarrySearcher searcher = new DimensionalQuarrySearcher(this);
+    private ChunkPos currentChunkPos;
     private ServerLevel currentDimension;
 
     private final DimensionalQuarryItemStackHandler inventory = new DimensionalQuarryItemStackHandler(INVENTORY_SIZE) {
@@ -94,7 +95,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     };
     private final EnergyStorage energy = new EnergyStorage(ENERGY_CAPACITY);
-
     private HashMap<Direction, BlockCapabilityCache<IItemHandler, @Nullable Direction>> itemHandlerCapCaches = new HashMap<>();
 
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
@@ -104,6 +104,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.ejectCooldown = 0;
         this.overflowingItemStack = null;
         this.currentYLevel = null;
+        this.currentChunkPos = null;
         this.minYLevel = null;
     }
 
@@ -149,28 +150,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         return stacks;
-    }
-
-    public int getInventorySlotsUsed() {
-        int cnt = 0;
-        for (int i = 0; i < getInventory().getSlots(); i++) {
-            if (!getInventory().getStackInSlot(i).isEmpty()) {
-                cnt++;
-            }
-        }
-        return cnt;
-    }
-
-    public String getInventoryString() {
-        StringBuilder ret = new StringBuilder();
-
-        for (int i = 0; i < getInventory().getSlots(); i++) {
-            if (!getInventory().getStackInSlot(i).isEmpty()) {
-                ret.append(getInventory().getStackInSlot(i).toString()).append(", ");
-            }
-        }
-
-        return ret.toString();
     }
 
     public float getMiniChunkRotation() {
@@ -305,9 +284,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public void mineNextBlock(ServerLevel level) {
         // Draw energy every tick
         energy.extractEnergy(this.getEnergyConsumptionPerTick(), false);
+        setChanged();
 
         this.miningCooldown++;
-        if (this.miningCooldown <= this.getTicksPerBlock()) {
+        if (this.miningCooldown < this.getTicksPerBlock()) {
             return;
         }
         this.miningCooldown = 0;
@@ -356,6 +336,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
             setChanged();
 
             if (this.blockStatesToMine.isEmpty()) {
+                this.currentYLevel = null;
+                this.currentChunkPos = null;
                 this.generateBlockStatesToMine(level);
                 return null;
             }
@@ -434,7 +416,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
             LOGGER.debug("Starting search for: " + worldPosition);
             this.searcher = new DimensionalQuarrySearcher(this);
-            searcher.setDimension(this.currentDimension);
+            searcher.updateSettings(this.currentDimension, this.currentChunkPos, this.currentYLevel);
             searcher.start();
         }
     }
@@ -541,15 +523,16 @@ public class DimensionalQuarryEntity extends BlockEntity {
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putBoolean("cursedcomponents:dimensional_quarry_running", this.running);
-        CompoundTag inventoryTag = inventory.serializeNBT(registries);
+        CompoundTag inventoryTag = this.inventory.serializeNBT(registries);
         tag.put("cursedcomponents:dimensional_quarry_inventory", inventoryTag);
+        Tag energyTag = this.energy.serializeNBT(registries);
+        tag.put("cursedcomponents:dimensional_quarry_energy", energyTag);
 
-        /*if (this.currentChunkPos != null)
-            tag.putLong("cursedcomponents:dimensional_quarry_chunk", this.currentChunkPos.toLong());
+        if (this.currentYLevel != null)
+            tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
 
-        if (this.currentMiningPos != null)
-            tag.putLong("cursedcomponents:dimensional_quarry_mine_pos", this.currentMiningPos.asLong());*/
-        //tag.put("cursedcomponents:dimensional_quarry_overflowItem", overflowingItemStack.save(registries));
+        if (this.searcher != null && this.searcher.getChunkPosition() != null)
+            tag.putLong("cursedcomponents:dimensional_quarry_chunk", this.searcher.getChunkPosition().toLong());
     }
 
     @Override
@@ -558,20 +541,23 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.running = tag.getBoolean("cursedcomponents:dimensional_quarry_running");
 
         if (tag.contains("cursedcomponents:dimensional_quarry_inventory")) {
-            Tag inv_tag = tag.get("cursedcomponents:dimensional_quarry_inventory");
-            if (inv_tag instanceof CompoundTag inv_compound_tag)
-                this.inventory.deserializeNBT(registries, inv_compound_tag);
+            Tag invTag = tag.get("cursedcomponents:dimensional_quarry_inventory");
+            if (invTag instanceof CompoundTag invCompoundTag)
+                this.inventory.deserializeNBT(registries, invCompoundTag);
         }
 
-        /*if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
+        if (tag.contains("cursedcomponents:dimensional_quarry_energy")) {
+            Tag energyTag = tag.get("cursedcomponents:dimensional_quarry_energy");
+            if (energyTag != null)
+                this.energy.deserializeNBT(registries, energyTag);
+        }
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
+            this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
+        }
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
             this.currentChunkPos = new ChunkPos(tag.getLong("cursedcomponents:dimensional_quarry_chunk"));
-
-        if (tag.contains("cursedcomponents:dimensional_quarry_mine_pos"))
-            this.currentMiningPos = BlockPos.of(tag.getLong("cursedcomponents:dimensional_quarry_mine_pos"));*/
-
-        /*if (tag.contains("cursedcomponents:dimensional_quarry_overflowItem")) {
-            ItemStack.parse(registries, tag.get("cursedcomponents:dimensional_quarry_overflowItem")).ifPresent(stack -> this.overflowingItemStack = stack);
-        }*/
     }
 
     @Nullable

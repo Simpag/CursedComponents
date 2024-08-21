@@ -7,6 +7,8 @@
 
   "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
   "block.cursedcomponents.mini_chunk_overworld": "Mini Chunk Overworld",
+  "block.cursedcomponents.mini_chunk_nether": "Mini Chunk Nether",
+  "block.cursedcomponents.mini_chunk_end": "Mini Chunk End",
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 

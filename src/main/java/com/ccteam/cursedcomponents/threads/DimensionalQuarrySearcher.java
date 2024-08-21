@@ -32,7 +32,6 @@ public class DimensionalQuarrySearcher extends Thread {
     private ChunkAccess chunkAccess;
     private Integer startY;
     private Random rng;
-    private Set<Item> blackList;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
         this(entity, State.FRESH);
@@ -44,7 +43,6 @@ public class DimensionalQuarrySearcher extends Thread {
         this.quarryEntity = entity;
         this.rng = new Random();
         this.rng.setSeed(System.nanoTime());
-        this.blackList = this.quarryEntity.getFilteredItems();
 
         setDaemon(true);
     }
@@ -91,8 +89,8 @@ public class DimensionalQuarrySearcher extends Thread {
         BlockPos.betweenClosedStream(area).forEach(pos -> {
             if (quarryEntity.isRemoved() || quarryEntity.getSearcher() != this) {
                 // Stop if the quarry is destroyed
-                LOGGER.debug("Stopping, quarry got destroyed...");
                 this.state = State.ERROR;
+                this.interrupt();
                 return;
             }
 
@@ -100,16 +98,15 @@ public class DimensionalQuarrySearcher extends Thread {
             Block blockToMine = blockState.getBlock();
 
             // Filters here
-            if (this.isMineable(blockState, blockToMine)) {
-                if (!acceptedBlocks.containsKey(blockToMine)) {
-                    // Check blacklist filters here and such....
-                    acceptedBlocks.put(blockToMine, !this.blackList.contains(blockToMine.asItem()));
-                }
-
-                if (acceptedBlocks.getBoolean(blockToMine)) {
-                    this.blockStatesToMine.computeIfAbsent(pos.getY(), k -> new BlockStateInfo()).increment(blockState);
-                }
+            if (!acceptedBlocks.containsKey(blockToMine)) {
+                // Check blacklist filters here and such....
+                acceptedBlocks.put(blockToMine, this.isMineable(blockState, blockToMine));
             }
+
+            if (acceptedBlocks.getBoolean(blockToMine)) {
+                this.blockStatesToMine.computeIfAbsent(pos.getY(), k -> new BlockStateInfo()).increment(blockState);
+            }
+
         });
 
         this.state = State.FINISHED;
@@ -123,7 +120,8 @@ public class DimensionalQuarrySearcher extends Thread {
     private boolean updateSamplingChunk() {
         if (this.dimension == null) {
             LOGGER.debug("Target dimension is null!");
-            return false;
+            throw new IllegalArgumentException("Target dimension is null!");
+            //return false;
         }
 
         int randomX = this.rng.nextInt(-1_000_000, 1_000_000);

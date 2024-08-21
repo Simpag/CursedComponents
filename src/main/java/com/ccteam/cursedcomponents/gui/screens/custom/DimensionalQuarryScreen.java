@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DimensionalQuarryScreen extends AbstractContainerScreen<DimensionalQuarryContainer> {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");
@@ -99,6 +99,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
 
         // Progress bar
         float bar_progress = (float) this.menu.getCooldown() / this.menu.getTicksPerBlock();
+        bar_progress = Math.clamp(bar_progress, 0, 1);
         //int progress_bar_y = (int) ((73f - 21f) * bar_progress + 21f); // downwards
         int progress_bar_y = (int) (73f - (73f - 21f) * bar_progress); // upwards
         guiGraphics.fillGradient(this.leftPos + 166, this.topPos + progress_bar_y, this.leftPos + 168, this.topPos + 73, this.green, this.dark_green);

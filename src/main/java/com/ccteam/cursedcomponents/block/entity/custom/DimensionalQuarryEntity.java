@@ -57,7 +57,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     private static final float miniChunkRotationSpeed = 0.5f; // For rotating the rendered minichunk inside the quarry
     public static final int EJECTION_COOLDOWN = 20;
-    public static final int EJECTION_ATTEMPTS_PER_CYCLE = 3;
+    public static final int EJECTION_ATTEMPTS_PER_CYCLE = 4;
     public static final int ENERGY_CAPACITY = 1_000_000;
     public static final int UPGRADE_SLOTS = 3;
     public static final int INVENTORY_SIZE = 9 + UPGRADE_SLOTS; // 9 storage slots + 3 upgrade
@@ -70,6 +70,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private int currentTicksPerBlock;
     private boolean running;
     private float miniChunkRotation;
+    private Set<Item> blacklistedItems;
     private ItemStack overflowingItemStack;
 
     // Searcher
@@ -91,9 +92,10 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 } else if (slot == 1) {
                     // Dimension slot, update the mining dimension
                     updateDimension((ServerLevel) level);
+                    resetSearcher((ServerLevel) level, false);
                 } else if (slot == 2) {
                     // Blacklist filter slot
-                    updateSearch((ServerLevel) level);
+                    updateBlacklistedItems();
                 }
 
                 if (slot < 3) {
@@ -118,6 +120,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.currentYLevel = null;
         this.currentChunkPos = null;
         this.minYLevel = null;
+        this.blockStatesToMine = null;
+        this.blacklistedItems = new HashSet<>();
     }
 
     @Override
@@ -143,7 +147,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.inventory.getStackInSlot(2).copy();
     }
 
-    public Set<Item> getFilteredItems() {
+    public void updateBlacklistedItems() {
         ItemStack filter = this.getItemFilterSlot();
         ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
         Set<Item> items = new HashSet<>();
@@ -151,7 +155,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
             items.add(inv.getStackInSlot(i).getItem());
         }
 
-        return items;
+        this.blacklistedItems = items;
+        setChanged();
     }
 
     public ContainerData getQuarryData() {
@@ -251,37 +256,27 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, IItemHandler inv, boolean inventoryFull) {
-        List<MiningRequirement> ret = new ArrayList<>();
+        ItemStack pickaxe = inv.getStackInSlot(0).copy();
+        ItemStack miniChunk = inv.getStackInSlot(1).copy();
 
-        if (energyStored < energyConsumption)
-            ret.add(MiningRequirement.notEnoughEnergy);
-
-        boolean hasPickaxe = inv.getStackInSlot(0).is(Items.NETHERITE_PICKAXE);
-        boolean hasDimension = inv.getStackInSlot(1).is(ModBlocks.MINI_CHUNK_OVERWORLD.asItem()); // TODO, maybe use tags
-
-        if (!hasPickaxe)
-            ret.add(MiningRequirement.noPickaxe);
-
-        if (!hasDimension)
-            ret.add(MiningRequirement.noDimension);
-
-        if (inventoryFull)
-            ret.add(MiningRequirement.inventoryFull);
-
-        if (ret.isEmpty())
-            ret.add(MiningRequirement.ok);
-
-        return ret;
+        return checkMiningRequirements(energyStored, energyConsumption, miniChunk, pickaxe, inventoryFull);
     }
 
     public static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, List<Slot> slots, boolean inventoryFull) {
+        ItemStack pickaxe = slots.get(0).getItem().copy();
+        ItemStack miniChunk = slots.get(1).getItem().copy();
+
+        return checkMiningRequirements(energyStored, energyConsumption, miniChunk, pickaxe, inventoryFull);
+    }
+
+    private static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, ItemStack miniChunk, ItemStack pickaxe, boolean inventoryFull) {
         List<MiningRequirement> ret = new ArrayList<>();
 
         if (energyStored < energyConsumption)
             ret.add(MiningRequirement.notEnoughEnergy);
 
-        boolean hasPickaxe = slots.get(0).getItem().is(Items.NETHERITE_PICKAXE);
-        boolean hasDimension = slots.get(1).getItem().is(ModTags.Items.MINI_CHUNK);
+        boolean hasPickaxe = pickaxe.is(Items.NETHERITE_PICKAXE);
+        boolean hasDimension = miniChunk.is(ModTags.Items.MINI_CHUNK);
 
         if (!hasPickaxe)
             ret.add(MiningRequirement.noPickaxe);
@@ -315,8 +310,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static void tick(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
         if (level.isClientSide)
             return;
-
-        // LOGGER.debug("Running: " + entity.running + ", searcher: " + entity.searcher.getCurrentState() + ", reqs: " + checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)));
 
         if (entity.running
                 && entity.searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING
@@ -353,6 +346,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         // Check if we can insert all drops
         for (ItemStack itemStack : itemStacks) {
+            if (this.blacklistedItems.contains(itemStack.getItem()))
+                continue;
+
             ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, true);
 
             // If the inventory is full, stop the mining process
@@ -365,15 +361,24 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         // Insert the items
-        for (ItemStack itemStack : itemStacks)
+        for (ItemStack itemStack : itemStacks) {
+            if (this.blacklistedItems.contains(itemStack.getItem()))
+                continue;
+
             ItemHandlerHelper.insertItemStacked(this.inventory, itemStack, false);
+        }
 
         this.consumeBlockState(blockToMineState);
     }
 
     private DimensionalQuarrySearcher.BlockStateInfo getNextBlockEntry(ServerLevel level) {
-        if (this.blockStatesToMine == null || this.blockStatesToMine.isEmpty()) {
+        if (this.blockStatesToMine == null) {
             this.generateBlockStatesToMine(level);
+            return null;
+        }
+
+        if (this.blockStatesToMine.isEmpty()) {
+            resetSearcher(level, true);
             return null;
         }
 
@@ -382,9 +387,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
             setChanged();
 
             if (this.blockStatesToMine.isEmpty()) {
-                this.currentYLevel = null;
-                this.currentChunkPos = null;
-                this.generateBlockStatesToMine(level);
+                resetSearcher(level, true);
                 return null;
             }
 
@@ -455,44 +458,48 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return attachedStorages;
     }
 
-    private void updateSearch(ServerLevel level) {
-        // Updates the search at the current chunk and y-level
-
+    private void resetSearcher(ServerLevel level, boolean startSearch) {
         // If we're already searching, terminate the search and create a new one
-        if (this.searcher != null && searcher.getCurrentState() != DimensionalQuarrySearcher.State.FINISHED)
-            this.searcher = new DimensionalQuarrySearcher(this);
+        this.currentYLevel = null;
+        this.currentChunkPos = null;
+        this.blockStatesToMine = null;
 
-        this.generateBlockStatesToMine(level);
+        if (startSearch) {
+            this.generateBlockStatesToMine(level);
+        }
     }
 
     private void generateBlockStatesToMine(ServerLevel level) {
         if (searcher == null || searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING) {
-            if (searcher == null)
-                this.searcher = new DimensionalQuarrySearcher(this);
+            this.searcher = new DimensionalQuarrySearcher(this);
 
-            if (this.currentDimension == null)
-                this.updateDimension(level);
+            if (this.currentDimension == null) {
+                if (!this.updateDimension(level)) {
+                    LOGGER.debug("Mini chunk dimension was not found!");
+                    return;
+                }
+            }
 
-            if (this.searcher.getCurrentState() == DimensionalQuarrySearcher.State.FINISHED)
-                this.searcher = new DimensionalQuarrySearcher(this);
             searcher.updateSettings(this.currentDimension, this.currentChunkPos, this.currentYLevel);
             searcher.start();
         }
     }
 
-    private void updateDimension(ServerLevel level) {
+    private boolean updateDimension(ServerLevel level) {
         if (level.isClientSide)
-            return;
+            return false;
 
         this.currentDimension = null;
         ResourceKey<Level> dim = this.getMiniChunkDimension();
-
         if (dim == null) {
-            LOGGER.debug("Mini Chunk Dimension is null!");
-            return;
+            return false;
         }
 
         this.currentDimension = level.getServer().getLevel(dim);
+        if (this.currentDimension == null)
+            return false;
+
+        return true;
     }
 
     private ResourceKey<Level> getMiniChunkDimension() {
@@ -502,6 +509,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return null;
 
         if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
+            LOGGER.debug("Type: " + block.chunkType);
             return switch (block.chunkType) {
                 case MiniChunkBlock.MiniChunkType.overworld -> ModRegistries.Dimension.OVERWORLD_SAMPLE_DIMENSION_KEY;
                 case MiniChunkBlock.MiniChunkType.nether -> ModRegistries.Dimension.NETHER_SAMPLE_DIMENSION_KEY;

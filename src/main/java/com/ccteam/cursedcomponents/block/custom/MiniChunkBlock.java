@@ -14,12 +14,11 @@ public class MiniChunkBlock extends Block {
             box(6, 6, 7, 9, 10, 10)
     );
     public static final VoxelShape NETHER_SHAPE = VoxelShapeUtils.combineShapes(
-            box(5, 0, 5, 11, 6, 11),
-            box(6, 6, 7, 9, 10, 10)
+            box(5, 0, 5, 11, 6, 11)
     );
     public static final VoxelShape END_SHAPE = VoxelShapeUtils.combineShapes(
             box(5, 0, 5, 11, 6, 11),
-            box(6, 6, 7, 9, 10, 10)
+            box(6, 6, 6, 10, 7, 10)
     );
     public final MiniChunkType chunkType;
 

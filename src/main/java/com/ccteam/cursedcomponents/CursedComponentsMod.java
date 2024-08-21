@@ -44,6 +44,8 @@ public class CursedComponentsMod {
 
     // Mining dimension sampling dimensions
     public static final ResourceKey<Level> OVERWORLD_SAMPLE_DIMENSION_KEY = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(MOD_ID, "overworld_sampling_dimension"));
+    public static final ResourceKey<Level> NETHER_SAMPLE_DIMENSION_KEY = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(MOD_ID, "nether_sampling_dimension"));
+    public static final ResourceKey<Level> END_SAMPLE_DIMENSION_KEY = ResourceKey.create(Registries.DIMENSION, ResourceLocation.fromNamespaceAndPath(MOD_ID, "end_sampling_dimension"));
 
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.

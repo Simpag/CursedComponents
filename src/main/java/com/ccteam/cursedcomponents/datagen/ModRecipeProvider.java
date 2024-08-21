@@ -22,8 +22,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildRecipes(RecipeOutput recipeOutput) {
-        // Build recipies
-
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MINI_CHUNK_OVERWORLD.get())
                 .pattern("GGG")
                 .pattern("DWD")
@@ -32,6 +30,27 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('D', Items.DIRT)
                 .define('W', ModItems.WARDEN_INFUSION.get())
                 .define('S', Items.STONE)
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MINI_CHUNK_NETHER.get())
+                .pattern("NGN")
+                .pattern("NWN")
+                .pattern("MMM")
+                .define('G', Items.GOLD_NUGGET)
+                .define('N', Items.NETHERRACK)
+                .define('W', ModItems.WARDEN_INFUSION.get())
+                .define('M', Items.MAGMA_BLOCK)
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MINI_CHUNK_END.get())
+                .pattern("EPE")
+                .pattern("EWE")
+                .pattern("EEE")
+                .define('P', Items.ENDER_PEARL)
+                .define('E', Items.END_STONE)
+                .define('W', ModItems.WARDEN_INFUSION.get())
                 .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 
@@ -64,46 +83,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('D', ModItems.WARDEN_INFUSED_DIAMOND.get())
                 .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE.get())
                 ).save(recipeOutput);
-
-        /* ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BLACK_OPAL_BLOCK.get())
-                .pattern("BBB")
-                .pattern("BBB")
-                .pattern("BBB")
-                .define('B', ModItems.BLACK_OPAL.get())
-                .unlockedBy("has_black_opal", has(ModItems.BLACK_OPAL.get())
-                ).save(recipeOutput);
-
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.BLACK_OPAL.get(), 9)
-                .requires(ModBlocks.BLACK_OPAL_BLOCK.get())
-                .unlockedBy("has_black_opal_block", has(ModBlocks.BLACK_OPAL_BLOCK.get())
-                ).save(recipeOutput);
-
-        List<ItemLike> BLACK_OPAL_SMELTABLES = List.of(ModItems.RAW_BLACK_OPAL,
-                ModBlocks.BLACK_OPAL_ORE); // Can add multiple variants of the ore here too...
-        oreSmelting(recipeOutput, BLACK_OPAL_SMELTABLES, RecipeCategory.MISC, ModItems.BLACK_OPAL.get(), 0.25f, 200, "black_opal");
-        oreBlasting(recipeOutput, BLACK_OPAL_SMELTABLES, RecipeCategory.MISC, ModItems.BLACK_OPAL.get(), 0.25f, 100, "black_opal");
-
-        stairBuilder(ModBlocks.BLACK_OPAL_STAIRS.get(), Ingredient.of(ModItems.BLACK_OPAL.get()))
-                .group("black_opal")
-                .unlockedBy("has_black_opal", has(ModItems.BLACK_OPAL.get())
-                ).save(recipeOutput);
-        slab(recipeOutput, RecipeCategory.BUILDING_BLOCKS, ModBlocks.BLACK_OPAL_SLAB.get(), ModItems.BLACK_OPAL.get());
-
-        pressurePlate(recipeOutput, ModBlocks.BLACK_OPAL_PRESSURE_PLATE.get(), ModItems.BLACK_OPAL.get());
-        buttonBuilder(ModBlocks.BLACK_OPAL_BUTTON.get(), Ingredient.of(ModItems.BLACK_OPAL.get()))
-                .group("black_opal")
-                .unlockedBy("has_black_opal", has(ModItems.BLACK_OPAL.get())
-                ).save(recipeOutput);
-
-        wall(recipeOutput, RecipeCategory.BUILDING_BLOCKS, ModBlocks.BLACK_OPAL_WALL.get(), ModItems.BLACK_OPAL.get());
-        fenceBuilder(ModBlocks.BLACK_OPAL_FENCE.get(), Ingredient.of(ModItems.BLACK_OPAL.get()))
-                .group("black_opal")
-                .unlockedBy("has_black_opal", has(ModItems.BLACK_OPAL.get())
-                ).save(recipeOutput);
-        fenceGateBuilder(ModBlocks.BLACK_OPAL_FENCE_GATE.get(), Ingredient.of(ModItems.BLACK_OPAL.get()))
-                .group("black_opal")
-                .unlockedBy("has_black_opal", has(ModItems.BLACK_OPAL.get())
-                ).save(recipeOutput); */
     }
 
     protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> ingredients, RecipeCategory category, ItemLike result,

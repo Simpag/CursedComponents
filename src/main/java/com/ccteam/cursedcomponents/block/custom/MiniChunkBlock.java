@@ -13,6 +13,14 @@ public class MiniChunkBlock extends Block {
             box(5, 0, 5, 11, 6, 11),
             box(6, 6, 7, 9, 10, 10)
     );
+    public static final VoxelShape NETHER_SHAPE = VoxelShapeUtils.combineShapes(
+            box(5, 0, 5, 11, 6, 11),
+            box(6, 6, 7, 9, 10, 10)
+    );
+    public static final VoxelShape END_SHAPE = VoxelShapeUtils.combineShapes(
+            box(5, 0, 5, 11, 6, 11),
+            box(6, 6, 7, 9, 10, 10)
+    );
     public final MiniChunkType chunkType;
 
     public MiniChunkBlock(Properties properties, MiniChunkType chunkType) {
@@ -23,12 +31,12 @@ public class MiniChunkBlock extends Block {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        switch (chunkType) {
-            case overworld:
-                return OVERWORLD_SHAPE;
-            default:
-                return super.getShape(state, level, pos, context);
-        }
+        return switch (chunkType) {
+            case overworld -> OVERWORLD_SHAPE;
+            case nether -> NETHER_SHAPE;
+            case end -> END_SHAPE;
+            default -> super.getShape(state, level, pos, context);
+        };
     }
 
     public enum MiniChunkType {

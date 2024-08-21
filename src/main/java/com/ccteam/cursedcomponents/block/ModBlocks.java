@@ -1,12 +1,10 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.custom.DimensionTester;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -36,7 +34,17 @@ public class ModBlocks {
             new Item.Properties().rarity(Rarity.EPIC)
     );
 
-    public static final DeferredBlock<Block> DimTester = registerBlock("dim_tester", () -> new DimensionTester(BlockBehaviour.Properties.of().strength(2f)));
+    public static final DeferredBlock<Block> MINI_CHUNK_NETHER = registerBlock(
+            "mini_chunk_nether",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.nether),
+            new Item.Properties().rarity(Rarity.EPIC)
+    );
+
+    public static final DeferredBlock<Block> MINI_CHUNK_END = registerBlock(
+            "mini_chunk_end",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.end),
+            new Item.Properties().rarity(Rarity.EPIC)
+    );
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);

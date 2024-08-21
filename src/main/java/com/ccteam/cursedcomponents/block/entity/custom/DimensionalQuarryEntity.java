@@ -442,7 +442,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (searcher == null || searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING) {
             if (searcher == null)
                 this.searcher = new DimensionalQuarrySearcher(this);
-            
+
             if (this.currentDimension == null)
                 this.updateDimension(level);
 
@@ -475,23 +475,18 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return null;
 
         if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
-            switch (block.chunkType) {
-                case MiniChunkBlock.MiniChunkType.overworld:
-                    return CursedComponentsMod.OVERWORLD_SAMPLE_DIMENSION_KEY;
-                case MiniChunkBlock.MiniChunkType.nether:
-                    throw new ValueException("Youre stupid!");
-                    //return Level.NETHER;
-                case MiniChunkBlock.MiniChunkType.end:
-                    throw new ValueException("Youre stupid!");
-                    //return Level.END;
-            }
+            return switch (block.chunkType) {
+                case MiniChunkBlock.MiniChunkType.overworld -> CursedComponentsMod.OVERWORLD_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.nether -> CursedComponentsMod.NETHER_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.end -> CursedComponentsMod.END_SAMPLE_DIMENSION_KEY;
+            };
         }
         return null;
     }
 
     public static boolean isStorageFull(IItemHandler storage, int from, int to, ItemStack overflowingItem) {
         if (from < 0 || to > storage.getSlots())
-            new IllegalArgumentException("From must be less than 0 and to must be less than " + storage.getSlots() + ", got (from: " + from + ", to: " + to + ")");
+            throw new IllegalArgumentException("From must be less than 0 and to must be less than " + storage.getSlots() + ", got (from: " + from + ", to: " + to + ")");
 
         if (overflowingItem != null)
             return true;

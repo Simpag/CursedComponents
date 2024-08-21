@@ -116,7 +116,7 @@ public class LuckyBlock extends BaseEntityBlock {
                 () -> constructBlockTower(world, player, pos),
                 () -> spawnLuckyVillager(world, pos),
                 () -> hurlBottlesOfEnchanting(world, pos),
-                () -> spawnLuckyParrot(world, pos),
+//                () -> spawnLuckyParrot(world, pos), // Deactivated until fixed
                 () -> dropEndPortalFrames(world, pos),
                 () -> spawnLuckyPyramid(world, player, pos)
         );

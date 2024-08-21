@@ -5,13 +5,17 @@ import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
+import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
+import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.stackHandlers.DimensionalQuarryItemStackHandler;
-
+import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
 import com.ccteam.cursedcomponents.threads.DimensionalQuarrySearcher;
 import com.mojang.logging.LogUtils;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -21,6 +25,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -42,9 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import org.openjdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class DimensionalQuarryEntity extends BlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -57,6 +60,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     public static final int INVENTORY_SIZE = 9 + UPGRADE_SLOTS; // 9 storage slots + 3 upgrade
     public static final int QUARRY_DATA_SIZE = 10;
 
+    // Entity
     private int miningCooldown;
     private int ejectCooldown;
     private int currentEnergyConsumption;
@@ -65,10 +69,11 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private float miniChunkRotation;
     private ItemStack overflowingItemStack;
 
+    // Searcher
+    private DimensionalQuarrySearcher searcher = new DimensionalQuarrySearcher(this);
     private Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> blockStatesToMine;
     private Integer currentYLevel;
     private Integer minYLevel;
-    private DimensionalQuarrySearcher searcher = new DimensionalQuarrySearcher(this);
     private ChunkPos currentChunkPos;
     private ServerLevel currentDimension;
 
@@ -83,6 +88,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 } else if (slot == 1) {
                     // Dimension slot, update the mining dimension
                     updateDimension((ServerLevel) level);
+                } else if (slot == 2) {
+                    // Blacklist filter slot
+                    updateSearch((ServerLevel) level);
                 }
 
                 if (slot < 3) {
@@ -132,6 +140,17 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.inventory.getStackInSlot(2).copy();
     }
 
+    public Set<Item> getFilteredItems() {
+        ItemStack filter = this.getItemFilterSlot();
+        ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
+        Set<Item> items = new HashSet<>();
+        for (int i = 0; i < inv.getSlots(); i++) {
+            items.add(inv.getStackInSlot(i).getItem());
+        }
+
+        return items;
+    }
+
     public ContainerData getQuarryData() {
         return this.quarryData;
     }
@@ -149,12 +168,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public NonNullList<ItemStack> getAllStacks() {
-        NonNullList<ItemStack> stacks = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
-        for (int i = 0; i < getInventory().getSlots(); i++) {
-            stacks.set(i, getInventory().getStackInSlot(i));
-        }
-
-        return stacks;
+        return this.inventory.getStacks();
     }
 
     public float getMiniChunkRotation() {
@@ -414,13 +428,26 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return attachedStorages;
     }
 
+    private void updateSearch(ServerLevel level) {
+        // Updates the search at the current chunk and y-level
+
+        // If we're already searching, terminate the search and create a new one
+        if (this.searcher != null && searcher.getCurrentState() != DimensionalQuarrySearcher.State.IDLE)
+            this.searcher = new DimensionalQuarrySearcher(this, DimensionalQuarrySearcher.State.FRESH);
+
+        this.generateBlockStatesToMine(level);
+    }
+
     private void generateBlockStatesToMine(ServerLevel level) {
-        if (searcher == null || searcher.getCurrentState() == DimensionalQuarrySearcher.State.IDLE) {
+        if (searcher == null)
+            this.searcher = new DimensionalQuarrySearcher(this, DimensionalQuarrySearcher.State.FRESH);
+
+        if (searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING) {
             if (this.currentDimension == null)
                 this.updateDimension(level);
 
-            LOGGER.debug("Starting search for: " + worldPosition);
-            this.searcher = new DimensionalQuarrySearcher(this);
+            if (this.searcher.getCurrentState() != DimensionalQuarrySearcher.State.FRESH)
+                this.searcher = new DimensionalQuarrySearcher(this);
             searcher.updateSettings(this.currentDimension, this.currentChunkPos, this.currentYLevel);
             searcher.start();
         }

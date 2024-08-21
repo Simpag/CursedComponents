@@ -31,7 +31,7 @@ public class DimensionalQuarrySearcher extends Thread {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final DimensionalQuarryEntity quarryEntity;
-    private State state = State.IDLE;
+    private State state;
     private ServerLevel dimension;
 
     private Int2ObjectMap<BlockStateInfo> blockStatesToMine = new Int2ObjectOpenHashMap<>();
@@ -41,19 +41,16 @@ public class DimensionalQuarrySearcher extends Thread {
     private Set<Item> blackList;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
+        this(entity, State.IDLE);
+    }
+
+    public DimensionalQuarrySearcher(DimensionalQuarryEntity entity, State state) {
         super("Dimensional Quarry Searcher: " + entity.getBlockPos());
+        this.state = state;
         this.quarryEntity = entity;
         this.rng = new Random();
         this.rng.setSeed(System.nanoTime());
-        this.blackList = new HashSet<>();
-
-        ItemFilterItemStackHandler inv = this.quarryEntity.getItemFilterSlot().getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.quarryEntity.getLevel().registryAccess());
-        for (int i = 0; i < inv.getSlots(); i++) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (stack.isEmpty())
-                return;
-            this.blackList.add(stack.getItem());
-        }
+        this.blackList = this.quarryEntity.getFilteredItems();
 
         setDaemon(true);
     }
@@ -72,15 +69,11 @@ public class DimensionalQuarrySearcher extends Thread {
     public void updateSettings(ServerLevel dimension, ChunkPos chunk, Integer startY) {
         this.dimension = dimension;
 
-        LOGGER.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        LOGGER.debug("Got: " + chunk + " and " + startY);
         if (chunk == null || startY == null)
             return;
 
         this.chunkAccess = this.dimension.getChunk(chunk.x, chunk.z);
         this.startY = startY;
-
-        LOGGER.debug("Got chunk: " + chunk + ", starting y pos: " + startY);
     }
 
     @Override
@@ -116,10 +109,7 @@ public class DimensionalQuarrySearcher extends Thread {
             if (this.isMineable(blockState, blockToMine)) {
                 if (!acceptedBlocks.containsKey(blockToMine)) {
                     // Check blacklist filters here and such....
-                    if (this.blackList.contains(blockToMine.asItem()))
-                        acceptedBlocks.put(blockToMine, false);
-                    else
-                        acceptedBlocks.put(blockToMine, true);
+                    acceptedBlocks.put(blockToMine, !this.blackList.contains(blockToMine.asItem()));
                 }
 
                 if (acceptedBlocks.getBoolean(blockToMine)) {
@@ -189,6 +179,7 @@ public class DimensionalQuarrySearcher extends Thread {
     }
 
     public enum State {
+        FRESH,
         IDLE,
         RUNNING,
         ERROR,

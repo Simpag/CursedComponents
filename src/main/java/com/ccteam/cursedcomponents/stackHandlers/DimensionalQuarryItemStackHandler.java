@@ -3,6 +3,7 @@ package com.ccteam.cursedcomponents.stackHandlers;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 
 import com.ccteam.cursedcomponents.item.ModItems;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -32,5 +33,9 @@ public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
             return 1;
 
         return super.getSlotLimit(slot);
+    }
+
+    public NonNullList<ItemStack> getStacks() {
+        return NonNullList.copyOf(this.stacks);
     }
 }

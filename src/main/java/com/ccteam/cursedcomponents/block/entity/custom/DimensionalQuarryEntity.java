@@ -292,7 +292,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         // LOGGER.debug("Running: " + entity.running + ", searcher: " + entity.searcher.getCurrentState() + ", reqs: " + checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)));
 
         if (entity.running
-                && entity.searcher.getCurrentState() == DimensionalQuarrySearcher.State.IDLE
+                && entity.searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING
                 && checkMiningRequirements(entity.getEnergyStored(), entity.getEnergyConsumptionPerTick(), entity.inventory, isStorageFull(entity.getInventory(), 3, entity.getInventorySlots(), entity.overflowingItemStack)).getFirst() == MiningRequirement.ok) {
             entity.mineNextBlock((ServerLevel) level);
         }
@@ -432,21 +432,21 @@ public class DimensionalQuarryEntity extends BlockEntity {
         // Updates the search at the current chunk and y-level
 
         // If we're already searching, terminate the search and create a new one
-        if (this.searcher != null && searcher.getCurrentState() != DimensionalQuarrySearcher.State.IDLE)
-            this.searcher = new DimensionalQuarrySearcher(this, DimensionalQuarrySearcher.State.FRESH);
+        if (this.searcher != null && searcher.getCurrentState() != DimensionalQuarrySearcher.State.FINISHED)
+            this.searcher = new DimensionalQuarrySearcher(this);
 
         this.generateBlockStatesToMine(level);
     }
 
     private void generateBlockStatesToMine(ServerLevel level) {
-        if (searcher == null)
-            this.searcher = new DimensionalQuarrySearcher(this, DimensionalQuarrySearcher.State.FRESH);
-
-        if (searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING) {
+        if (searcher == null || searcher.getCurrentState() != DimensionalQuarrySearcher.State.RUNNING) {
+            if (searcher == null)
+                this.searcher = new DimensionalQuarrySearcher(this);
+            
             if (this.currentDimension == null)
                 this.updateDimension(level);
 
-            if (this.searcher.getCurrentState() != DimensionalQuarrySearcher.State.FRESH)
+            if (this.searcher.getCurrentState() == DimensionalQuarrySearcher.State.FINISHED)
                 this.searcher = new DimensionalQuarrySearcher(this);
             searcher.updateSettings(this.currentDimension, this.currentChunkPos, this.currentYLevel);
             searcher.start();

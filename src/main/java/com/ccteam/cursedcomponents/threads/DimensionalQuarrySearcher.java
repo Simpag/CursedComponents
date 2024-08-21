@@ -1,9 +1,6 @@
 package com.ccteam.cursedcomponents.threads;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
-import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
-import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -11,9 +8,7 @@ import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BubbleColumnBlock;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -22,7 +17,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -41,7 +35,7 @@ public class DimensionalQuarrySearcher extends Thread {
     private Set<Item> blackList;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
-        this(entity, State.IDLE);
+        this(entity, State.FRESH);
     }
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity, State state) {
@@ -118,7 +112,7 @@ public class DimensionalQuarrySearcher extends Thread {
             }
         });
 
-        this.state = State.IDLE;
+        this.state = State.FINISHED;
 
         if (!quarryEntity.isRemoved() && quarryEntity.getSearcher() == this) {
             //Only update search if we are still valid
@@ -180,7 +174,7 @@ public class DimensionalQuarrySearcher extends Thread {
 
     public enum State {
         FRESH,
-        IDLE,
+        FINISHED,
         RUNNING,
         ERROR,
     }

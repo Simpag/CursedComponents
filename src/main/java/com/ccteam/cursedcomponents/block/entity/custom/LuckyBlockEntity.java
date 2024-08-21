@@ -8,6 +8,7 @@ import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -45,7 +46,6 @@ public class LuckyBlockEntity extends BlockEntity {
     private int spinTicks;
     private Player activatingPlayer;
     private int tintColor;
-    private int outcomeColor;
 
     private RollOutcome rollOutcome;
     private Runnable dropRunnable;
@@ -62,18 +62,19 @@ public class LuckyBlockEntity extends BlockEntity {
         this.isSpinning = true;
         this.spinTicks = MAX_SPIN_TICKS;
         this.activatingPlayer = activatingPlayer;
+        this.tintColor = BASE_TINT;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, LuckyBlockEntity entity) {
         entity.spinTicks--;
 
         if (level.isClientSide) {
-            if (entity.isSpinning) {
+            if (entity.isSpinning && entity.rollOutcome != null) {
                 entity.diceRotation = (entity.diceRotation + diceRotationSpeed) % 360;
-                entity.tintColor = entity.outcomeColor;
-//                        FastColor.ARGB32.lerp(1f - (MAX_SPIN_TICKS - entity.spinTicks),
-//                        FastColor.ARGB32.color(0, 0xFFFFFF),
-//                        entity.outcomeColor);
+                int alpha = (int) Math.clamp((((MAX_SPIN_TICKS - entity.spinTicks) / (float) MAX_SPIN_TICKS) * 255), 0, 255);
+                LogUtils.getLogger().info("alpha {}", alpha);
+                int whiteWithAlpha = FastColor.ARGB32.color(alpha, 255, 255, 255);
+                entity.tintColor = FastColor.ARGB32.multiply(whiteWithAlpha, entity.rollOutcome.getColor());
             }
         } else {
             if (entity.isSpinning && entity.spinTicks <= 0) {
@@ -103,9 +104,7 @@ public class LuckyBlockEntity extends BlockEntity {
         else {
             rollOutcome = RollOutcome.LUCKY;
         }
-
-        this.outcomeColor = rollOutcome.getColor();
-        this.tintColor = this.outcomeColor;
+        this.tintColor = BASE_TINT;
 
         dropRunnable =  switch (rollOutcome) {
             case VERY_UNLUCKY -> () -> carpetBomb(world, player);
@@ -318,7 +317,7 @@ public class LuckyBlockEntity extends BlockEntity {
     private void dropEndPortalFrames(Level world, BlockPos pos) {
         int numFrames = world.random.nextInt(5) + 2;
         dropItemStacks(world, pos, new ItemStack[] {
-                new ItemStack(Items.END_PORTAL_FRAME, 12)
+                new ItemStack(Items.END_PORTAL_FRAME, numFrames)
         });
     }
 

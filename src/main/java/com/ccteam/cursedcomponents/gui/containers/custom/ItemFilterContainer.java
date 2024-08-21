@@ -4,6 +4,7 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
 import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
+import com.ccteam.cursedcomponents.gui.slots.FilterSlot;
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
 import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
 import com.mojang.logging.LogUtils;
@@ -43,7 +44,7 @@ public class ItemFilterContainer extends AbstractContainerMenu {
 
         // Add quarry inventory item buffer
         for (int col = 0; col < ItemFilter.FILTER_SIZE; col++) {
-            this.addSlot(new SlotItemHandler(this.myItemHandler, col, 43 + 18 * col, 21));
+            this.addSlot(new FilterSlot(this.myItemHandler, col, 43 + 18 * col, 21));
         }
 
         // Add player inventory
@@ -94,11 +95,6 @@ public class ItemFilterContainer extends AbstractContainerMenu {
     public void removed(Player player) {
         super.removed(player);
         this.myStack.set(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(this.myItemHandler.serializeNBT(player.registryAccess())));
-    }
-
-    @Override
-    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
-        return super.moveItemStackTo(stack, startIndex, endIndex, reverseDirection);
     }
 
     @Override

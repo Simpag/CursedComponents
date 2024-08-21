@@ -16,8 +16,7 @@ public class ModTags {
     }
 
     public static class Items {
-        // Create custom item tags like such...
-        // public static final TagKey<Item> TRANSFORMABLE_ITEMS = createTag("transformable_items");
+        public static final TagKey<Item> MINI_CHUNK = createTag("mini_chunk");
 
         private static TagKey<Item> createTag(String name) {
             return ItemTags.create(ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, name));

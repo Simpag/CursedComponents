@@ -2,6 +2,7 @@ package com.ccteam.cursedcomponents.block.entity.custom;
 
 import com.ccteam.cursedcomponents.Config;
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.ModRegistries;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
@@ -10,6 +11,7 @@ import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.stackHandlers.DimensionalQuarryItemStackHandler;
 import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
 import com.ccteam.cursedcomponents.threads.DimensionalQuarrySearcher;
+import com.ccteam.cursedcomponents.util.ModTags;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
@@ -25,6 +27,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -271,6 +274,30 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return ret;
     }
 
+    public static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, List<Slot> slots, boolean inventoryFull) {
+        List<MiningRequirement> ret = new ArrayList<>();
+
+        if (energyStored < energyConsumption)
+            ret.add(MiningRequirement.notEnoughEnergy);
+
+        boolean hasPickaxe = slots.get(0).getItem().is(Items.NETHERITE_PICKAXE);
+        boolean hasDimension = slots.get(1).getItem().is(ModTags.Items.MINI_CHUNK);
+
+        if (!hasPickaxe)
+            ret.add(MiningRequirement.noPickaxe);
+
+        if (!hasDimension)
+            ret.add(MiningRequirement.noDimension);
+
+        if (inventoryFull)
+            ret.add(MiningRequirement.inventoryFull);
+
+        if (ret.isEmpty())
+            ret.add(MiningRequirement.ok);
+
+        return ret;
+    }
+
     public void checkIfOverflowIsFixed() {
         ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, this.overflowingItemStack, true);
 
@@ -476,9 +503,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
             return switch (block.chunkType) {
-                case MiniChunkBlock.MiniChunkType.overworld -> CursedComponentsMod.OVERWORLD_SAMPLE_DIMENSION_KEY;
-                case MiniChunkBlock.MiniChunkType.nether -> CursedComponentsMod.NETHER_SAMPLE_DIMENSION_KEY;
-                case MiniChunkBlock.MiniChunkType.end -> CursedComponentsMod.END_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.overworld -> ModRegistries.Dimension.OVERWORLD_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.nether -> ModRegistries.Dimension.NETHER_SAMPLE_DIMENSION_KEY;
+                case MiniChunkBlock.MiniChunkType.end -> ModRegistries.Dimension.END_SAMPLE_DIMENSION_KEY;
             };
         }
         return null;

@@ -128,7 +128,7 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     public List<DimensionalQuarryEntity.MiningRequirement> getMiningRequirements() {
-        return DimensionalQuarryEntity.checkMiningRequirements(this.getEnergyStored(), this.getEnergyConsumption(), this.inventory, this.getInventoryFull() == 1);
+        return DimensionalQuarryEntity.checkMiningRequirements(this.getEnergyStored(), this.getEnergyConsumption(), this.slots, this.getInventoryFull() == 1);
     }
 
     public int getEnergyStored() {

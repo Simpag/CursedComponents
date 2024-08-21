@@ -3,6 +3,7 @@ package com.ccteam.cursedcomponents.stackHandlers;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 
 import com.ccteam.cursedcomponents.item.ModItems;
+import com.ccteam.cursedcomponents.util.ModTags;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -19,7 +20,7 @@ public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
             case 0: // Pickaxe slot
                 return stack.is(Items.NETHERITE_PICKAXE);
             case 1: // Dimension slot
-                return stack.is(ModBlocks.MINI_CHUNK_OVERWORLD.get().asItem());
+                return stack.is(ModTags.Items.MINI_CHUNK);
             case 2: // Blacklist slot
                 return stack.is(ModItems.ITEM_FILTER.get());
             default:

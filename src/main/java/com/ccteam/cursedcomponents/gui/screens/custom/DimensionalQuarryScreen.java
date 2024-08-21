@@ -79,7 +79,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
 
         // Draw warning sprite if needed
         List<DimensionalQuarryEntity.MiningRequirement> reqs = this.menu.getMiningRequirements();
-        if (reqs.get(0) != DimensionalQuarryEntity.MiningRequirement.ok) {
+        if (reqs.getFirst() != DimensionalQuarryEntity.MiningRequirement.ok) {
             guiGraphics.blitSprite(WARNING_SPRITE, this.leftPos - 26, this.topPos, 26, 26);
 
             // Render requirement

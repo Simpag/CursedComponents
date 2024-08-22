@@ -99,7 +99,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
                     updateBlacklistedItems();
                 }
 
-                if (slot < 3) {
+                if (slot < UPGRADE_SLOTS) {
+                    // A bit hacky but send data to client when changing upgrades
                     level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
                 } else if (overflowingItemStack != null) {
                     isOverflowIsFixed();
@@ -181,9 +182,13 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return currentYLevel;
     }
 
-    public Integer getMaxCurrentYLevel() { return maxCurrentYLevel; }
+    public Integer getMaxCurrentYLevel() {
+        return maxCurrentYLevel;
+    }
 
-    public Integer getMinCurrentYLevel() { return minCurrentYLevel; }
+    public Integer getMinCurrentYLevel() {
+        return minCurrentYLevel;
+    }
 
     public EnergyStorage getEnergy() {
         return energy;
@@ -252,13 +257,16 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         this.currentDimension = level.getServer().getLevel(dim);
+        setChanged();
         return this.currentDimension != null;
     }
 
     public void updateBlockStatesToMine(Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> info) {
         this.blockStatesToMine = info;
         this.setCurrentYLevel(this.blockStatesToMine.keySet().intStream().max().orElseThrow());
-        this.setMinMaxCurrentYLevel(this.blockStatesToMine.keySet().intStream().min().orElseThrow(), this.getCurrentYLevel());
+        if (this.minCurrentYLevel == null)
+            this.setMinMaxCurrentYLevel(this.blockStatesToMine.keySet().intStream().min().orElseThrow(), this.getCurrentYLevel());
+
         LOGGER.debug("Got blocks, max y: " + this.currentYLevel);
         setChanged();
     }
@@ -572,6 +580,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private void resetSearcher(ServerLevel level, boolean startSearch) {
         // If we're already searching, terminate the search and create a new one
         this.setCurrentYLevel(null);
+        this.setMinMaxCurrentYLevel(null, null);
         this.currentChunkPos = null;
         this.blockStatesToMine = null;
 
@@ -640,7 +649,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
             tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
 
         if (this.minCurrentYLevel != null)
-            tag.putInt("cursedcomponents:dimensional_quarry_max_current_y_level", this.minCurrentYLevel);
+            tag.putInt("cursedcomponents:dimensional_quarry_min_current_y_level", this.minCurrentYLevel);
 
         if (this.maxCurrentYLevel != null)
             tag.putInt("cursedcomponents:dimensional_quarry_max_current_y_level", this.maxCurrentYLevel);
@@ -695,7 +704,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         public int get(int index) {
             return switch (index) {
                 case 0 -> energy.getEnergyStored();
-                case 1 -> currentYLevel != null ? currentYLevel : 0;
+                case 1 -> currentYLevel != null ? currentYLevel : Integer.MAX_VALUE;
                 case 2 -> miningCooldown;
                 case 3 -> running ? 1 : 0;
                 case 4 -> worldPosition.getX();

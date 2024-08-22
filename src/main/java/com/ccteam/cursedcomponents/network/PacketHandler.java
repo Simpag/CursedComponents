@@ -1,5 +1,6 @@
 package com.ccteam.cursedcomponents.network;
 
+import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
 import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -14,6 +15,11 @@ public class PacketHandler {
                 LuckyBlockInteractionPayload.TYPE,
                 LuckyBlockInteractionPayload.STREAM_CODEC,
                 ClientPayloadHandler::handleLuckyBlockInteractionPayload
+        );
+        registrar.playToServer(
+                GUIButtonPayload.TYPE,
+                GUIButtonPayload.STREAM_CODEC,
+                ServerPayloadHandler::handleGUIButtonPayload
         );
     }
 }

@@ -2,12 +2,17 @@ package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
+import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
+import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -24,31 +29,48 @@ public class ModBlocks {
                     .lightLevel((s) -> 15)
                     .noOcclusion()
             ));
-
-
-    /*public static final DeferredBlock<Block> BLOCK_1 = registerBlock(
-            "block_1",
-            () -> new Block(
-                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
-            )
+    public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
+            "dimensional_quarry",
+            () -> new DimensionalQuarryBlock(
+                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().noOcclusion().pushReaction(PushReaction.IGNORE)
+            ),
+            new Item.Properties().rarity(Rarity.EPIC)
     );
-    public static final DeferredBlock<Block> ORE_BLOCK = registerBlock("ore_block",
-            () -> new DropExperienceBlock(
-                    UniformInt.of(2, 5),
-                    BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()
-            )
-    );*/
 
+    public static final DeferredBlock<Block> MINI_CHUNK_OVERWORLD = registerBlock(
+            "mini_chunk_overworld",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.overworld),
+            new Item.Properties().rarity(Rarity.EPIC)
+    );
+
+    public static final DeferredBlock<Block> MINI_CHUNK_NETHER = registerBlock(
+            "mini_chunk_nether",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.nether),
+            new Item.Properties().rarity(Rarity.EPIC)
+    );
+
+    public static final DeferredBlock<Block> MINI_CHUNK_END = registerBlock(
+            "mini_chunk_end",
+            () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.end),
+            new Item.Properties().rarity(Rarity.EPIC)
+    );
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
-        registerBlockItem(name, toReturn);
+        registerBlockItem(name, toReturn, new Item.Properties());
 
         return toReturn;
     }
 
-    private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block) {
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block, Item.Properties props) {
+        DeferredBlock<T> toReturn = BLOCKS.register(name, block);
+        registerBlockItem(name, toReturn, props);
+
+        return toReturn;
+    }
+
+    private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block, Item.Properties props) {
+        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), props));
     }
 
     public static void register(IEventBus eventBus) {

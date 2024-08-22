@@ -16,12 +16,11 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        // basicItem(ModItems.ITEM_1.get());
+        basicItem(ModItems.WARDEN_INFUSION.get());
+        basicItem(ModItems.DIMENSIONAL_CORE.get());
+        basicItem(ModItems.WARDEN_INFUSED_DIAMOND.get());
+        basicItem(ModItems.ITEM_FILTER.get());
         basicItem(ModItems.ICON.get());
-
-        // buttonItem(ModBlocks.BLACK_OPAL_BUTTON, ModBlocks.BLACK_OPAL_BLOCK);
-        // fenceItem(ModBlocks.BLACK_OPAL_FENCE, ModBlocks.BLACK_OPAL_BLOCK);
-        // wallItem(ModBlocks.BLACK_OPAL_WALL, ModBlocks.BLACK_OPAL_BLOCK);
     }
 
     public void buttonItem(DeferredBlock<Block> block, DeferredBlock<Block> baseBlock) {

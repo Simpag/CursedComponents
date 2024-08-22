@@ -26,23 +26,12 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     // Add new items here to generate their loot tables...
     @Override
     protected void generate() {
-        // These are just nice shorthand functions
-        // dropSelf(ModBlocks.ITEM_1.get());
+        dropSelf(ModBlocks.DIMENSIONAL_QUARRY.get());
+        dropSelf(ModBlocks.MINI_CHUNK_OVERWORLD.get());
+        dropSelf(ModBlocks.MINI_CHUNK_NETHER.get());
+        dropSelf(ModBlocks.MINI_CHUNK_END.get());
+
         this.add(ModBlocks.LUCKY_BLOCK.get(), block -> LootTable.lootTable()); // Lucky block has no drops
-
-        // This is how you create a custom drop
-        /* this.add(
-                ModBlocks.BLACK_OPAL_ORE.get(),
-                block -> createMultipleOreDrops(
-                        ModBlocks.BLACK_OPAL_ORE.get(),
-                        ModItems.RAW_BLACK_OPAL.get(),
-                        2,
-                        5
-                )
-        ); */
-
-        // Slabs could drop 1 or 2 items
-        // this.add(ModBlocks.BLACK_OPAL_SLAB.get(), block -> createSlabItemTable(ModBlocks.BLACK_OPAL_SLAB.get()));
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block block, Item item, float minDrops, float maxDrops) {

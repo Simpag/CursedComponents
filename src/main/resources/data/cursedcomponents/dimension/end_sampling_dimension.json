@@ -1,0 +1,10 @@
+{
+  "type": "cursedcomponents:end_sampling_dimension_type",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:the_end"
+    },
+    "settings": "minecraft:end"
+  }
+}

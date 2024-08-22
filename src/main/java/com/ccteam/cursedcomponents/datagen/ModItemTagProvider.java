@@ -1,6 +1,8 @@
 package com.ccteam.cursedcomponents.datagen;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.util.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -17,10 +19,9 @@ public class ModItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        // How to add tags to items...
-        /*tag(ModTags.Items.CUSTOM_TAG)
-                .add(ModItems.BLACK_OPAL.get())
-                .add(Items.COAL)
-                .add(Items.STONE); */
+        tag(ModTags.Items.MINI_CHUNK)
+                .add(ModBlocks.MINI_CHUNK_OVERWORLD.asItem())
+                .add(ModBlocks.MINI_CHUNK_NETHER.asItem())
+                .add(ModBlocks.MINI_CHUNK_END.asItem());
     }
 }

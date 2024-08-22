@@ -36,7 +36,7 @@ public class LuckyBlockEntityRenderer implements BlockEntityRenderer<LuckyBlockE
         poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.getDiceRotation()));
 
         renderTintedModelLists(model, ItemStack.EMPTY, packedLight, OverlayTexture.NO_OVERLAY, poseStack,
-                bufferSource.getBuffer(RenderType.solid()),
+                bufferSource.getBuffer(RenderType.translucent()),
                 blockEntity.getTintColor());
 
         poseStack.popPose();

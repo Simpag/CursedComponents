@@ -8,7 +8,6 @@ import com.ccteam.cursedcomponents.entity.ModEntities;
 import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -72,7 +71,6 @@ public class LuckyBlockEntity extends BlockEntity {
             if (entity.isSpinning && entity.rollOutcome != null) {
                 entity.diceRotation = (entity.diceRotation + diceRotationSpeed) % 360;
                 int alpha = (int) Math.clamp((((MAX_SPIN_TICKS - entity.spinTicks) / (float) MAX_SPIN_TICKS) * 255), 0, 255);
-                LogUtils.getLogger().info("alpha {}", alpha);
                 int whiteWithAlpha = FastColor.ARGB32.color(alpha, 255, 255, 255);
                 entity.tintColor = FastColor.ARGB32.multiply(whiteWithAlpha, entity.rollOutcome.getColor());
             }
@@ -89,7 +87,10 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     public void rollAndSetDropRunnable(Level world, Player player, BlockPos pos) {
-        float luck = 1.0f;
+        if (world.isClientSide)
+            return;
+
+        float luck = 1.0f; // TODO: Use luck modifiers
         float r = world.getRandom().nextFloat() * luck;
 
         if (r < 1/100.0 * luck) {
@@ -104,7 +105,6 @@ public class LuckyBlockEntity extends BlockEntity {
         else {
             rollOutcome = RollOutcome.LUCKY;
         }
-        this.tintColor = BASE_TINT;
 
         dropRunnable =  switch (rollOutcome) {
             case VERY_UNLUCKY -> () -> carpetBomb(world, player);

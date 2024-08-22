@@ -31,10 +31,8 @@ public class DataGenerator {
                 List.of(new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK)), lookupProvider));
 
         BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(packOutput, lookupProvider, existingFileHelper);
-        EntityTypeTagsProvider entityTypeTagsProvider = new ModEntityTypeTagProvider(packOutput, lookupProvider, CursedComponentsMod.MOD_ID, existingFileHelper);
 
         gen.addProvider(event.includeServer(), blockTagsProvider);
-        gen.addProvider(event.includeServer(), entityTypeTagsProvider);
         gen.addProvider(event.includeServer(), new ModItemTagProvider(packOutput, lookupProvider, blockTagsProvider.contentsGetter(), existingFileHelper));
 
         gen.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));

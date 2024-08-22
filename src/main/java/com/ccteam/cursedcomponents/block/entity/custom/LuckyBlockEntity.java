@@ -361,5 +361,9 @@ public class LuckyBlockEntity extends BlockEntity {
     public int getTintColor() {
         return tintColor;
     }
+
+    public boolean isSpinning() {
+        return isSpinning;
+    }
 }
 

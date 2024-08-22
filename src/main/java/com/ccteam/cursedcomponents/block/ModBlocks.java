@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.AutoShearer;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
@@ -28,6 +29,7 @@ public class ModBlocks {
                     .lightLevel((s) -> 15)
                     .noOcclusion()
             ));
+
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
             "dimensional_quarry",
             () -> new DimensionalQuarryBlock(
@@ -52,6 +54,11 @@ public class ModBlocks {
             "mini_chunk_end",
             () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.end),
             new Item.Properties().rarity(Rarity.EPIC)
+    );
+
+    public static final DeferredBlock<Block> AUTO_SHEARER = registerBlock(
+            "auto_shearer",
+            () -> new AutoShearer(BlockBehaviour.Properties.of().strength(4f).noOcclusion().noCollission())
     );
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {

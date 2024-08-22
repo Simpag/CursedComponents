@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.custom.AutoShearer;
+import com.ccteam.cursedcomponents.block.custom.AutoShearerBlock;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
@@ -58,7 +58,7 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> AUTO_SHEARER = registerBlock(
             "auto_shearer",
-            () -> new AutoShearer(BlockBehaviour.Properties.of().strength(4f).noOcclusion().noCollission())
+            () -> new AutoShearerBlock(BlockBehaviour.Properties.of().strength(4f).noOcclusion().noCollission())
     );
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {

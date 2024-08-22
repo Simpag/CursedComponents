@@ -53,7 +53,7 @@ public class AutoShearerBlock extends BaseEntityBlock {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal("This block shears entities passing through it"));
+        tooltip.add(Component.translatable("tooltip.cursedcomponents.auto_shearer"));
     }
 
     @Override

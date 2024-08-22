@@ -12,6 +12,7 @@
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
+  "tooltip.cursedcomponents.auto_shearer": "This block shears entities passing through it",
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.1": "Dimensional Quarry go brrr",
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Capacity: %s FE",
   "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption: %s FE/t",

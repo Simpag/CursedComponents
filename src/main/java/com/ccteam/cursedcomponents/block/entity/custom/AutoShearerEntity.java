@@ -9,6 +9,4 @@ public class AutoShearerEntity extends BlockEntity {
     public AutoShearerEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.AUTO_SHEARER_BE.get(), pos, blockState);
     }
-
-
 }

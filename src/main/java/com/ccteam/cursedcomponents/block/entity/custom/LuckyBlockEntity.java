@@ -56,6 +56,8 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     public void startSpinning(Player activatingPlayer) {
+        if (this.isSpinning)
+            return;
         this.isSpinning = true;
         this.spinTicks = MAX_SPIN_TICKS;
         this.activatingPlayer = activatingPlayer;
@@ -83,7 +85,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     public void rollAndSetDropRunnable(Level world, Player player, BlockPos pos) {
-        if (world.isClientSide)
+        if (world.isClientSide || this.isSpinning)
             return;
 
         float luck = 1.0f; // TODO: Use luck modifiers

@@ -2,8 +2,8 @@ package com.ccteam.cursedcomponents.block.entity;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
+import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;

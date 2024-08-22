@@ -667,7 +667,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         @Override
         public void set(int index, int value) {
-            return;
         }
 
 

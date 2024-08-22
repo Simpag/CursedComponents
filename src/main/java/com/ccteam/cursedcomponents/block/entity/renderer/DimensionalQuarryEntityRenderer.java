@@ -2,7 +2,6 @@ package com.ccteam.cursedcomponents.block.entity.renderer;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;

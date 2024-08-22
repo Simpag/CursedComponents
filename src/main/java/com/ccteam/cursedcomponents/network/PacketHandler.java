@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.network;
 
-import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
 import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
+import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 

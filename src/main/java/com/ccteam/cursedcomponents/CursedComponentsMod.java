@@ -7,23 +7,15 @@ import com.ccteam.cursedcomponents.codecs.ModCodecs;
 import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.screens.ModScreens;
-import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.ccteam.cursedcomponents.network.PacketHandler;
-import com.ccteam.cursedcomponents.network.PacketHandler;
 import com.ccteam.cursedcomponents.structures.ModStructures;
-import com.mojang.logging.LogUtils;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(CursedComponentsMod.MOD_ID)

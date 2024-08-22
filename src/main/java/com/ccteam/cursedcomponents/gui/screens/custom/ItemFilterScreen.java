@@ -3,14 +3,12 @@ package com.ccteam.cursedcomponents.gui.screens.custom;
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.gui.containers.custom.ItemFilterContainer;
 import com.ccteam.cursedcomponents.util.GuiUtil;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 public class ItemFilterScreen extends AbstractContainerScreen<ItemFilterContainer> {
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/item_filter_container.png");

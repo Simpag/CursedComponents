@@ -5,8 +5,6 @@ import com.ccteam.cursedcomponents.item.custom.ItemFilter;
 import com.ccteam.cursedcomponents.item.custom.WardenInfusion;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;

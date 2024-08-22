@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.stackHandlers;
+package com.ccteam.cursedcomponents.stack_handler;
 
 import net.neoforged.neoforge.items.ItemStackHandler;
 

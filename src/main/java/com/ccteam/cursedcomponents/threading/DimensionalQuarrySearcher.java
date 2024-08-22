@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.threads;
+package com.ccteam.cursedcomponents.threading;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

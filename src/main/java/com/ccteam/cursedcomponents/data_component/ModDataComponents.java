@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.datacomponents;
+package com.ccteam.cursedcomponents.data_component;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.codecs.ModCodecs;
-import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
+import com.ccteam.cursedcomponents.codec.ModCodecs;
+import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
 import net.minecraft.core.component.DataComponentType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;

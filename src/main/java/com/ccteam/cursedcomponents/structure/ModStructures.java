@@ -1,7 +1,7 @@
-package com.ccteam.cursedcomponents.structures;
+package com.ccteam.cursedcomponents.structure;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.structures.custom.LuckyStructure;
+import com.ccteam.cursedcomponents.structure.custom.LuckyStructure;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.neoforged.bus.api.IEventBus;

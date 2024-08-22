@@ -1,6 +1,6 @@
-package com.ccteam.cursedcomponents.structures.custom;
+package com.ccteam.cursedcomponents.structure.custom;
 
-import com.ccteam.cursedcomponents.structures.ModStructures;
+import com.ccteam.cursedcomponents.structure.ModStructures;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;

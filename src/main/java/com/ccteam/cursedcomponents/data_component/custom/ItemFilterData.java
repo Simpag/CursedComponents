@@ -1,7 +1,7 @@
-package com.ccteam.cursedcomponents.datacomponents.custom;
+package com.ccteam.cursedcomponents.data_component.custom;
 
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
-import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
+import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 

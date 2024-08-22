@@ -30,11 +30,15 @@ public class ModBlocks {
                     .noOcclusion()
             ));
 
-    public static final DeferredBlock<Block> CONVEYOR_BELT = registerBlock("conveyor_belt",
+    public static final DeferredBlock<Block> CONVEYOR_BELT_TIER1 = registerBlock("conveyor_belt_tier1",
             () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
                     .strength(2f)
-                    .noCollission()
-            ));
+                    .noCollission(), 0.1));
+
+    public static final DeferredBlock<Block> CONVEYOR_BELT_TIER2 = registerBlock("conveyor_belt_tier2",
+            () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
+                    .strength(2f)
+                    .noCollission(), 0.3));
 
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
             "dimensional_quarry",

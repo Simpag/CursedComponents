@@ -35,7 +35,8 @@ public class ModCreativeModeTabs {
         add(ModBlocks.MINI_CHUNK_NETHER);
         add(ModBlocks.MINI_CHUNK_END);
 
-        add(ModBlocks.CONVEYOR_BELT);
+        add(ModBlocks.CONVEYOR_BELT_TIER1);
+        add(ModBlocks.CONVEYOR_BELT_TIER2);
     }};
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CursedComponentsMod.MOD_ID);

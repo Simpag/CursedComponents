@@ -15,9 +15,11 @@ import net.minecraft.world.phys.Vec3;
 
 public class ConveyorBeltBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    private final double speedMultiplier;
 
-    public ConveyorBeltBlock(Properties properties) {
+    public ConveyorBeltBlock(Properties properties, double speedMultiplier) {
         super(properties);
+        this.speedMultiplier = speedMultiplier;
     }
 
     @Override
@@ -39,8 +41,7 @@ public class ConveyorBeltBlock extends Block {
 
             Direction direction = state.getValue(FACING);
             Vec3 vel = new Vec3(direction.step());
-            double speed = 0.1;
-            vel = vel.multiply(speed, speed, speed);
+            vel = vel.multiply(speedMultiplier, speedMultiplier, speedMultiplier);
             entity.push(vel);
         }
     }

@@ -1,5 +1,6 @@
 package com.ccteam.cursedcomponents.threading;
 
+import com.ccteam.cursedcomponents.ModRegistries;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -21,6 +22,8 @@ import java.util.Random;
 
 
 public class DimensionalQuarrySearcher extends Thread {
+    private static final int MAX_CHUNK_ATTEMPTS = 50;
+
     private final DimensionalQuarryEntity quarryEntity;
     private State state;
     private ServerLevel dimension;
@@ -113,25 +116,42 @@ public class DimensionalQuarrySearcher extends Thread {
         }
     }
 
-    private boolean updateSamplingChunk() {
+    private boolean updateSamplingChunk(int attempt) {
         if (this.dimension == null) {
             throw new IllegalArgumentException("Target dimension is null!");
         }
 
         int randomX = this.rng.nextInt(-1_000_000, 1_000_000);
         int randomZ = this.rng.nextInt(-1_000_000, 1_000_000);
-        ChunkPos chunkPos = new ChunkPos(randomX, randomZ);
 
+        if (this.dimension.dimension() == ModRegistries.Dimension.END_SAMPLE_DIMENSION_KEY) {
+            // If the selected chunk is within a 1000 block radius (62.5 chunks) of the center island
+            // then it's just void so sample a chunk from outside this area
+            if (Math.abs(randomX) < 63)
+                randomX = this.rng.nextFloat() < 0.5 ? 63 : -63;
+
+            if (Math.abs(randomZ) < 63)
+                randomZ = this.rng.nextFloat() < 0.5 ? 63 : -63;
+        }
+
+        ChunkPos chunkPos = new ChunkPos(randomX, randomZ);
         BlockPos startPos = this.getFirstPos(chunkPos);
 
         if (startPos == null) {
-            throw new NullPointerException("Starting Y position in dimension is null!");
+            if (attempt < MAX_CHUNK_ATTEMPTS)
+                return this.updateSamplingChunk(attempt + 1);
+            else
+                throw new NullPointerException("Starting Y position in dimension is null!");
         }
 
         this.chunkAccess = this.dimension.getChunk(chunkPos.x, chunkPos.z);
         this.startY = startPos.getY();
 
         return true;
+    }
+
+    private boolean updateSamplingChunk() {
+        return this.updateSamplingChunk(0);
     }
 
     private boolean isMineable(BlockState blockToMineState, Block blockToMine) {

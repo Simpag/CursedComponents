@@ -16,10 +16,10 @@ public enum RollOutcome {
 
     public int getColor() {
         return switch (this) {
-            case VERY_UNLUCKY -> FastColor.ARGB32.color(255, 0x000000); // Black color
-            case UNLUCKY -> FastColor.ARGB32.color(255, 0xFF0000); // Red color
-            case NORMAL -> FastColor.ARGB32.color(0, 0xFFFFFF); // transparent, so no tint
-            case LUCKY -> FastColor.ARGB32.color(255, 0x00FF00); // Green color
+            case VERY_UNLUCKY -> FastColor.ARGB32.color(255, 0x000000); // Black
+            case UNLUCKY -> FastColor.ARGB32.color(255, 0xFF0000); // Red
+            case NORMAL -> FastColor.ARGB32.color(255, 0xE3CA4F); // Yellow
+            case LUCKY -> FastColor.ARGB32.color(255, 0x00FF00); // Green
         };
     }
 

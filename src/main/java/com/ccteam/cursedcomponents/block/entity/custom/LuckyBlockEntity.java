@@ -36,7 +36,7 @@ public class LuckyBlockEntity extends BlockEntity {
 
     private static final float diceRotationSpeed = 40f;
     private static final int MAX_SPIN_TICKS = 20;
-    private static final int BASE_TINT = FastColor.ARGB32.color(0, 0xFFFFFF);
+    private static final int BASE_TINT = RollOutcome.NORMAL.getColor();
 
     private float diceRotation;
     private boolean isSpinning;
@@ -59,7 +59,6 @@ public class LuckyBlockEntity extends BlockEntity {
         this.isSpinning = true;
         this.spinTicks = MAX_SPIN_TICKS;
         this.activatingPlayer = activatingPlayer;
-        this.tintColor = BASE_TINT;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, LuckyBlockEntity entity) {
@@ -68,9 +67,8 @@ public class LuckyBlockEntity extends BlockEntity {
         if (level.isClientSide) {
             if (entity.isSpinning && entity.rollOutcome != null) {
                 entity.diceRotation = (entity.diceRotation + diceRotationSpeed) % 360;
-                int alpha = (int) Math.clamp((((MAX_SPIN_TICKS - entity.spinTicks) / (float) MAX_SPIN_TICKS) * 255), 0, 255);
-                int whiteWithAlpha = FastColor.ARGB32.color(alpha, 255, 255, 255);
-                entity.tintColor = FastColor.ARGB32.multiply(whiteWithAlpha, entity.rollOutcome.getColor());
+                float delta = (MAX_SPIN_TICKS - entity.spinTicks) / (float) MAX_SPIN_TICKS;
+                entity.tintColor = FastColor.ARGB32.lerp(delta, BASE_TINT, entity.rollOutcome.getColor());
             }
         } else {
             if (entity.isSpinning && entity.spinTicks <= 0) {

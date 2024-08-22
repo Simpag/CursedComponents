@@ -4,8 +4,6 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.custom.RollOutcome;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.entity.ModEntities;
-import com.ccteam.cursedcomponents.entity.custom.LuckyParrot;
 import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
@@ -149,7 +147,6 @@ public class LuckyBlockEntity extends BlockEntity {
                 () -> constructBlockTower(world, player, pos),
                 () -> spawnLuckyVillager(world, pos),
                 () -> hurlBottlesOfEnchanting(world, pos),
-//                () -> spawnLuckyParrot(world, pos), // Deactivated until fixed
                 () -> dropEndPortalFrames(world, pos),
                 () -> spawnLuckyPyramid(world, player, pos)
         );
@@ -282,12 +279,6 @@ public class LuckyBlockEntity extends BlockEntity {
         world.setBlock(pos.above(height + 1), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
         world.setBlock(pos.above(height + 2), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
         world.setBlock(pos.above(height + 3), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
-    }
-
-    private void spawnLuckyParrot(Level world, BlockPos pos) {
-        LuckyParrot luckyParrot = ModEntities.LUCKY_PARROT.get().create(world);
-        luckyParrot.setPos(pos.getX(), pos.getY(), pos.getZ());
-        world.addFreshEntity(luckyParrot);
     }
 
     private void spawnLuckyVillager(Level world, BlockPos pos) {

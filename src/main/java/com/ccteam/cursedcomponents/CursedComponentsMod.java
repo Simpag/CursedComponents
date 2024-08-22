@@ -2,8 +2,6 @@ package com.ccteam.cursedcomponents;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.entity.ModEntities;
-import com.ccteam.cursedcomponents.entity.attachments.ModEntityAttachments;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItems;
 
@@ -43,8 +41,6 @@ public class CursedComponentsMod {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModStructures.register(modEventBus);
-        ModEntities.register(modEventBus);
-        ModEntityAttachments.register(modEventBus);
         ModBlockEntities.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.

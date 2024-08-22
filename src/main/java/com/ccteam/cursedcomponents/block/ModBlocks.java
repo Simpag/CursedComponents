@@ -1,6 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
+import com.ccteam.cursedcomponents.block.custom.ConveyorBeltBlock;
 import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
@@ -28,6 +29,13 @@ public class ModBlocks {
                     .lightLevel((s) -> 15)
                     .noOcclusion()
             ));
+
+    public static final DeferredBlock<Block> CONVEYOR_BELT = registerBlock("conveyor_belt",
+            () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
+                    .strength(2f)
+                    .noCollission()
+            ));
+
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
             "dimensional_quarry",
             () -> new DimensionalQuarryBlock(

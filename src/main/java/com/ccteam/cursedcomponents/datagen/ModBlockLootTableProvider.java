@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.datagen;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;

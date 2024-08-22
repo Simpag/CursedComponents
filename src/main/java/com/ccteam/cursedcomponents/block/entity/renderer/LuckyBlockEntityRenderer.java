@@ -44,9 +44,9 @@ public class LuckyBlockEntityRenderer implements BlockEntityRenderer<LuckyBlockE
 
 
     private void renderTintedModelLists(BakedModel model, ItemStack stack,
-                                 int combinedLight, int combinedOverlay,
-                                 PoseStack poseStack, VertexConsumer buffer,
-                                 int tintColor) {
+                                        int combinedLight, int combinedOverlay,
+                                        PoseStack poseStack, VertexConsumer buffer,
+                                        int tintColor) {
         RandomSource randomsource = RandomSource.create();
         long seed = 42L;
 
@@ -63,10 +63,10 @@ public class LuckyBlockEntityRenderer implements BlockEntityRenderer<LuckyBlockE
         PoseStack.Pose posestack$pose = poseStack.last();
 
         for (BakedQuad bakedquad : quads) {
-            float f = (float)FastColor.ARGB32.alpha(tintColor) / 255.0F;
-            float f1 = (float)FastColor.ARGB32.red(tintColor) / 255.0F;
-            float f2 = (float)FastColor.ARGB32.green(tintColor) / 255.0F;
-            float f3 = (float)FastColor.ARGB32.blue(tintColor) / 255.0F;
+            float f = (float) FastColor.ARGB32.alpha(tintColor) / 255.0F;
+            float f1 = (float) FastColor.ARGB32.red(tintColor) / 255.0F;
+            float f2 = (float) FastColor.ARGB32.green(tintColor) / 255.0F;
+            float f3 = (float) FastColor.ARGB32.blue(tintColor) / 255.0F;
             buffer.putBulkData(posestack$pose, bakedquad, f1, f2, f3, f, combinedLight, combinedOverlay, true); // Neo: pass readExistingColor=true
         }
     }

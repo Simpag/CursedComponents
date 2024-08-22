@@ -52,15 +52,14 @@ public class LuckyStructure extends Structure {
     private final LiquidSettings liquidSettings;
 
     public LuckyStructure(Structure.StructureSettings config,
-                         Holder<StructureTemplatePool> startPool,
-                         Optional<ResourceLocation> startJigsawName,
-                         int size,
-                         HeightProvider startHeight,
-                         Optional<Heightmap.Types> projectStartToHeightmap,
-                         int maxDistanceFromCenter,
-                         DimensionPadding dimensionPadding,
-                         LiquidSettings liquidSettings)
-    {
+                          Holder<StructureTemplatePool> startPool,
+                          Optional<ResourceLocation> startJigsawName,
+                          int size,
+                          HeightProvider startHeight,
+                          Optional<Heightmap.Types> projectStartToHeightmap,
+                          int maxDistanceFromCenter,
+                          DimensionPadding dimensionPadding,
+                          LiquidSettings liquidSettings) {
         super(config);
         this.startPool = startPool;
         this.startJigsawName = startJigsawName;

@@ -10,7 +10,8 @@ import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.*;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 public class ModConfiguredFeatures {
@@ -30,8 +31,8 @@ public class ModConfiguredFeatures {
         // TODO: Add small temple with lucky block inside
         register(context, LUCKY_BLOCK_KEY, Feature.SIMPLE_BLOCK,
                 new SimpleBlockConfiguration(new WeightedStateProvider(
-                    SimpleWeightedRandomList.<BlockState>builder()
-                            .add(ModBlocks.LUCKY_BLOCK.get().defaultBlockState(), 1)
+                        SimpleWeightedRandomList.<BlockState>builder()
+                                .add(ModBlocks.LUCKY_BLOCK.get().defaultBlockState(), 1)
                 )));
 
     }

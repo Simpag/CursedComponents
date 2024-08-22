@@ -7,7 +7,6 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.BiomeModifiers;
@@ -37,9 +36,9 @@ public class ModBiomeModifiers {
 //            GenerationStep.Decoration.UNDERGROUND_ORES));
 
         context.register(ADD_LUCKY_BLOCK, new BiomeModifiers.AddFeaturesBiomeModifier(
-            biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
-            HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.LUCKY_BLOCK_PLACED_KEY)),
-            GenerationStep.Decoration.VEGETAL_DECORATION));
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.LUCKY_BLOCK_PLACED_KEY)),
+                GenerationStep.Decoration.VEGETAL_DECORATION));
     }
 
 

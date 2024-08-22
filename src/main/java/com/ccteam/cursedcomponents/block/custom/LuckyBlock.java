@@ -25,7 +25,7 @@ import java.util.List;
 
 public class LuckyBlock extends BaseEntityBlock {
 
-    private static MapCodec<? extends BaseEntityBlock> CODEC = simpleCodec(LuckyBlock::new);
+    private static final MapCodec<? extends BaseEntityBlock> CODEC = simpleCodec(LuckyBlock::new);
 
     public LuckyBlock(Properties properties) {
         super(properties);

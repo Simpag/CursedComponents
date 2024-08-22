@@ -1,9 +1,8 @@
 package com.ccteam.cursedcomponents.datagen;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.ModBlocks;
 import net.minecraft.data.PackOutput;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -21,7 +20,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         // Custom stairs
         // stairsBlock((StairBlock) ModBlocks.BLACK_OPAL_STAIRS.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
         // blockItem(ModBlocks.BLACK_OPAL_STAIRS);
-        
+
         // Custom slabs
         // slabBlock((SlabBlock) ModBlocks.BLACK_OPAL_SLAB.get(), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()), blockTexture(ModBlocks.BLACK_OPAL_BLOCK.get()));
         // blockItem(ModBlocks.BLACK_OPAL_SLAB);

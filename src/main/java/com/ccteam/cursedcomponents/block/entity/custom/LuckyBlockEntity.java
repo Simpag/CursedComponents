@@ -91,20 +91,17 @@ public class LuckyBlockEntity extends BlockEntity {
         float luck = 1.0f; // TODO: Use luck modifiers
         float r = world.getRandom().nextFloat() * luck;
 
-        if (r < 1/100.0 * luck) {
+        if (r < 1 / 100.0 * luck) {
             rollOutcome = RollOutcome.VERY_UNLUCKY;
-        }
-        else if (r < 20/100.0 * luck) {
+        } else if (r < 20 / 100.0 * luck) {
             rollOutcome = RollOutcome.UNLUCKY;
-        }
-        else if (r < 80/100.0 * luck) {
+        } else if (r < 80 / 100.0 * luck) {
             rollOutcome = RollOutcome.NORMAL;
-        }
-        else {
+        } else {
             rollOutcome = RollOutcome.LUCKY;
         }
 
-        dropRunnable =  switch (rollOutcome) {
+        dropRunnable = switch (rollOutcome) {
             case VERY_UNLUCKY -> () -> carpetBomb(world, player);
             case UNLUCKY -> () -> dropUnlucky(world, player, pos);
             case NORMAL -> () -> dropNormal(world, pos);
@@ -187,8 +184,8 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void spawnSkeletons(Level world, BlockPos pos) {
-        int[] xOffsets = new int[] { -4, 4, 0, 0 };
-        int[] zOffsets = new int[] { 0, 0, -4, 4 };
+        int[] xOffsets = new int[]{-4, 4, 0, 0};
+        int[] zOffsets = new int[]{0, 0, -4, 4};
 
         for (int i = 0; i < xOffsets.length; i++) {
             Skeleton skeleton = EntityType.SKELETON.create(world);
@@ -201,7 +198,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void dropGoldArmor(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.GOLDEN_HELMET),
                 new ItemStack(Items.GOLDEN_CHESTPLATE),
                 new ItemStack(Items.GOLDEN_LEGGINGS),
@@ -210,7 +207,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void dropGoldTools(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.GOLDEN_SHOVEL),
                 new ItemStack(Items.GOLDEN_PICKAXE),
                 new ItemStack(Items.GOLDEN_AXE),
@@ -224,14 +221,14 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void dropSaddles(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.SADDLE),
                 new ItemStack(Items.SADDLE)
         });
     }
 
     private void dropPotatoes(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.POTATO, 32),
                 new ItemStack(Items.BAKED_POTATO, 16),
                 new ItemStack(Items.POISONOUS_POTATO, 4),
@@ -239,7 +236,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void dropFishingEquipment(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.FISHING_ROD, 1),
                 new ItemStack(Items.COD_BUCKET, 1),
                 new ItemStack(Items.COOKED_SALMON, 16),
@@ -252,7 +249,7 @@ public class LuckyBlockEntity extends BlockEntity {
         EnchantmentHelper.enchantItem(world.random, enchantedBook, 12, world.registryAccess(),
                 world.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
                         .getTag(EnchantmentTags.IN_ENCHANTING_TABLE));
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.BOOKSHELF, 7),
                 new ItemStack(Items.BOOK, 32),
                 enchantedBook
@@ -260,7 +257,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     private void dropBuckets(Level world, BlockPos pos) {
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.BUCKET, 3),
                 new ItemStack(Items.WATER_BUCKET, 1),
                 new ItemStack(Items.LAVA_BUCKET, 1),
@@ -298,16 +295,16 @@ public class LuckyBlockEntity extends BlockEntity {
     private void throwExperienceBottle(Level world, BlockPos pos, Direction facing, double d, int speed) {
         ThrownExperienceBottle experienceBottle = new ThrownExperienceBottle(world, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5);
         experienceBottle.setDeltaMovement(
-                world.random.triangle((double)facing.getStepX() * d, 0.0172275 * (double)speed),
-                world.random.triangle(0.2, 0.0172275 * (double)speed),
-                world.random.triangle((double)facing.getStepZ() * d, 0.0172275 * (double)speed)
+                world.random.triangle((double) facing.getStepX() * d, 0.0172275 * (double) speed),
+                world.random.triangle(0.2, 0.0172275 * (double) speed),
+                world.random.triangle((double) facing.getStepZ() * d, 0.0172275 * (double) speed)
         );
         world.addFreshEntity(experienceBottle);
     }
 
     private void dropEndPortalFrames(Level world, BlockPos pos) {
         int numFrames = world.random.nextInt(5) + 2;
-        dropItemStacks(world, pos, new ItemStack[] {
+        dropItemStacks(world, pos, new ItemStack[]{
                 new ItemStack(Items.END_PORTAL_FRAME, numFrames)
         });
     }
@@ -338,8 +335,7 @@ public class LuckyBlockEntity extends BlockEntity {
                     } // Edge blocks at the base layer
                     else if (y == 0 && (x == 0 || z == 0 || x == layerSize - 1 || z == layerSize - 1)) {
                         world.setBlock(newPos, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
-                    }
-                    else {
+                    } else {
                         world.setBlock(newPos, Blocks.SANDSTONE.defaultBlockState(), 3);
                     }
                 }

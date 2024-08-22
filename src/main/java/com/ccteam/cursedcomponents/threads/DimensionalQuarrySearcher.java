@@ -1,13 +1,14 @@
 package com.ccteam.cursedcomponents.threads;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Reference2BooleanOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BubbleColumnBlock;
@@ -15,23 +16,19 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.phys.AABB;
-import org.slf4j.Logger;
 
 import java.util.Random;
-import java.util.Set;
 
 
 public class DimensionalQuarrySearcher extends Thread {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private final DimensionalQuarryEntity quarryEntity;
     private State state;
     private ServerLevel dimension;
 
-    private Int2ObjectMap<BlockStateInfo> blockStatesToMine = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<BlockStateInfo> blockStatesToMine = new Int2ObjectOpenHashMap<>();
+    private final Random rng = new Random();
     private ChunkAccess chunkAccess;
     private Integer startY;
-    private Random rng;
 
     public DimensionalQuarrySearcher(DimensionalQuarryEntity entity) {
         this(entity, State.FRESH);
@@ -41,7 +38,6 @@ public class DimensionalQuarrySearcher extends Thread {
         super("Dimensional Quarry Searcher: " + entity.getBlockPos());
         this.state = state;
         this.quarryEntity = entity;
-        this.rng = new Random();
         this.rng.setSeed(System.nanoTime());
 
         setDaemon(true);
@@ -104,7 +100,7 @@ public class DimensionalQuarrySearcher extends Thread {
             }
 
             if (acceptedBlocks.getBoolean(blockToMine)) {
-                this.blockStatesToMine.computeIfAbsent(pos.getY(), k -> new BlockStateInfo()).increment(blockState);
+                this.blockStatesToMine.computeIfAbsent(pos.getY(), k -> new BlockStateInfo()).incrementState(blockState);
             }
 
         });
@@ -119,9 +115,7 @@ public class DimensionalQuarrySearcher extends Thread {
 
     private boolean updateSamplingChunk() {
         if (this.dimension == null) {
-            LOGGER.debug("Target dimension is null!");
             throw new IllegalArgumentException("Target dimension is null!");
-            //return false;
         }
 
         int randomX = this.rng.nextInt(-1_000_000, 1_000_000);
@@ -131,8 +125,7 @@ public class DimensionalQuarrySearcher extends Thread {
         BlockPos startPos = this.getFirstPos(chunkPos);
 
         if (startPos == null) {
-            LOGGER.debug("Starting Y position in dimension is null!");
-            return false;
+            throw new NullPointerException("Starting Y position in dimension is null!");
         }
 
         this.chunkAccess = this.dimension.getChunk(chunkPos.x, chunkPos.z);
@@ -147,12 +140,8 @@ public class DimensionalQuarrySearcher extends Thread {
             return false;
         }
 
-        if (blockToMine instanceof LiquidBlock || blockToMine instanceof BubbleColumnBlock) {
-            // Skip liquids
-            return false;
-        }
-
-        return true;
+        // Skip liquids
+        return !(blockToMine instanceof LiquidBlock) && !(blockToMine instanceof BubbleColumnBlock);
     }
 
     private BlockPos getFirstPos(ChunkPos chunkPos) {
@@ -184,7 +173,7 @@ public class DimensionalQuarrySearcher extends Thread {
             this.blockStates = new Object2IntOpenHashMap<>();
         }
 
-        public void increment(BlockState state) {
+        public void incrementState(BlockState state) {
             this.blockStates.put(state, this.blockStates.getOrDefault(state, 0) + 1);
         }
 

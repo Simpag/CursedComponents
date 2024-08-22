@@ -1,8 +1,5 @@
 package com.ccteam.cursedcomponents.block.entity.renderer;
 
-import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.block.attachments.ModBlockAttachments;
-import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -10,8 +7,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -21,17 +16,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelDataManager;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import org.joml.Quaternionf;
-import org.slf4j.Logger;
 
 public class DimensionalQuarryEntityRenderer implements BlockEntityRenderer<DimensionalQuarryEntity> {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public DimensionalQuarryEntityRenderer(BlockEntityRendererProvider.Context context) {
 
     }

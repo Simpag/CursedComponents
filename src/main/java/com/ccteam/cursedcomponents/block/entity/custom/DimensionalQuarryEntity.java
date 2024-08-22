@@ -1,9 +1,7 @@
 package com.ccteam.cursedcomponents.block.entity.custom;
 
 import com.ccteam.cursedcomponents.Config;
-import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.ModRegistries;
-import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
@@ -47,7 +45,6 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.openjdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -85,7 +82,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         @Override
         protected void onContentsChanged(int slot) {
             // Update slots to client when upgrades change
-            if (!level.isClientSide) {
+            if (level != null && !level.isClientSide) {
                 if (slot == 0) {
                     // Pickaxe slot, update the upgrades
                     updateUpgrades();
@@ -101,7 +98,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 if (slot < 3) {
                     level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
                 } else if (overflowingItemStack != null) {
-                    checkIfOverflowIsFixed();
+                    isOverflowIsFixed();
                 }
             }
 
@@ -109,7 +106,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     };
     private final EnergyStorage energy = new EnergyStorage(ENERGY_CAPACITY);
-    private HashMap<Direction, BlockCapabilityCache<IItemHandler, @Nullable Direction>> itemHandlerCapCaches = new HashMap<>();
+    private final HashMap<Direction, BlockCapabilityCache<IItemHandler, @Nullable Direction>> itemHandlerCapCaches = new HashMap<>();
 
     public DimensionalQuarryEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), pos, blockState);
@@ -135,6 +132,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     }
 
+    // Getters
+
     public ItemStack getPickaxeSlot() {
         return this.inventory.getStackInSlot(0).copy();
     }
@@ -145,18 +144,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     public ItemStack getItemFilterSlot() {
         return this.inventory.getStackInSlot(2).copy();
-    }
-
-    public void updateBlacklistedItems() {
-        ItemStack filter = this.getItemFilterSlot();
-        ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
-        Set<Item> items = new HashSet<>();
-        for (int i = 0; i < inv.getSlots(); i++) {
-            items.add(inv.getStackInSlot(i).getItem());
-        }
-
-        this.blacklistedItems = items;
-        setChanged();
     }
 
     public ContainerData getQuarryData() {
@@ -197,35 +184,56 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return this.currentEnergyConsumption;
     }
 
-    private void updateEnergyConsumption() {
-        ItemStack pick = this.getPickaxeSlot();
-
-        if (pick.isEmpty()) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
-            return;
-        }
-
-        int unbreakingLevel = EnchantmentHelper.getTagEnchantmentLevel(level.holder(Enchantments.UNBREAKING).get(), pick);
-
-        if (unbreakingLevel < 0) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
-        } else if (unbreakingLevel < 4) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.get(unbreakingLevel);
-        } else {
-            // If any mods add higher unbreaking levels
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getLast();
-        }
-    }
-
     public int getTicksPerBlock() {
         return this.currentTicksPerBlock;
     }
+
+    private List<IItemHandler> getAttachedStorages() {
+        List<IItemHandler> attachedStorages = new ArrayList<>();
+
+        this.itemHandlerCapCaches.forEach((ejectDir, cache) -> {
+            IItemHandler handler = cache.getCapability();
+            if (handler != null && !(handler instanceof DimensionalQuarryItemStackHandler))
+                attachedStorages.add(handler);
+        });
+
+        return attachedStorages;
+    }
+
+    private boolean updateDimension(ServerLevel level) {
+        if (level.isClientSide)
+            return false;
+
+        this.currentDimension = null;
+        ResourceKey<Level> dim = this.getMiniChunkDimension();
+        if (dim == null) {
+            return false;
+        }
+
+        this.currentDimension = level.getServer().getLevel(dim);
+        return this.currentDimension != null;
+    }
+
+    // Setters
+
+    public void setRunning(boolean state) {
+        this.running = state;
+        setChanged();
+    }
+
+    // Updaters
 
     public void updateBlockStatesToMine(Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> info) {
         this.blockStatesToMine = info;
         this.currentYLevel = this.blockStatesToMine.keySet().intStream().max().orElseThrow();
         this.minYLevel = this.blockStatesToMine.keySet().intStream().min().orElseThrow();
         LOGGER.debug("Got blocks, max y: " + this.currentYLevel + ", min: " + this.minYLevel);
+        setChanged();
+    }
+
+    private void updateUpgrades() {
+        updateEnergyConsumption();
+        updateTicksPerBlock();
         setChanged();
     }
 
@@ -237,7 +245,9 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return;
         }
 
-        int efficiencyLevel = EnchantmentHelper.getTagEnchantmentLevel(level.holder(Enchantments.EFFICIENCY).get(), pick);
+        int efficiencyLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.EFFICIENCY).isPresent())
+            efficiencyLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.EFFICIENCY).get(), pick);
 
         if (efficiencyLevel < 0) {
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.getFirst();
@@ -249,11 +259,44 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     }
 
-    private void updateUpgrades() {
-        updateEnergyConsumption();
-        updateTicksPerBlock();
+    private void updateEnergyConsumption() {
+        ItemStack pick = this.getPickaxeSlot();
+
+        if (pick.isEmpty()) {
+            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
+            return;
+        }
+
+        int unbreakingLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.UNBREAKING).isPresent())
+            unbreakingLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.UNBREAKING).get(), pick);
+
+        if (unbreakingLevel < 0) {
+            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
+        } else if (unbreakingLevel < 4) {
+            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.get(unbreakingLevel);
+        } else {
+            // If any mods add higher unbreaking levels
+            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getLast();
+        }
+    }
+
+    public void updateBlacklistedItems() {
+        if (this.level == null)
+            return;
+
+        ItemStack filter = this.getItemFilterSlot();
+        ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
+        Set<Item> items = new HashSet<>();
+        for (int i = 0; i < inv.getSlots(); i++) {
+            items.add(inv.getStackInSlot(i).getItem());
+        }
+
+        this.blacklistedItems = items;
         setChanged();
     }
+
+    // Checkers
 
     public static List<MiningRequirement> checkMiningRequirements(int energyStored, int energyConsumption, IItemHandler inv, boolean inventoryFull) {
         ItemStack pickaxe = inv.getStackInSlot(0).copy();
@@ -293,18 +336,66 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return ret;
     }
 
-    public void checkIfOverflowIsFixed() {
+    public void isOverflowIsFixed() {
         ItemStack simItemStack = ItemHandlerHelper.insertItemStacked(this.inventory, this.overflowingItemStack, true);
 
         // If the inventory is not full anymore, continue the mining process
         if (simItemStack.isEmpty()) {
             this.overflowingItemStack = null;
+            setChanged();
         }
     }
 
-    public void setRunning(boolean state) {
-        this.running = state;
-        setChanged();
+    public static boolean isStorageFull(IItemHandler storage, int from, int to, ItemStack overflowingItem) {
+        if (from < 0 || to > storage.getSlots())
+            throw new IllegalArgumentException("From must be less than 0 and to must be less than " + storage.getSlots() + ", got (from: " + from + ", to: " + to + ")");
+
+        if (overflowingItem != null)
+            return true;
+
+        for (int i = from; i < to; i++) {
+            ItemStack stack = storage.getStackInSlot(i);
+            if (stack.getCount() < stack.getMaxStackSize()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isStorageFull(IItemHandler storage) {
+        return isStorageFull(storage, 0, storage.getSlots(), null);
+    }
+
+    // Creators
+
+    private void createItemHandlerCapCaches(ServerLevel serverLevel) {
+        Direction.Plane.VERTICAL.forEach((ejectDir) -> {
+            itemHandlerCapCaches.put(
+                    ejectDir,
+                    BlockCapabilityCache.create(
+                            Capabilities.ItemHandler.BLOCK, // capability to cache
+                            serverLevel, // level
+                            worldPosition.relative(ejectDir), // target position
+                            ejectDir.getOpposite(), // context
+                            () -> !this.isRemoved(), // validity check (because the cache might outlive the object it belongs to)
+                            () -> onItemHandlerCapInvalidate(ejectDir, serverLevel) // invalidation listener
+                    )
+            );
+        });
+
+        Direction.Plane.HORIZONTAL.forEach((ejectDir) -> {
+            itemHandlerCapCaches.put(
+                    ejectDir,
+                    BlockCapabilityCache.create(
+                            Capabilities.ItemHandler.BLOCK, // capability to cache
+                            serverLevel, // level
+                            worldPosition.relative(ejectDir), // target position
+                            ejectDir.getOpposite(), // context
+                            () -> !this.isRemoved(), // validity check (because the cache might outlive the object it belongs to)
+                            () -> onItemHandlerCapInvalidate(ejectDir, serverLevel) // invalidation listener
+                    )
+            );
+        });
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, DimensionalQuarryEntity entity) {
@@ -317,7 +408,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
             entity.mineNextBlock((ServerLevel) level);
         }
 
-        entity.tryEject(level, pos);
+        entity.tryEject();
     }
 
     public void mineNextBlock(ServerLevel level) {
@@ -402,7 +493,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         setChanged();
     }
 
-    public void tryEject(Level level, BlockPos pos) {
+    public void tryEject() {
         // TODO update this, cache the eject inventory and only look for more if the inventory is full or gets destroyed
         this.ejectCooldown++;
         if (this.ejectCooldown <= EJECTION_COOLDOWN) {
@@ -412,7 +503,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.ejectCooldown = 0;
 
         // Check for attached containers
-        List<IItemHandler> attachedStorages = getAttachedStorages(level, pos);
+        List<IItemHandler> attachedStorages = getAttachedStorages();
         if (attachedStorages.isEmpty()) {
             return;
         }
@@ -446,18 +537,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     }
 
-    private List<IItemHandler> getAttachedStorages(Level level, BlockPos center) {
-        List<IItemHandler> attachedStorages = new ArrayList<>();
-
-        this.itemHandlerCapCaches.forEach((ejectDir, cache) -> {
-            IItemHandler handler = cache.getCapability();
-            if (handler != null && !(handler instanceof DimensionalQuarryItemStackHandler))
-                attachedStorages.add(handler);
-        });
-
-        return attachedStorages;
-    }
-
     private void resetSearcher(ServerLevel level, boolean startSearch) {
         // If we're already searching, terminate the search and create a new one
         this.currentYLevel = null;
@@ -485,23 +564,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
     }
 
-    private boolean updateDimension(ServerLevel level) {
-        if (level.isClientSide)
-            return false;
-
-        this.currentDimension = null;
-        ResourceKey<Level> dim = this.getMiniChunkDimension();
-        if (dim == null) {
-            return false;
-        }
-
-        this.currentDimension = level.getServer().getLevel(dim);
-        if (this.currentDimension == null)
-            return false;
-
-        return true;
-    }
-
     private ResourceKey<Level> getMiniChunkDimension() {
         ItemStack miniChunk = this.getMiniChunkInSlot();
 
@@ -517,56 +579,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
             };
         }
         return null;
-    }
-
-    public static boolean isStorageFull(IItemHandler storage, int from, int to, ItemStack overflowingItem) {
-        if (from < 0 || to > storage.getSlots())
-            throw new IllegalArgumentException("From must be less than 0 and to must be less than " + storage.getSlots() + ", got (from: " + from + ", to: " + to + ")");
-
-        if (overflowingItem != null)
-            return true;
-
-        for (int i = from; i < to; i++) {
-            ItemStack stack = storage.getStackInSlot(i);
-            if (stack.getCount() < stack.getMaxStackSize()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean isStorageFull(IItemHandler storage) {
-        return isStorageFull(storage, 0, storage.getSlots(), null);
-    }
-
-    private void createItemHandlerCapCaches(ServerLevel serverLevel) {
-        Direction.Plane.VERTICAL.forEach((ejectDir) -> {
-            itemHandlerCapCaches.put(
-                    ejectDir,
-                    BlockCapabilityCache.create(
-                            Capabilities.ItemHandler.BLOCK, // capability to cache
-                            serverLevel, // level
-                            worldPosition.relative(ejectDir), // target position
-                            ejectDir.getOpposite(), // context
-                            () -> !this.isRemoved(), // validity check (because the cache might outlive the object it belongs to)
-                            () -> onItemHandlerCapInvalidate(ejectDir, serverLevel) // invalidation listener
-                    )
-            );
-        });
-
-        Direction.Plane.HORIZONTAL.forEach((ejectDir) -> {
-            itemHandlerCapCaches.put(
-                    ejectDir,
-                    BlockCapabilityCache.create(
-                            Capabilities.ItemHandler.BLOCK, // capability to cache
-                            serverLevel, // level
-                            worldPosition.relative(ejectDir), // target position
-                            ejectDir.getOpposite(), // context
-                            () -> !this.isRemoved(), // validity check (because the cache might outlive the object it belongs to)
-                            () -> onItemHandlerCapInvalidate(ejectDir, serverLevel) // invalidation listener
-                    )
-            );
-        });
     }
 
     private void onItemHandlerCapInvalidate(Direction ejectDir, ServerLevel serverLevel) {

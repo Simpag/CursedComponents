@@ -1,29 +1,20 @@
 package com.ccteam.cursedcomponents.gui.containers.custom;
 
-import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.datacomponents.ModDataComponents;
 import com.ccteam.cursedcomponents.datacomponents.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.slots.FilterSlot;
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
 import com.ccteam.cursedcomponents.stackHandlers.ItemFilterItemStackHandler;
-import com.mojang.logging.LogUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemFilterContainer extends AbstractContainerMenu {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private final ItemStack myStack;
-    private final HolderLookup.Provider lookupProvider;
     private final ItemFilterItemStackHandler myItemHandler;
 
     // Client menu constructor
@@ -35,8 +26,7 @@ public class ItemFilterContainer extends AbstractContainerMenu {
     public ItemFilterContainer(int containerId, Inventory playerInventory, ItemStack fromStack) {
         super(ModContainers.ITEM_FILTER_CONTAINER.get(), containerId);
         this.myStack = fromStack;
-        this.lookupProvider = playerInventory.player.registryAccess();
-        this.myItemHandler = myStack.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.lookupProvider);
+        this.myItemHandler = myStack.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(playerInventory.player.registryAccess());
 
         if (this.myItemHandler.getSlots() < ItemFilter.FILTER_SIZE) {
             throw new IllegalArgumentException("Container size " + this.myItemHandler.getSlots() + " is smaller than expected " + ItemFilter.FILTER_SIZE);
@@ -61,12 +51,12 @@ public class ItemFilterContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int index) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         // Handle shift-clicking in the inventory
         ItemStack itemStack = ItemStack.EMPTY;
         Slot movedSlot = this.slots.get(index);
 
-        if (movedSlot != null && movedSlot.hasItem()) {
+        if (movedSlot.hasItem()) {
             ItemStack rawStack = movedSlot.getItem();
             itemStack = rawStack.copy();
 
@@ -92,7 +82,7 @@ public class ItemFilterContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public void removed(Player player) {
+    public void removed(@NotNull Player player) {
         super.removed(player);
         this.myStack.set(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(this.myItemHandler.serializeNBT(player.registryAccess())));
     }
@@ -103,12 +93,12 @@ public class ItemFilterContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public boolean canTakeItemForPickAll(ItemStack stack, Slot slot) {
+    public boolean canTakeItemForPickAll(@NotNull ItemStack stack, Slot slot) {
         return slot.index >= ItemFilter.FILTER_SIZE;
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         return true;
     }
 }

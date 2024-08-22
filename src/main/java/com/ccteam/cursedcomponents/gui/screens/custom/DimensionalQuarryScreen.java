@@ -2,9 +2,8 @@ package com.ccteam.cursedcomponents.gui.screens.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.util.GuiUtil;
 import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
-import com.mojang.logging.LogUtils;
+import com.ccteam.cursedcomponents.util.GuiUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,20 +12,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DimensionalQuarryScreen extends AbstractContainerScreen<DimensionalQuarryContainer> {
     private static final boolean DEBUG = false;
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");
     private static final ResourceLocation WARNING_SPRITE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "container/dimensional_quarry/warning_triangle");
-    private final int green;
-    private final int dark_green;
-    private final int red;
+    private final int green = FastColor.ARGB32.color(255, 31, 125, 0);
+    private final int dark_green = FastColor.ARGB32.color(255, 18, 74, 0);
+    private final int red = FastColor.ARGB32.color(255, 135, 0, 14);
 
     private ExtendedButton startRunningButton;
     private ExtendedButton stopRunningButton;
@@ -37,9 +35,6 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         this.imageWidth = 176;
         this.imageHeight = 181;
         this.inventoryLabelY = this.imageHeight - 94;
-        this.green = FastColor.ARGB32.color(255, 31, 125, 0);
-        this.dark_green = FastColor.ARGB32.color(255, 18, 74, 0);
-        this.red = FastColor.ARGB32.color(255, 135, 0, 14);
     }
 
     @Override
@@ -74,7 +69,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         // Draw warning sprite if needed
@@ -100,8 +95,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         // Progress bar
         float bar_progress = (float) this.menu.getCooldown() / this.menu.getTicksPerBlock();
         bar_progress = Math.clamp(bar_progress, 0, 1);
-        //int progress_bar_y = (int) ((73f - 21f) * bar_progress + 21f); // downwards
-        int progress_bar_y = (int) (73f - (73f - 21f) * bar_progress); // upwards
+        int progress_bar_y = (int) (73f - (73f - 21f) * bar_progress);
         guiGraphics.fillGradient(this.leftPos + 166, this.topPos + progress_bar_y, this.leftPos + 168, this.topPos + 73, this.green, this.dark_green);
 
         // Energy bar
@@ -128,7 +122,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void renderLabels(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY) {
         // Draw super class
         GuiUtil.drawCenteredString(guiGraphics, this.font, this.title, this.imageWidth / 2, this.titleLabelY, 4210752, false);
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
@@ -145,15 +139,15 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
                 0.9f
         );
 
-        if (this.DEBUG) {
+        if (DEBUG && ChatFormatting.RED.getColor() != null) {
             int debugXOffset = -125;
-            guiGraphics.drawString(this.font, "Stored: " + String.valueOf(this.menu.getEnergyStored()), debugXOffset, 23, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Capacity: " + String.valueOf(DimensionalQuarryEntity.ENERGY_CAPACITY), debugXOffset, 33, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Consumption Rate (FE/t): " + String.valueOf(this.menu.getEnergyConsumption()), debugXOffset, 43, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Y: " + String.valueOf(this.menu.getCurrentYLevel()), debugXOffset, 53, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Cooldown: " + String.valueOf(this.menu.getCooldown()), debugXOffset, 63, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "progress: " + String.valueOf((float) this.menu.getCooldown() / this.menu.getTicksPerBlock()), debugXOffset, 73, ChatFormatting.RED.getColor(), false);
-            guiGraphics.drawString(this.font, "Running: " + String.valueOf(this.menu.getRunning()), debugXOffset, 83, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Stored: " + (this.menu.getEnergyStored()), debugXOffset, 23, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Capacity: " + (DimensionalQuarryEntity.ENERGY_CAPACITY), debugXOffset, 33, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Consumption Rate (FE/t): " + (this.menu.getEnergyConsumption()), debugXOffset, 43, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Y: " + (this.menu.getCurrentYLevel()), debugXOffset, 53, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Cooldown: " + (this.menu.getCooldown()), debugXOffset, 63, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "progress: " + ((float) this.menu.getCooldown() / this.menu.getTicksPerBlock()), debugXOffset, 73, ChatFormatting.RED.getColor(), false);
+            guiGraphics.drawString(this.font, "Running: " + (this.menu.getRunning()), debugXOffset, 83, ChatFormatting.RED.getColor(), false);
             guiGraphics.drawString(this.font, "TPB: " + this.menu.getTicksPerBlock(), debugXOffset, 93, ChatFormatting.RED.getColor(), false);
         }
     }

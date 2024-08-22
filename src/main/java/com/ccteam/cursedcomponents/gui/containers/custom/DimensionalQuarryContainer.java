@@ -5,7 +5,6 @@ import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
 import com.ccteam.cursedcomponents.stackHandlers.DimensionalQuarryItemStackHandler;
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,13 +13,11 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.slf4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class DimensionalQuarryContainer extends AbstractContainerMenu {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     private final ContainerLevelAccess access;
     private final IItemHandler inventory;
     private final ContainerData quarryData;
@@ -71,12 +68,12 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int index) {
+    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         // Handle shift-clicking in the inventory
         ItemStack itemStack = ItemStack.EMPTY;
         Slot movedSlot = this.slots.get(index);
 
-        if (movedSlot != null && movedSlot.hasItem()) {
+        if (movedSlot.hasItem()) {
             ItemStack rawStack = movedSlot.getItem();
             itemStack = rawStack.copy();
 
@@ -113,12 +110,12 @@ public class DimensionalQuarryContainer extends AbstractContainerMenu {
     }
 
     @Override
-    protected boolean moveItemStackTo(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+    protected boolean moveItemStackTo(@NotNull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
         return super.moveItemStackTo(stack, startIndex, endIndex, reverseDirection);
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         return AbstractContainerMenu.stillValid(this.access, player, ModBlocks.DIMENSIONAL_QUARRY.get());
     }
 

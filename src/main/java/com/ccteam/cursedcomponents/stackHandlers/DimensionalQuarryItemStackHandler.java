@@ -1,13 +1,12 @@
 package com.ccteam.cursedcomponents.stackHandlers;
 
-import com.ccteam.cursedcomponents.block.ModBlocks;
-
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.ccteam.cursedcomponents.util.ModTags;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
     public DimensionalQuarryItemStackHandler(int size) {
@@ -15,17 +14,16 @@ public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
     }
 
     @Override
-    public boolean isItemValid(int slot, ItemStack stack) {
-        switch (slot) {
-            case 0: // Pickaxe slot
-                return stack.is(Items.NETHERITE_PICKAXE);
-            case 1: // Dimension slot
-                return stack.is(ModTags.Items.MINI_CHUNK);
-            case 2: // Blacklist slot
-                return stack.is(ModItems.ITEM_FILTER.get());
-            default:
-                return true;
-        }
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        return switch (slot) {
+            case 0 -> // Pickaxe slot
+                    stack.is(Items.NETHERITE_PICKAXE);
+            case 1 -> // Dimension slot
+                    stack.is(ModTags.Items.MINI_CHUNK);
+            case 2 -> // Blacklist slot
+                    stack.is(ModItems.ITEM_FILTER.get());
+            default -> true;
+        };
     }
 
     @Override

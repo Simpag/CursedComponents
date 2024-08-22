@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 public class MiniChunkBlock extends Block {
     public static final VoxelShape OVERWORLD_SHAPE = VoxelShapeUtils.combineShapes(
@@ -29,7 +30,7 @@ public class MiniChunkBlock extends Block {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return switch (chunkType) {
             case overworld -> OVERWORLD_SHAPE;
             case nether -> NETHER_SHAPE;

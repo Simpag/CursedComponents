@@ -23,11 +23,6 @@ public class ModContainers {
             () -> new MenuType<>(ItemFilterContainer::new, FeatureFlags.DEFAULT_FLAGS)
     );
 
-    /*public static final Supplier<MenuType<DimensionalQuarryContiner>> DIMENSIONAL_QUARRY_CONTAINER = CONTAINERS.register(
-        "dimensional_quarry_container",
-            () -> IMenuTypeExtension.create(DimensionalQuarryContiner::new)
-    );*/
-
     public static void register(IEventBus eventBus) {
         CONTAINERS.register(eventBus);
     }

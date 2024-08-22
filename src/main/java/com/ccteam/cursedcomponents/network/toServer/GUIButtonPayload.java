@@ -8,6 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ByIdMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.IntFunction;
 
@@ -28,7 +29,7 @@ public record GUIButtonPayload(ButtonType buttonType, BlockPos pos, boolean stat
     );
 
     @Override
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    public CustomPacketPayload.@NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 

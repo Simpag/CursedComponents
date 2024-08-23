@@ -7,6 +7,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -29,13 +30,15 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> CONVEYOR_BELT_TIER1 = registerBlock("conveyor_belt_tier1",
             () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
-                    .strength(2f)
-                    .noCollission(), 0.1));
+                    .strength(0.7f)
+                    .noCollission()
+                    .sound(SoundType.METAL), 0.1));
 
     public static final DeferredBlock<Block> CONVEYOR_BELT_TIER2 = registerBlock("conveyor_belt_tier2",
             () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
-                    .strength(2f)
-                    .noCollission(), 0.3));
+                    .strength(0.7f)
+                    .noCollission()
+                    .sound(SoundType.METAL), 0.3));
 
 
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(

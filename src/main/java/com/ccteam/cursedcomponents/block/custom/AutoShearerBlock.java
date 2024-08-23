@@ -1,7 +1,6 @@
 package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.block.entity.custom.AutoShearerEntity;
-import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

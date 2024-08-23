@@ -1,11 +1,7 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.custom.AutoShearerBlock;
-import com.ccteam.cursedcomponents.block.custom.ConveyorBeltBlock;
-import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
-import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
-import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
+import com.ccteam.cursedcomponents.block.custom.*;
 import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;

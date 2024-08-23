@@ -1,25 +1,17 @@
 package com.ccteam.cursedcomponents.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.logging.LogUtils;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.IBakedModelExtension;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -38,9 +30,9 @@ public class RenderUtil {
     }
 
     public static void renderTintedModelLists(BakedModel model,
-                                        int combinedLight, int combinedOverlay,
-                                        PoseStack poseStack, VertexConsumer buffer,
-                                        RenderType renderType, int tintColor) {
+                                              int combinedLight, int combinedOverlay,
+                                              PoseStack poseStack, VertexConsumer buffer,
+                                              RenderType renderType, int tintColor) {
         RandomSource randomsource = RandomSource.create();
         long seed = 42L;
 

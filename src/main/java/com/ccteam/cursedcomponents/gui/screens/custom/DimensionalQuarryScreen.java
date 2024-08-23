@@ -108,8 +108,8 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         if (mouseX > this.leftPos + 8 && mouseX < this.leftPos + 168f
                 && mouseY > this.topPos + 79 && mouseY < this.topPos + 83) {
             List<Component> energy_tooltip = new ArrayList<>();
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2", this.menu.getEnergyConsumption()));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.energy_consumption.2", this.menu.getEnergyConsumption()));
 
             guiGraphics.renderComponentTooltip(
                     this.font,

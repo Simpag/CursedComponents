@@ -71,7 +71,5 @@ public class ItemFilter extends Item {
 
         if (empty)
             tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.item_filter.empty"));
-
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

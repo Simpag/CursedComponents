@@ -52,8 +52,7 @@ public class DimensionalQuarryBlock extends BaseEntityBlock {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.@NotNull TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.1"));
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.1"));
     }
 
     @Override

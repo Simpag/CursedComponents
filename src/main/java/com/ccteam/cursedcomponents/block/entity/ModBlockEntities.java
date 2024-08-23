@@ -2,6 +2,7 @@ package com.ccteam.cursedcomponents.block.entity;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.ModBlocks;
+import com.ccteam.cursedcomponents.block.entity.custom.AutoShearerEntity;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +23,10 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<DimensionalQuarryEntity>> DIMENSIONAL_QUARRY_BE =
             BLOCK_ENTITIES.register("dimensional_quarry_be", () -> BlockEntityType.Builder.of(
                     DimensionalQuarryEntity::new, ModBlocks.DIMENSIONAL_QUARRY.get()).build(null));
+
+    public static final Supplier<BlockEntityType<AutoShearerEntity>> AUTO_SHEARER_BE =
+            BLOCK_ENTITIES.register("auto_shearer_be", () -> BlockEntityType.Builder.of(
+                    AutoShearerEntity::new, ModBlocks.AUTO_SHEARER.get()).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

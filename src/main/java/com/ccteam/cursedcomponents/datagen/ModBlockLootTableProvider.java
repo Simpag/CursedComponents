@@ -32,6 +32,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.MINI_CHUNK_END.get());
         dropSelf(ModBlocks.CONVEYOR_BELT_TIER1.get());
         dropSelf(ModBlocks.CONVEYOR_BELT_TIER2.get());
+        dropSelf(ModBlocks.AUTO_SHEARER.get());
 
         this.add(ModBlocks.LUCKY_BLOCK.get(), block -> LootTable.lootTable()); // Lucky block has no drops
     }

@@ -104,7 +104,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern("GBG")
                 .pattern("GGG")
                 .define('B', ModBlocks.CONVEYOR_BELT_TIER1.get())
-                .define('S', Items.SLIME_BALL)
                 .define('G', Items.GOLD_INGOT)
                 .unlockedBy("has_conveyor_belt_tier1", has(ModBlocks.CONVEYOR_BELT_TIER1.get())
                 ).save(recipeOutput);

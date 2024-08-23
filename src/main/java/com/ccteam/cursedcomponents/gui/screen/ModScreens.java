@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.gui.screens;
+package com.ccteam.cursedcomponents.gui.screen;
 
-import com.ccteam.cursedcomponents.gui.containers.ModContainers;
-import com.ccteam.cursedcomponents.gui.screens.custom.DimensionalQuarryScreen;
-import com.ccteam.cursedcomponents.gui.screens.custom.ItemFilterScreen;
+import com.ccteam.cursedcomponents.gui.container.ModContainers;
+import com.ccteam.cursedcomponents.gui.screen.custom.DimensionalQuarryScreen;
+import com.ccteam.cursedcomponents.gui.screen.custom.ItemFilterScreen;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 public class ModScreens {

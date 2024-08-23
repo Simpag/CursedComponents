@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.gui.slots;
+package com.ccteam.cursedcomponents.gui.slot;
 
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;

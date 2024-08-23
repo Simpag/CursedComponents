@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.gui.screens.custom;
+package com.ccteam.cursedcomponents.gui.screen.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
 import com.ccteam.cursedcomponents.util.GuiUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;

@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.network.toClient;
+package com.ccteam.cursedcomponents.network.to_client;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.custom.RollOutcome;

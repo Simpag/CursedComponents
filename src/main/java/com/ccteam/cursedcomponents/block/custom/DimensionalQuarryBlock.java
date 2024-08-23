@@ -2,7 +2,7 @@ package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

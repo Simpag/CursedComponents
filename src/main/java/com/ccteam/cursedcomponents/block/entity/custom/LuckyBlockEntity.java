@@ -4,7 +4,7 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
 import com.ccteam.cursedcomponents.block.custom.RollOutcome;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
+import com.ccteam.cursedcomponents.network.to_client.LuckyBlockInteractionPayload;
 import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

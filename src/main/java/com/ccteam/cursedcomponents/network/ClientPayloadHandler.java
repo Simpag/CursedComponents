@@ -2,9 +2,9 @@ package com.ccteam.cursedcomponents.network;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.block.entity.custom.LuckyBlockEntity;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryMinMaxYLevelPayload;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryYLevelPayload;
-import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryMinMaxYLevelPayload;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryYLevelPayload;
+import com.ccteam.cursedcomponents.network.to_client.LuckyBlockInteractionPayload;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 

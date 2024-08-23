@@ -1,6 +1,6 @@
 package com.ccteam.cursedcomponents.item.custom;
 
-import com.ccteam.cursedcomponents.gui.containers.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
 import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;

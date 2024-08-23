@@ -1,7 +1,7 @@
-package com.ccteam.cursedcomponents.gui.containers.custom;
+package com.ccteam.cursedcomponents.gui.container.custom;
 
-import com.ccteam.cursedcomponents.gui.containers.ModContainers;
-import com.ccteam.cursedcomponents.gui.slots.FilterSlot;
+import com.ccteam.cursedcomponents.gui.container.ModContainers;
+import com.ccteam.cursedcomponents.gui.slot.FilterSlot;
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
 import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;

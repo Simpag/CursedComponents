@@ -1,7 +1,8 @@
 package com.ccteam.cursedcomponents.item.custom;
 
 import com.ccteam.cursedcomponents.item.ModItems;
-import com.ccteam.cursedcomponents.item.interfaces.PoweredItem;
+import com.ccteam.cursedcomponents.item.base.BasePoweredItem;
+import com.ccteam.cursedcomponents.item.base.PoweredItem;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,16 +30,17 @@ import java.util.List;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 
-public class SpongeOnStick extends Item implements PoweredItem {
+public class SpongeOnStick extends BasePoweredItem {
     public static final int MAX_DEPTH = 6;
     public static final int MAX_COUNT = 64;
-    public static final int MAX_ENERGY = 10_000;
+    public static final int ENERGY_CAPACITY = 10_000;
     public static final int ENERGY_USAGE = 500;
     private static final Direction[] ALL_DIRECTIONS = Direction.values();
 
     public SpongeOnStick(Properties properties) {
-        super(properties);
+        super(properties, ENERGY_CAPACITY, ENERGY_USAGE);
     }
+
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
@@ -127,33 +129,5 @@ public class SpongeOnStick extends Item implements PoweredItem {
                 }
         )
                 > 1;
-    }
-
-    @Override
-    public int getCapacity() {
-        return MAX_ENERGY;
-    }
-
-    @Override
-    public int getEnergyUse() {
-        return ENERGY_USAGE;
-    }
-
-    @Override
-    public boolean isBarVisible(ItemStack stack) {
-        return this.isPowerBarVisible(stack);
-    }
-
-    @Override
-    public int getBarWidth(ItemStack stack) {
-        return this.getPowerBarWidth(stack);
-    }
-
-    @Override
-    public int getBarColor(ItemStack stack) {
-        Integer color = this.getPowerBarColor(stack);
-        if (color == null)
-            return super.getBarColor(stack);
-        return color;
     }
 }

@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.item;
 
 import com.ccteam.cursedcomponents.energy_storage.ItemStackEnergyStorage;
-import com.ccteam.cursedcomponents.item.interfaces.PoweredItem;
+import com.ccteam.cursedcomponents.item.base.PoweredItem;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 

@@ -6,6 +6,8 @@ import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
+import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryMinMaxYLevelPayload;
+import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryYLevelPayload;
 import com.ccteam.cursedcomponents.stack_handler.DimensionalQuarryItemStackHandler;
 import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
 import com.ccteam.cursedcomponents.threading.DimensionalQuarrySearcher;
@@ -43,6 +45,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.EnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -74,7 +77,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private DimensionalQuarrySearcher searcher = new DimensionalQuarrySearcher(this);
     private Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> blockStatesToMine;
     private Integer currentYLevel;
-    private Integer minYLevel;
+    private Integer maxCurrentYLevel;
+    private Integer minCurrentYLevel;
     private ChunkPos currentChunkPos;
     private ServerLevel currentDimension;
 
@@ -95,7 +99,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
                     updateBlacklistedItems();
                 }
 
-                if (slot < 3) {
+                if (slot < UPGRADE_SLOTS) {
+                    // A bit hacky but send data to client when changing upgrades
                     level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
                 } else if (overflowingItemStack != null) {
                     isOverflowIsFixed();
@@ -116,7 +121,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
         this.overflowingItemStack = null;
         this.currentYLevel = null;
         this.currentChunkPos = null;
-        this.minYLevel = null;
+        this.maxCurrentYLevel = null;
+        this.minCurrentYLevel = null;
         this.blockStatesToMine = null;
         this.blacklistedItems = new HashSet<>();
     }
@@ -172,6 +178,18 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return miniChunkRotation;
     }
 
+    public Integer getCurrentYLevel() {
+        return currentYLevel;
+    }
+
+    public Integer getMaxCurrentYLevel() {
+        return maxCurrentYLevel;
+    }
+
+    public Integer getMinCurrentYLevel() {
+        return minCurrentYLevel;
+    }
+
     public EnergyStorage getEnergy() {
         return energy;
     }
@@ -200,6 +218,34 @@ public class DimensionalQuarryEntity extends BlockEntity {
         return attachedStorages;
     }
 
+    // Setters
+
+    public void setRunning(boolean state) {
+        this.running = state;
+        setChanged();
+    }
+
+    public void setCurrentYLevel(Integer currentYLevel) {
+        this.currentYLevel = currentYLevel;
+
+        if (!this.level.isClientSide)
+            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) this.level, this.level.getChunk(this.worldPosition).getPos(), new DimensionalQuarryYLevelPayload(this.currentYLevel, this.worldPosition));
+
+        setChanged();
+    }
+
+    public void setMinMaxCurrentYLevel(Integer minCurrentYLevel, Integer maxCurrentYLevel) {
+        this.minCurrentYLevel = minCurrentYLevel;
+        this.maxCurrentYLevel = maxCurrentYLevel;
+
+        if (!this.level.isClientSide)
+            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) this.level, this.level.getChunk(this.worldPosition).getPos(), new DimensionalQuarryMinMaxYLevelPayload(this.minCurrentYLevel, this.maxCurrentYLevel, this.worldPosition));
+
+        setChanged();
+    }
+
+    // Updaters
+
     private boolean updateDimension(ServerLevel level) {
         if (level.isClientSide)
             return false;
@@ -211,23 +257,17 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         this.currentDimension = level.getServer().getLevel(dim);
+        setChanged();
         return this.currentDimension != null;
     }
 
-    // Setters
-
-    public void setRunning(boolean state) {
-        this.running = state;
-        setChanged();
-    }
-
-    // Updaters
-
     public void updateBlockStatesToMine(Int2ObjectMap<DimensionalQuarrySearcher.BlockStateInfo> info) {
         this.blockStatesToMine = info;
-        this.currentYLevel = this.blockStatesToMine.keySet().intStream().max().orElseThrow();
-        this.minYLevel = this.blockStatesToMine.keySet().intStream().min().orElseThrow();
-        LOGGER.debug("Got blocks, max y: " + this.currentYLevel + ", min: " + this.minYLevel);
+        this.setCurrentYLevel(this.blockStatesToMine.keySet().intStream().max().orElseThrow());
+        if (this.minCurrentYLevel == null)
+            this.setMinMaxCurrentYLevel(this.blockStatesToMine.keySet().intStream().min().orElseThrow(), this.getCurrentYLevel());
+
+        LOGGER.debug("Got blocks, max y: " + this.currentYLevel);
         setChanged();
     }
 
@@ -482,7 +522,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 return null;
             }
 
-            this.currentYLevel = this.blockStatesToMine.keySet().intStream().max().orElseThrow();
+            this.setCurrentYLevel(this.blockStatesToMine.keySet().intStream().max().orElseThrow());
         }
 
         return this.blockStatesToMine.get(this.currentYLevel.intValue());
@@ -539,7 +579,8 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
     private void resetSearcher(ServerLevel level, boolean startSearch) {
         // If we're already searching, terminate the search and create a new one
-        this.currentYLevel = null;
+        this.setCurrentYLevel(null);
+        this.setMinMaxCurrentYLevel(null, null);
         this.currentChunkPos = null;
         this.blockStatesToMine = null;
 
@@ -607,6 +648,12 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (this.currentYLevel != null)
             tag.putInt("cursedcomponents:dimensional_quarry_current_y_level", this.currentYLevel);
 
+        if (this.minCurrentYLevel != null)
+            tag.putInt("cursedcomponents:dimensional_quarry_min_current_y_level", this.minCurrentYLevel);
+
+        if (this.maxCurrentYLevel != null)
+            tag.putInt("cursedcomponents:dimensional_quarry_max_current_y_level", this.maxCurrentYLevel);
+
         if (this.searcher != null && this.searcher.getChunkPosition() != null)
             tag.putLong("cursedcomponents:dimensional_quarry_chunk", this.searcher.getChunkPosition().toLong());
     }
@@ -628,9 +675,14 @@ public class DimensionalQuarryEntity extends BlockEntity {
                 this.energy.deserializeNBT(registries, energyTag);
         }
 
-        if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level")) {
+        if (tag.contains("cursedcomponents:dimensional_quarry_current_y_level"))
             this.currentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_current_y_level");
-        }
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_min_current_y_level"))
+            this.minCurrentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_min_current_y_level");
+
+        if (tag.contains("cursedcomponents:dimensional_quarry_max_current_y_level"))
+            this.maxCurrentYLevel = tag.getInt("cursedcomponents:dimensional_quarry_max_current_y_level");
 
         if (tag.contains("cursedcomponents:dimensional_quarry_chunk"))
             this.currentChunkPos = new ChunkPos(tag.getLong("cursedcomponents:dimensional_quarry_chunk"));
@@ -652,7 +704,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         public int get(int index) {
             return switch (index) {
                 case 0 -> energy.getEnergyStored();
-                case 1 -> currentYLevel != null ? currentYLevel : 0;
+                case 1 -> currentYLevel != null ? currentYLevel : Integer.MAX_VALUE;
                 case 2 -> miningCooldown;
                 case 3 -> running ? 1 : 0;
                 case 4 -> worldPosition.getX();

@@ -131,7 +131,10 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         GuiUtil.drawScaledString(
                 this.font,
                 guiGraphics,
-                Component.translatable("menu.cursedcomponents.dimensional_quarry.current_y_level", this.menu.getCurrentYLevel()),
+                Component.translatable(
+                        "menu.cursedcomponents.dimensional_quarry.current_y_level",
+                        this.menu.getCurrentYLevel() == Integer.MAX_VALUE ? "-" : this.menu.getCurrentYLevel()
+                ),
                 124 - 30,
                 20,
                 4210752,

@@ -12,6 +12,8 @@ import net.minecraft.world.level.block.Block;
 
 public class ModTags {
     public static class Blocks {
+        public static final TagKey<Block> CONVEYOR_BELT = createTag("conveyor_belt");
+
         private static TagKey<Block> createTag(String name) {
             return BlockTags.create(ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, name));
         }

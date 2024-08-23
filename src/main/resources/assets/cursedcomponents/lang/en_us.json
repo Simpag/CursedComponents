@@ -3,6 +3,7 @@
   "item.cursedcomponents.item_filter": "Item Filter",
   "item.cursedcomponents.warden_infused_diamond": "Warden Infused Diamond",
   "item.cursedcomponents.warden_infusion": "Warden Infusion",
+  "item.cursedcomponents.sponge_on_stick": "Sponge On a Stick",
 
   "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
   "block.cursedcomponents.lucky_block": "Lucky Block",
@@ -12,15 +13,17 @@
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
-  "tooltip.cursedcomponents.dimensional_quarry.tooltip.1": "Dimensional Quarry go brrr",
-  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1": "Energy Capacity: %s FE",
-  "tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2": "Energy Consumption: %s FE/t",
+  "tooltip.cursedcomponents.dimensional_quarry.1": "Dimensional Quarry go brrr",
+  "tooltip.cursedcomponents.dimensional_quarry.energy_consumption.1": "Energy Capacity: %s FE",
+  "tooltip.cursedcomponents.dimensional_quarry.energy_consumption.2": "Energy Consumption: %s FE/t",
   "tooltip.cursedcomponents.item_filter.1": "Blacklists items from being mined in the §dDimensional Quarry§r",
   "tooltip.cursedcomponents.item_filter.2": "Currently blacklisted items:",
   "tooltip.cursedcomponents.item_filter.empty": "  - None",
   "tooltip.cursedcomponents.warden_infusion.1": "You can obtain §dWarden Infusion§r by killing the warden",
   "tooltip.cursedcomponents.warden_infusion.2": "Drops 1-3 pieces",
   "tooltip.cursedcomponents.warden_infusion.shift": "Press §eShift§r for more Information",
+  "tooltip.cursedcomponents.sponge_on_stick.1": "  - Energy: %s / %s FE",
+  "tooltip.cursedcomponents.sponge_on_stick.shift": "Absorbs water in exchange for energy when you right click\nPress §eShift§r for current charge",
 
   "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: %s",
   "menu.cursedcomponents.dimensional_quarry.start_button": "Start",

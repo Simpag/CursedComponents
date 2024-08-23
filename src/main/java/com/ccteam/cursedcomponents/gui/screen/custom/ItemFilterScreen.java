@@ -1,7 +1,7 @@
-package com.ccteam.cursedcomponents.gui.screens.custom;
+package com.ccteam.cursedcomponents.gui.screen.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.gui.containers.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
 import com.ccteam.cursedcomponents.util.GuiUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.network;
 
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
+import com.ccteam.cursedcomponents.network.to_server.GUIButtonPayload;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.network.toServer;
+package com.ccteam.cursedcomponents.network.to_server;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import io.netty.buffer.ByteBuf;

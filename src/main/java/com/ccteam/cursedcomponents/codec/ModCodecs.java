@@ -1,8 +1,8 @@
 package com.ccteam.cursedcomponents.codec;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.glm.WardenGlobalLootModifier;
+import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

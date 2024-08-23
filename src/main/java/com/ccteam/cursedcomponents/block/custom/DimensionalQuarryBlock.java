@@ -2,7 +2,7 @@ package com.ccteam.cursedcomponents.block.custom;
 
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -52,8 +52,7 @@ public class DimensionalQuarryBlock extends BaseEntityBlock {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.@NotNull TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.1"));
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.1"));
     }
 
     @Override

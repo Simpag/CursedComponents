@@ -22,7 +22,5 @@ public class WardenInfusion extends Item {
         } else {
             tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.warden_infusion.shift"));
         }
-
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

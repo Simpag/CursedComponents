@@ -1,8 +1,8 @@
 package com.ccteam.cursedcomponents.item.custom;
 
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
-import com.ccteam.cursedcomponents.gui.containers.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
+import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -71,7 +71,5 @@ public class ItemFilter extends Item {
 
         if (empty)
             tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.item_filter.empty"));
-
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

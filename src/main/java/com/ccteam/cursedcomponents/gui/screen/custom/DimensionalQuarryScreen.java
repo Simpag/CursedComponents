@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.gui.screens.custom;
+package com.ccteam.cursedcomponents.gui.screen.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
-import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
 import com.ccteam.cursedcomponents.util.GuiUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -108,8 +108,8 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
         if (mouseX > this.leftPos + 8 && mouseX < this.leftPos + 168f
                 && mouseY > this.topPos + 79 && mouseY < this.topPos + 83) {
             List<Component> energy_tooltip = new ArrayList<>();
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
-            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.tooltip.energy_consumption.2", this.menu.getEnergyConsumption()));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.energy_consumption.1", DimensionalQuarryEntity.ENERGY_CAPACITY));
+            energy_tooltip.add(Component.translatable("tooltip.cursedcomponents.dimensional_quarry.energy_consumption.2", this.menu.getEnergyConsumption()));
 
             guiGraphics.renderComponentTooltip(
                     this.font,

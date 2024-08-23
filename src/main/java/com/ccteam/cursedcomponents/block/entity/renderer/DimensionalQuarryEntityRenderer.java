@@ -5,10 +5,8 @@ import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
 import com.ccteam.cursedcomponents.util.RenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -16,16 +14,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 public class DimensionalQuarryEntityRenderer implements BlockEntityRenderer<DimensionalQuarryEntity> {
     private static final Vector2f overworld_scan_offset = new Vector2f(0.21F, 0.82F);

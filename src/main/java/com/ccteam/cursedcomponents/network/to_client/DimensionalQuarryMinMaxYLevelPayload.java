@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.network.toClient;
+package com.ccteam.cursedcomponents.network.to_client;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import io.netty.buffer.ByteBuf;
@@ -10,7 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public record DimensionalQuarryMinMaxYLevelPayload(Integer currentMinYLevel, Integer currentMaxYLevel, BlockPos pos) implements CustomPacketPayload {
+public record DimensionalQuarryMinMaxYLevelPayload(Integer currentMinYLevel, Integer currentMaxYLevel,
+                                                   BlockPos pos) implements CustomPacketPayload {
     public static final Type<DimensionalQuarryMinMaxYLevelPayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "dimensional_quarry_min_max_y_level_payload"));
 
     private static final StreamCodec<ByteBuf, Integer> NULLABLE_INT = new StreamCodec<ByteBuf, Integer>() {

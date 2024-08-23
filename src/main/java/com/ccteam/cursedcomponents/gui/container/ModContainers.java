@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.gui.containers;
+package com.ccteam.cursedcomponents.gui.container;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.gui.containers.custom.DimensionalQuarryContainer;
-import com.ccteam.cursedcomponents.gui.containers.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;

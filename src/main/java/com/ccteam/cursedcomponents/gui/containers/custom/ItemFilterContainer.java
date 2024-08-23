@@ -1,10 +1,10 @@
 package com.ccteam.cursedcomponents.gui.containers.custom;
 
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.slots.FilterSlot;
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
+import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
+import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

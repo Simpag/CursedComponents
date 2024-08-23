@@ -1,8 +1,8 @@
-package com.ccteam.cursedcomponents.data_component;
+package com.ccteam.cursedcomponents.item.data_component;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.codec.ModCodecs;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
+import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -22,7 +22,7 @@ public class ModDataComponents {
                     .networkSynchronized(ModCodecs.ITEM_FILTER_DATA_STREAM_CODEC)
     );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ITEM_ENERGY = REGISTRAR.registerComponentType(
-            "sponge_on_stick_energy",
+            "item_energy",
             builder -> builder
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.VAR_INT)

@@ -1,15 +1,15 @@
 package com.ccteam.cursedcomponents;
 
-import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.ModBlockCapabilities;
+import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.codec.ModCodecs;
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.gui.containers.ModContainers;
 import com.ccteam.cursedcomponents.gui.screens.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
 import com.ccteam.cursedcomponents.item.ModItemCapabilities;
 import com.ccteam.cursedcomponents.item.ModItems;
+import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.network.PacketHandler;
 import com.ccteam.cursedcomponents.structure.ModStructures;
 import net.neoforged.bus.api.IEventBus;

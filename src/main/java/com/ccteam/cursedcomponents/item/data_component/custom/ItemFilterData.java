@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.data_component.custom;
+package com.ccteam.cursedcomponents.item.data_component.custom;
 
 import com.ccteam.cursedcomponents.item.custom.ItemFilter;
 import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;

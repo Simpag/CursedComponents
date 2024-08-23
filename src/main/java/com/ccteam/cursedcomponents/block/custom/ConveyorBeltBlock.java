@@ -3,7 +3,7 @@ package com.ccteam.cursedcomponents.block.custom;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -35,14 +35,15 @@ public class ConveyorBeltBlock extends Block {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (entity instanceof LivingEntity) {
-            if (entity.isShiftKeyDown())
-                return;
+        if (entity.isShiftKeyDown())
+            return;
 
-            Direction direction = state.getValue(FACING);
-            Vec3 vel = new Vec3(direction.step());
-            vel = vel.multiply(speedMultiplier, speedMultiplier, speedMultiplier);
-            entity.push(vel);
-        }
+        if (entity instanceof ItemEntity)
+            ((ItemEntity) entity).setExtendedLifetime();
+
+        Direction direction = state.getValue(FACING);
+        Vec3 vel = new Vec3(direction.step());
+        vel = vel.multiply(speedMultiplier, speedMultiplier, speedMultiplier);
+        entity.push(vel);
     }
 }

@@ -20,6 +20,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.DIMENSIONAL_CORE.get());
         basicItem(ModItems.WARDEN_INFUSED_DIAMOND.get());
         basicItem(ModItems.ITEM_FILTER.get());
+        basicItem(ModItems.SPONGE_ON_STICK.get());
+
         basicItem(ModItems.ICON.get());
     }
 

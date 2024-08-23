@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.energy_storage;
+package com.ccteam.cursedcomponents.item.base;
 
 import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import net.minecraft.util.Mth;
@@ -23,7 +23,7 @@ public class ItemStackEnergyStorage extends EnergyStorage {
         int energyReceived = Mth.clamp(this.capacity - this.energy, 0, Math.min(this.maxReceive, toReceive));
         if (!simulate) {
             this.energy += energyReceived;
-            onEnergyChaged();
+            onEnergyChanged();
         }
         return energyReceived;
     }
@@ -37,7 +37,7 @@ public class ItemStackEnergyStorage extends EnergyStorage {
         int energyExtracted = Math.min(this.energy, Math.min(this.maxExtract, toExtract));
         if (!simulate) {
             this.energy -= energyExtracted;
-            onEnergyChaged();
+            onEnergyChanged();
         }
         return energyExtracted;
     }
@@ -47,7 +47,7 @@ public class ItemStackEnergyStorage extends EnergyStorage {
         return this.itemStack.getOrDefault(ModDataComponents.ITEM_ENERGY, 0);
     }
 
-    protected void onEnergyChaged() {
+    protected void onEnergyChanged() {
         this.itemStack.set(ModDataComponents.ITEM_ENERGY, this.energy);
     }
 }

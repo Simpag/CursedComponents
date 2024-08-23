@@ -1,11 +1,10 @@
 package com.ccteam.cursedcomponents.item.data_component;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.codec.ModCodecs;
-import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -13,13 +12,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class ModDataComponents {
     public static final DeferredRegister.DataComponents REGISTRAR = DeferredRegister.createDataComponents(CursedComponentsMod.MOD_ID);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemFilterData>> ITEM_FILTER_DATA = REGISTRAR.registerComponentType(
-            "item_filter_data",
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemContainerContents>> ITEM_INVENTORY = REGISTRAR.registerComponentType(
+            "item_inventory",
             builder -> builder
                     // The codec to read/write the data to disk
-                    .persistent(ModCodecs.ITEM_FILTER_DATA_CODEC)
+                    .persistent(ItemContainerContents.CODEC)
                     // The codec to read/write the data across the network
-                    .networkSynchronized(ModCodecs.ITEM_FILTER_DATA_STREAM_CODEC)
+                    .networkSynchronized(ItemContainerContents.STREAM_CODEC)
+                    .cacheEncoding()
     );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ITEM_ENERGY = REGISTRAR.registerComponentType(
             "item_energy",

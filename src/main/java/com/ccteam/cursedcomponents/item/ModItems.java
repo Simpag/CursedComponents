@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.item;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.item.custom.ItemFilter;
+import com.ccteam.cursedcomponents.item.custom.DimensionalQuarryItemFilter;
 import com.ccteam.cursedcomponents.item.custom.SpongeOnStick;
 import com.ccteam.cursedcomponents.item.custom.WardenInfusion;
 import net.minecraft.world.item.Item;
@@ -26,9 +26,9 @@ public class ModItems {
             "warden_infused_diamond",
             new Item.Properties().rarity(Rarity.EPIC)
     );
-    public static final DeferredItem<Item> ITEM_FILTER = ITEMS.registerItem(
-            "item_filter",
-            ItemFilter::new,
+    public static final DeferredItem<Item> DIMENSIONAL_QUARRY_ITEM_FILTER = ITEMS.registerItem(
+            "dimensional_quarry_item_filter",
+            DimensionalQuarryItemFilter::new,
             new Item.Properties()
     );
     public static final DeferredItem<Item> SPONGE_ON_STICK = ITEMS.registerItem(

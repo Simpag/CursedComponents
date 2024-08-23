@@ -83,6 +83,15 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE.get())
                 ).save(recipeOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIMENSIONAL_QUARRY_ITEM_FILTER.get())
+                .pattern("PPP")
+                .pattern("PWP")
+                .pattern("PPP")
+                .define('P', Items.PAPER)
+                .define('W', ModItems.WARDEN_INFUSION.get())
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
+                ).save(recipeOutput);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SPONGE_ON_STICK.get())
                 .pattern("  S")
                 .pattern(" D ")

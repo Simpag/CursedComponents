@@ -1,7 +1,7 @@
 package com.ccteam.cursedcomponents.gui.screen.custom;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryItemFilterContainer;
 import com.ccteam.cursedcomponents.util.GuiUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,15 +10,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-public class ItemFilterScreen extends AbstractContainerScreen<ItemFilterContainer> {
-    private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/item_filter_container.png");
+public class DimensionalQuarryItemFilterScreen extends AbstractContainerScreen<DimensionalQuarryItemFilterContainer> {
+    private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_item_filter_container.png");
 
 
-    public ItemFilterScreen(ItemFilterContainer menu, Inventory playerInventory, Component title) {
+    public DimensionalQuarryItemFilterScreen(DimensionalQuarryItemFilterContainer menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
 
-        this.imageWidth = 176;
-        this.imageHeight = 134;
+        this.imageHeight = 133;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 

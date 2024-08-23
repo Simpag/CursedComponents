@@ -1,8 +1,6 @@
 package com.ccteam.cursedcomponents.item.base;
 
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public interface PoweredItem {

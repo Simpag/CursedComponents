@@ -1,8 +1,7 @@
 package com.ccteam.cursedcomponents.item;
 
-import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
 import com.ccteam.cursedcomponents.energy_storage.ItemStackEnergyStorage;
-import com.ccteam.cursedcomponents.item.custom.SpongeOnStick;
+import com.ccteam.cursedcomponents.item.interfaces.PoweredItem;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
@@ -13,12 +12,13 @@ public class ModItemCapabilities {
                 (itemStack, context) -> {
                     int capacity = 0;
                     int usage = 0;
-                    if (itemStack.getItem() instanceof SpongeOnStick) {
-                        capacity = SpongeOnStick.MAX_ENERGY;
-                        usage = SpongeOnStick.ENERGY_USAGE;
+                    if (itemStack.getItem() instanceof PoweredItem pi) {
+                        capacity = pi.getCapacity();
+                        usage = pi.getEnergyUse();
                     }
                     return new ItemStackEnergyStorage(capacity, usage, itemStack);
                 },
+                // Add items that implement PoweredItem here
                 ModItems.SPONGE_ON_STICK.get()
         );
     }

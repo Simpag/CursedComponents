@@ -1,10 +1,8 @@
 package com.ccteam.cursedcomponents.item.custom;
 
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
 import com.ccteam.cursedcomponents.item.ModItems;
-import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
-import com.mojang.logging.LogUtils;
+import com.ccteam.cursedcomponents.item.interfaces.PoweredItem;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -25,16 +23,13 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 
-public class SpongeOnStick extends Item {
+public class SpongeOnStick extends Item implements PoweredItem {
     public static final int MAX_DEPTH = 6;
     public static final int MAX_COUNT = 64;
     public static final int MAX_ENERGY = 10_000;
@@ -69,27 +64,20 @@ public class SpongeOnStick extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.1"));
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.shift"));
 
-        IEnergyStorage storage = this.getEnergyStorage(stack);
-        Integer energy = null;
-        if (storage != null) {
-            energy = storage.getEnergyStored();
+        if (Screen.hasShiftDown()) {
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.1", this.getEnergyStored(stack), this.getCapacity()));
         }
-        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.2", energy == null ? "?" : energy));
     }
 
-    private IEnergyStorage getEnergyStorage(ItemStack stack) {
-        return stack.getCapability(Capabilities.EnergyStorage.ITEM);
-    }
 
     protected void tryAbsorbWater(Level level, BlockPos pos, ItemStack stack) {
         if (!stack.is(ModItems.SPONGE_ON_STICK))
             return;
 
-        IEnergyStorage storage = getEnergyStorage(stack);
-        if (storage.getEnergyStored() >= ENERGY_USAGE && this.removeWaterBreadthFirstSearch(level, pos)) {
-            storage.extractEnergy(ENERGY_USAGE, false);
+        if (this.isOperable(stack) && this.removeWaterBreadthFirstSearch(level, pos)) {
+            this.extractEnergy(stack, ENERGY_USAGE, false);
             level.playSound(null, pos, SoundEvents.SPONGE_ABSORB, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
@@ -139,5 +127,33 @@ public class SpongeOnStick extends Item {
                 }
         )
                 > 1;
+    }
+
+    @Override
+    public int getCapacity() {
+        return MAX_ENERGY;
+    }
+
+    @Override
+    public int getEnergyUse() {
+        return ENERGY_USAGE;
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return this.isPowerBarVisible(stack);
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        return this.getPowerBarWidth(stack);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        Integer color = this.getPowerBarColor(stack);
+        if (color == null)
+            return super.getBarColor(stack);
+        return color;
     }
 }

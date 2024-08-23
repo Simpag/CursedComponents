@@ -1,6 +1,5 @@
 package com.ccteam.cursedcomponents.command;
 
-import com.ccteam.cursedcomponents.item.ModItemCapabilities;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -39,8 +38,14 @@ public class ChargeItemCommand {
         if (storage == null)
             return -1;
 
-        int charged = storage.receiveEnergy(Integer.MAX_VALUE, false);
-        source.sendSuccess(() -> Component.literal("Charged item with " + charged + " FE!"), true);
+        int totalCharged = 0;
+        int charged = -1;
+        while (charged != 0) {
+            charged = storage.receiveEnergy(Integer.MAX_VALUE, false);
+            totalCharged += charged;
+        }
+        int finalTotalCharged = totalCharged; // Stupid formatting
+        source.sendSuccess(() -> Component.literal("Charged item with %d FE!".formatted(finalTotalCharged)), true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -52,8 +57,14 @@ public class ChargeItemCommand {
         if (storage == null)
             return -1;
 
-        int discharged = storage.extractEnergy(Integer.MAX_VALUE, false);
-        source.sendSuccess(() -> Component.literal("Discharged item with " + discharged + " FE!"), true);
+        int totalDischarged = 0;
+        int discharged = -1;
+        while (discharged != 0) {
+            discharged = storage.extractEnergy(Integer.MAX_VALUE, false);
+            totalDischarged += discharged;
+        }
+        int finalTotalDischarged = totalDischarged; //  Again I really dislike formatting
+        source.sendSuccess(() -> Component.literal("Discharged item with %d FE!".formatted(finalTotalDischarged)), true);
 
         return Command.SINGLE_SUCCESS;
     }

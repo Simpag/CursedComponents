@@ -21,7 +21,7 @@ public class DimensionalQuarryScreen extends AbstractContainerScreen<Dimensional
     private static final boolean DEBUG = false;
 
     private static final ResourceLocation GUI_TEXTURE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "textures/gui/container/dimensional_quarry_container.png");
-    private static final ResourceLocation WARNING_SPRITE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "container/dimensional_quarry/warning_triangle");
+    private static final ResourceLocation WARNING_SPRITE = ResourceLocation.fromNamespaceAndPath(CursedComponentsMod.MOD_ID, "container/warning_triangle");
     private final int green = FastColor.ARGB32.color(255, 31, 125, 0);
     private final int dark_green = FastColor.ARGB32.color(255, 18, 74, 0);
     private final int red = FastColor.ARGB32.color(255, 135, 0, 14);

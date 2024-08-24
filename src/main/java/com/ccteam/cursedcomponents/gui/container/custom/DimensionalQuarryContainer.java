@@ -2,9 +2,9 @@ package com.ccteam.cursedcomponents.gui.container.custom;
 
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;
+import com.ccteam.cursedcomponents.block.stack_handler.DimensionalQuarryItemStackHandler;
 import com.ccteam.cursedcomponents.gui.container.ModContainers;
 import com.ccteam.cursedcomponents.network.to_server.GUIButtonPayload;
-import com.ccteam.cursedcomponents.stack_handler.DimensionalQuarryItemStackHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;

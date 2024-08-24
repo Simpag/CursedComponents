@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.stack_handler;
+package com.ccteam.cursedcomponents.block.stack_handler;
 
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.ccteam.cursedcomponents.util.ModTags;
@@ -21,7 +21,7 @@ public class DimensionalQuarryItemStackHandler extends ItemStackHandler {
             case 1 -> // Dimension slot
                     stack.is(ModTags.Items.MINI_CHUNK);
             case 2 -> // Blacklist slot
-                    stack.is(ModItems.ITEM_FILTER.get());
+                    stack.is(ModItems.DIMENSIONAL_QUARRY_ITEM_FILTER.get());
             default -> true;
         };
     }

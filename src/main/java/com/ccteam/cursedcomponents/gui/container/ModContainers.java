@@ -2,7 +2,7 @@ package com.ccteam.cursedcomponents.gui.container;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryContainer;
-import com.ccteam.cursedcomponents.gui.container.custom.ItemFilterContainer;
+import com.ccteam.cursedcomponents.gui.container.custom.DimensionalQuarryItemFilterContainer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
@@ -18,9 +18,9 @@ public class ModContainers {
             "dimensional_quarry_container",
             () -> new MenuType<>(DimensionalQuarryContainer::new, FeatureFlags.DEFAULT_FLAGS)
     );
-    public static final Supplier<MenuType<ItemFilterContainer>> ITEM_FILTER_CONTAINER = CONTAINERS.register(
-            "item_filter_container",
-            () -> new MenuType<>(ItemFilterContainer::new, FeatureFlags.DEFAULT_FLAGS)
+    public static final Supplier<MenuType<DimensionalQuarryItemFilterContainer>> DIMENSIONAL_QUARRY_ITEM_FILTER_CONTAINER = CONTAINERS.register(
+            "dimensional_quarry_item_filter_container",
+            () -> new MenuType<>(DimensionalQuarryItemFilterContainer::new, FeatureFlags.DEFAULT_FLAGS)
     );
 
     public static void register(IEventBus eventBus) {

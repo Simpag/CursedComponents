@@ -4,13 +4,11 @@ import com.ccteam.cursedcomponents.Config;
 import com.ccteam.cursedcomponents.ModRegistries;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.item.data_component.custom.ItemFilterData;
+import com.ccteam.cursedcomponents.block.stack_handler.DimensionalQuarryItemStackHandler;
+import com.ccteam.cursedcomponents.block.threading.DimensionalQuarrySearcher;
+import com.ccteam.cursedcomponents.item.base.InventoryItem;
 import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryMinMaxYLevelPayload;
 import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryYLevelPayload;
-import com.ccteam.cursedcomponents.stack_handler.DimensionalQuarryItemStackHandler;
-import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
-import com.ccteam.cursedcomponents.threading.DimensionalQuarrySearcher;
 import com.ccteam.cursedcomponents.util.ModTags;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -132,6 +130,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         super.onLoad();
 
         this.updateUpgrades();
+        this.updateBlacklistedItems();
 
         if (level != null && !level.isClientSide) {
             createItemHandlerCapCaches((ServerLevel) level);
@@ -325,15 +324,20 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (this.level == null)
             return;
 
+        setChanged();
         ItemStack filter = this.getItemFilterSlot();
-        ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
-        Set<Item> items = new HashSet<>();
-        for (int i = 0; i < inv.getSlots(); i++) {
-            items.add(inv.getStackInSlot(i).getItem());
+        if (filter.getItem() instanceof InventoryItem ii) {
+            IItemHandler inv = ii.getInventory(filter);
+            Set<Item> items = new HashSet<>();
+            for (int i = 0; i < inv.getSlots(); i++) {
+                items.add(inv.getStackInSlot(i).getItem());
+            }
+
+            this.blacklistedItems = items;
+            return;
         }
 
-        this.blacklistedItems = items;
-        setChanged();
+        this.blacklistedItems.clear();
     }
 
     // Checkers

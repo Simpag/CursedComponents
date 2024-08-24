@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.threading;
+package com.ccteam.cursedcomponents.block.threading;
 
 import com.ccteam.cursedcomponents.ModRegistries;
 import com.ccteam.cursedcomponents.block.entity.custom.DimensionalQuarryEntity;

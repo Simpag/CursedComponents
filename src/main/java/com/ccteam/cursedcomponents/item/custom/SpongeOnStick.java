@@ -2,7 +2,6 @@ package com.ccteam.cursedcomponents.item.custom;
 
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.ccteam.cursedcomponents.item.base.BasePoweredItem;
-import com.ccteam.cursedcomponents.item.base.PoweredItem;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +12,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;

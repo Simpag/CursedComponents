@@ -1,8 +1,8 @@
 package com.ccteam.cursedcomponents.gui.screen;
 
 import com.ccteam.cursedcomponents.gui.container.ModContainers;
+import com.ccteam.cursedcomponents.gui.screen.custom.DimensionalQuarryItemFilterScreen;
 import com.ccteam.cursedcomponents.gui.screen.custom.DimensionalQuarryScreen;
-import com.ccteam.cursedcomponents.gui.screen.custom.ItemFilterScreen;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 public class ModScreens {
@@ -12,8 +12,8 @@ public class ModScreens {
                 DimensionalQuarryScreen::new
         );
         event.register(
-                ModContainers.ITEM_FILTER_CONTAINER.get(),
-                ItemFilterScreen::new
+                ModContainers.DIMENSIONAL_QUARRY_ITEM_FILTER_CONTAINER.get(),
+                DimensionalQuarryItemFilterScreen::new
         );
     }
 }

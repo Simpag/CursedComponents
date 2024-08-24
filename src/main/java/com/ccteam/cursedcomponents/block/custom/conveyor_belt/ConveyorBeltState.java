@@ -1,4 +1,4 @@
-package com.ccteam.cursedcomponents.block.custom;
+package com.ccteam.cursedcomponents.block.custom.conveyor_belt;
 
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
@@ -81,7 +81,7 @@ public class ConveyorBeltState {
 
     private void removeSoftConnections() {
         for (int i = 0; i < this.connections.size(); i++) {
-            ConveyorBeltState beltState = this.getRail(this.connections.get(i));
+            ConveyorBeltState beltState = this.getConveyorBelt(this.connections.get(i));
             if (beltState != null && beltState.connectsTo(this)) {
                 this.connections.set(i, beltState.pos);
             } else {
@@ -97,7 +97,7 @@ public class ConveyorBeltState {
     }
 
     @Nullable
-    private ConveyorBeltState getRail(BlockPos pos) {
+    private ConveyorBeltState getConveyorBelt(BlockPos pos) {
         BlockState blockstate = this.level.getBlockState(pos);
         if (ConveyorBeltBlock.isConveyorBelt(blockstate)) {
             return new ConveyorBeltState(this.level, pos, blockstate);
@@ -203,7 +203,7 @@ public class ConveyorBeltState {
             railshape = RailShape.NORTH_SOUTH;
         }
 
-        if (!this.block.isValidConveyorBeltShape(railshape)) { // Forge: allow rail block to decide if the new shape is valid
+        if (!this.block.isValidConveyorBeltShape()) { // Forge: allow rail block to decide if the new shape is valid
             this.connections.remove(state.pos);
             return;
         }
@@ -212,7 +212,7 @@ public class ConveyorBeltState {
     }
 
     private boolean hasNeighborRail(BlockPos pos) {
-        ConveyorBeltState ConveyorBeltState = this.getRail(pos);
+        ConveyorBeltState ConveyorBeltState = this.getConveyorBelt(pos);
         if (ConveyorBeltState == null) {
             return false;
         } else {
@@ -329,7 +329,7 @@ public class ConveyorBeltState {
             }
         }
 
-        if (railshape == null || !this.block.isValidConveyorBeltShape(railshape)) { // Forge: allow rail block to decide if the new shape is valid
+        if (railshape == null || !this.block.isValidConveyorBeltShape()) { // Forge: allow rail block to decide if the new shape is valid
             railshape = shape;
         }
 
@@ -339,7 +339,7 @@ public class ConveyorBeltState {
             this.level.setBlock(this.pos, this.state, 3);
 
             for (int i = 0; i < this.connections.size(); i++) {
-                ConveyorBeltState ConveyorBeltState = this.getRail(this.connections.get(i));
+                ConveyorBeltState ConveyorBeltState = this.getConveyorBelt(this.connections.get(i));
                 if (ConveyorBeltState != null) {
                     ConveyorBeltState.removeSoftConnections();
                     if (ConveyorBeltState.canConnectTo(this)) {

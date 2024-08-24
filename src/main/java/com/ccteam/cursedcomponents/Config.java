@@ -31,7 +31,7 @@ public class Config {
 
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_BASE = BUILDER
             .pop()
-            .comment("Quarry speed (Block/Tick)")
+            .comment("Quarry speed (Tick/Block)")
             .push("speed")
             .comment("How many ticks between each block mined")
             .defineInRange("base", 15, 1, Integer.MAX_VALUE);

@@ -7,12 +7,11 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Neo's config APIs
 @EventBusSubscriber(modid = CursedComponentsMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
+    // Dimensional Quarry
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_CONSUMPTION_BASE = BUILDER
             .comment("Dimensional Quarry Settings")
             .push("dimensional_quarry")
@@ -52,12 +51,26 @@ public class Config {
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_5 = BUILDER
             .defineInRange("efficiencyV", 1, 1, Integer.MAX_VALUE);
 
+    // Sponge on Stick
+    private static final ModConfigSpec.IntValue SPONGE_ON_STICK_CAPACITY = BUILDER
+            .pop(2)
+            .comment("Sponge On a Stick")
+            .push("sponge_on_a_stick")
+            .comment("Energy capacity")
+            .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
+
+    private static final ModConfigSpec.IntValue SPONGE_ON_STICK_USAGE = BUILDER
+            .comment("Energy usage per use")
+            .defineInRange("usage", 500, 0, Integer.MAX_VALUE);
+
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
     /* CONFIG VALUES */
     public static List<Integer> dimensionalQuarryConsumptions;
     public static List<Integer> dimensionalQuarrySpeed;
+    public static Integer spongeOnStickCapacity;
+    public static Integer spongeOnStickUsage;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -76,5 +89,8 @@ public class Config {
                 DIMENSIONAL_QUARRY_TPB_4.get(),
                 DIMENSIONAL_QUARRY_TPB_5.get()
         );
+
+        spongeOnStickCapacity = SPONGE_ON_STICK_CAPACITY.get();
+        spongeOnStickUsage = SPONGE_ON_STICK_USAGE.get();
     }
 }

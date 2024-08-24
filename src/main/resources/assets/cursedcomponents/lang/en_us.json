@@ -22,8 +22,9 @@
   "tooltip.cursedcomponents.warden_infusion.1": "You can obtain §dWarden Infusion§r by killing the warden",
   "tooltip.cursedcomponents.warden_infusion.2": "Drops 1-3 pieces",
   "tooltip.cursedcomponents.warden_infusion.shift": "Press §eShift§r for more Information",
-  "tooltip.cursedcomponents.sponge_on_stick.1": "  - Energy: %s / %s FE",
-  "tooltip.cursedcomponents.sponge_on_stick.shift": "Absorbs water in exchange for energy when you right click\nPress §eShift§r for current charge",
+  "tooltip.cursedcomponents.sponge_on_stick.1": "§aEnergy:§r %s / %s FE",
+  "tooltip.cursedcomponents.sponge_on_stick.2": "Absorbs water in exchange for energy when you\nright click just like a sponge!",
+  "tooltip.cursedcomponents.sponge_on_stick.shift": "Press §eShift§r for description",
 
   "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: %s",
   "menu.cursedcomponents.dimensional_quarry.start_button": "Start",

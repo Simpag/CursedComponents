@@ -6,11 +6,13 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class BasePoweredItem extends Item implements PoweredItem {
-    protected final int energyCapacity;
-    protected final int energyUsage;
+import java.util.function.Supplier;
 
-    public BasePoweredItem(Properties properties, int energyCapacity, int energyUsage) {
+public class BasePoweredItem extends Item implements PoweredItem {
+    protected Supplier<Integer> energyCapacity;
+    protected Supplier<Integer> energyUsage;
+
+    public BasePoweredItem(Properties properties, Supplier<Integer> energyCapacity, Supplier<Integer> energyUsage) {
         super(properties);
         this.energyCapacity = energyCapacity;
         this.energyUsage = energyUsage;
@@ -23,17 +25,17 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public int getCapacity() {
-        return this.energyCapacity;
+        return energyCapacity.get();
     }
 
     @Override
-    public int getEnergyUse() {
-        return this.energyUsage;
+    public int getEnergyUsage() {
+        return energyUsage.get();
     }
 
     @Override
     public int getEnergyStored(ItemStack stack) {
-        IEnergyStorage energy = getEnergyStorage(stack);
+        IEnergyStorage energy = this.getEnergyStorage(stack);
         if (energy == null)
             return -1;
 
@@ -42,7 +44,7 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public int getPowerBarWidth(ItemStack stack) {
-        IEnergyStorage energy = getEnergyStorage(stack);
+        IEnergyStorage energy = this.getEnergyStorage(stack);
         if (energy == null)
             return 13;
 
@@ -51,7 +53,7 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public Integer getPowerBarColor(ItemStack stack) {
-        IEnergyStorage energy = getEnergyStorage(stack);
+        IEnergyStorage energy = this.getEnergyStorage(stack);
         if (energy == null)
             return null;
 
@@ -61,7 +63,7 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public int extractEnergy(ItemStack stack, int amount, boolean simulate) {
-        IEnergyStorage energy = getEnergyStorage(stack);
+        IEnergyStorage energy = this.getEnergyStorage(stack);
         if (energy == null)
             return 0;
 
@@ -70,7 +72,7 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public boolean isPowerBarVisible(ItemStack stack) {
-        IEnergyStorage energy = getEnergyStorage(stack);
+        IEnergyStorage energy = this.getEnergyStorage(stack);
         if (energy == null)
             return false;
 
@@ -79,7 +81,7 @@ public class BasePoweredItem extends Item implements PoweredItem {
 
     @Override
     public boolean isOperable(ItemStack stack) {
-        return getEnergyStored(stack) >= getEnergyUse();
+        return this.getEnergyStored(stack) >= this.getEnergyUsage();
     }
 
     @Override

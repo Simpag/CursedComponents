@@ -1,7 +1,9 @@
 package com.ccteam.cursedcomponents.item.custom;
 
+import com.ccteam.cursedcomponents.Config;
 import com.ccteam.cursedcomponents.item.ModItems;
 import com.ccteam.cursedcomponents.item.base.BasePoweredItem;
+import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,16 +32,13 @@ import java.util.List;
 import static net.minecraft.world.level.block.Block.dropResources;
 
 public class SpongeOnStick extends BasePoweredItem {
-    public static final int MAX_DEPTH = 6;
-    public static final int MAX_COUNT = 64;
-    public static final int ENERGY_CAPACITY = 10_000;
-    public static final int ENERGY_USAGE = 500;
+    private static final int MAX_DEPTH = 6;
+    private static final int MAX_COUNT = 64;
     private static final Direction[] ALL_DIRECTIONS = Direction.values();
 
     public SpongeOnStick(Properties properties) {
-        super(properties, ENERGY_CAPACITY, ENERGY_USAGE);
+        super(properties, () -> Config.spongeOnStickCapacity, () -> Config.spongeOnStickUsage);
     }
-
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
@@ -64,10 +64,12 @@ public class SpongeOnStick extends BasePoweredItem {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.shift"));
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.1", this.getEnergyStored(stack), this.getCapacity()));
 
         if (Screen.hasShiftDown()) {
-            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.1", this.getEnergyStored(stack), this.getCapacity()));
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.2"));
+        } else {
+            tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.shift"));
         }
     }
 
@@ -77,7 +79,7 @@ public class SpongeOnStick extends BasePoweredItem {
             return;
 
         if (this.isOperable(stack) && this.removeWaterBreadthFirstSearch(level, pos)) {
-            this.extractEnergy(stack, ENERGY_USAGE, false);
+            this.extractEnergy(stack, this.getEnergyUsage(), false);
             level.playSound(null, pos, SoundEvents.SPONGE_ABSORB, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }

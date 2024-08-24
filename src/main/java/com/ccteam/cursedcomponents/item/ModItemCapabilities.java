@@ -17,7 +17,7 @@ public class ModItemCapabilities {
                     int usage = 0;
                     if (itemStack.getItem() instanceof PoweredItem pi) {
                         capacity = pi.getCapacity();
-                        usage = pi.getEnergyUse();
+                        usage = pi.getEnergyUsage();
                     }
                     return new ItemStackEnergyStorage(capacity, usage, itemStack);
                 },

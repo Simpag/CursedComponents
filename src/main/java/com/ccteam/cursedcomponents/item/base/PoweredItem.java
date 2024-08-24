@@ -6,7 +6,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 public interface PoweredItem {
     int getCapacity();
 
-    int getEnergyUse();
+    int getEnergyUsage();
 
     IEnergyStorage getEnergyStorage(ItemStack stack);
 

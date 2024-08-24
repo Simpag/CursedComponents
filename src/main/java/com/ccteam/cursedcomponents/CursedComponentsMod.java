@@ -3,7 +3,7 @@ package com.ccteam.cursedcomponents;
 import com.ccteam.cursedcomponents.block.ModBlockCapabilities;
 import com.ccteam.cursedcomponents.block.ModBlocks;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.codec.ModCodecs;
+import com.ccteam.cursedcomponents.glm.ModGlobalLootModifierCodecs;
 import com.ccteam.cursedcomponents.gui.container.ModContainers;
 import com.ccteam.cursedcomponents.gui.screen.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
@@ -51,7 +51,7 @@ public class CursedComponentsMod {
         modEventBus.addListener(PacketHandler::register);
 
         // Register custom CODECS
-        ModCodecs.register(modEventBus);
+        ModGlobalLootModifierCodecs.register(modEventBus);
 
         // Register custom data components
         ModDataComponents.register(modEventBus);
@@ -60,6 +60,6 @@ public class CursedComponentsMod {
         modEventBus.addListener(ModItemCapabilities::registerItemCapabilities);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MOD_ID + ".toml");
+        modContainer.registerConfig(ModConfig.Type.SERVER, Config.SPEC, MOD_ID + ".toml");
     }
 }

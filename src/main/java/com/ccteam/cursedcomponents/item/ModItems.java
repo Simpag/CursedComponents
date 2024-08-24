@@ -34,7 +34,7 @@ public class ModItems {
     public static final DeferredItem<Item> SPONGE_ON_STICK = ITEMS.registerItem(
             "sponge_on_stick",
             SpongeOnStick::new,
-            new Item.Properties()
+            new Item.Properties().stacksTo(1)
     );
 
     public static final DeferredItem<Item> ICON = ITEMS.registerSimpleItem("icon");

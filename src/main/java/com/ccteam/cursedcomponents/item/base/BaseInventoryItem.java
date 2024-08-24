@@ -1,8 +1,8 @@
 package com.ccteam.cursedcomponents.item.base;
 
-import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 public class BaseInventoryItem extends Item implements InventoryItem {
@@ -27,7 +27,7 @@ public class BaseInventoryItem extends Item implements InventoryItem {
 
     @Override
     public IItemHandler getInventory(ItemStack thisStack) {
-        return new ItemStackInventory(thisStack, ModDataComponents.ITEM_INVENTORY.get(), this.getSize(), this.getSlotSizeLimit());
+        return thisStack.getCapability(Capabilities.ItemHandler.ITEM);
     }
 
     @Override
@@ -56,6 +56,4 @@ public class BaseInventoryItem extends Item implements InventoryItem {
 
         return inv.extractItem(slot, amount, simulate);
     }
-
-
 }

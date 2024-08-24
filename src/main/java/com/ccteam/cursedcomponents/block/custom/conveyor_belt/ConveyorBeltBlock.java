@@ -27,6 +27,7 @@ public class ConveyorBeltBlock extends Block {
     protected static final VoxelShape HALF_BLOCK_AABB = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
 
     public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE;
+    public static final BooleanProperty REVERSED = BooleanProperty.create("reversed");
 
     private final double speedMultiplier;
     private final boolean isStraight;
@@ -114,7 +115,7 @@ public class ConveyorBeltBlock extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(SHAPE);
+        builder.add(SHAPE, REVERSED);
     }
 
     @Override
@@ -290,10 +291,13 @@ public class ConveyorBeltBlock extends Block {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction direction = context.getHorizontalDirection().getOpposite();
+        boolean isReversed = (direction == Direction.NORTH || direction == Direction.EAST);
+
         BlockState blockstate = super.defaultBlockState();
-        Direction direction = context.getHorizontalDirection();
-        boolean flag1 = direction == Direction.EAST || direction == Direction.WEST;
-        return blockstate.setValue(this.getShapeProperty(), flag1 ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH);
+        boolean isEastWest = direction == Direction.EAST || direction == Direction.WEST;
+        return blockstate.setValue(SHAPE, isEastWest ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH)
+                .setValue(REVERSED, isReversed);
     }
 
     @Override

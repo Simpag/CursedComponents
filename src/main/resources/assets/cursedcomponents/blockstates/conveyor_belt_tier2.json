@@ -44,36 +44,6 @@
     "shape=north_south,reversed=true": {
       "model": "cursedcomponents:block/conveyor_belt_tier2",
       "y": 180
-    },
-    "shape=north_east,reversed=false": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 270
-    },
-    "shape=north_east,reversed=true": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 90
-    },
-    "shape=north_west,reversed=false": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 180
-    },
-    "shape=north_west,reversed=true": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 180
-    },
-    "shape=south_east,reversed=false": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner"
-    },
-    "shape=south_east,reversed=true": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner"
-    },
-    "shape=south_west,reversed=false": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 90
-    },
-    "shape=south_west,reversed=true": {
-      "model": "cursedcomponents:block/conveyor_belt_tier2_corner",
-      "y": 90
     }
   }
 }

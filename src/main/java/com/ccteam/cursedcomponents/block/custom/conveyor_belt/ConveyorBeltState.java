@@ -15,7 +15,6 @@ public class ConveyorBeltState {
     private final BlockPos pos;
     private final ConveyorBeltBlock block;
     private BlockState state;
-    private final boolean isStraight;
     private final List<BlockPos> connections = Lists.newArrayList();
     private final boolean canMakeSlopes;
 
@@ -25,13 +24,8 @@ public class ConveyorBeltState {
         this.state = state;
         this.block = (ConveyorBeltBlock)state.getBlock();
         RailShape railshape = this.block.getConveyorBeltShape(state);
-        this.isStraight = this.block.isStraight();
         this.canMakeSlopes = true;
         this.updateConnections(railshape);
-    }
-
-    public List<BlockPos> getConnections() {
-        return this.connections;
     }
 
     private void updateConnections(RailShape shape) {
@@ -61,21 +55,6 @@ public class ConveyorBeltState {
                 this.connections.add(this.pos.north());
                 this.connections.add(this.pos.south().above());
                 break;
-            case SOUTH_EAST:
-                this.connections.add(this.pos.east());
-                this.connections.add(this.pos.south());
-                break;
-            case SOUTH_WEST:
-                this.connections.add(this.pos.west());
-                this.connections.add(this.pos.south());
-                break;
-            case NORTH_WEST:
-                this.connections.add(this.pos.west());
-                this.connections.add(this.pos.north());
-                break;
-            case NORTH_EAST:
-                this.connections.add(this.pos.east());
-                this.connections.add(this.pos.north());
         }
     }
 
@@ -161,43 +140,7 @@ public class ConveyorBeltState {
             railshape = RailShape.EAST_WEST;
         }
 
-        if (!this.isStraight) {
-            if (flag1 && flag3 && !flag && !flag2) {
-                railshape = RailShape.SOUTH_EAST;
-            }
-
-            if (flag1 && flag2 && !flag && !flag3) {
-                railshape = RailShape.SOUTH_WEST;
-            }
-
-            if (flag && flag2 && !flag1 && !flag3) {
-                railshape = RailShape.NORTH_WEST;
-            }
-
-            if (flag && flag3 && !flag1 && !flag2) {
-                railshape = RailShape.NORTH_EAST;
-            }
-        }
-
-        if (railshape == RailShape.NORTH_SOUTH && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos.above())) {
-                railshape = RailShape.ASCENDING_NORTH;
-            }
-
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos1.above())) {
-                railshape = RailShape.ASCENDING_SOUTH;
-            }
-        }
-
-        if (railshape == RailShape.EAST_WEST && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos3.above())) {
-                railshape = RailShape.ASCENDING_EAST;
-            }
-
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos2.above())) {
-                railshape = RailShape.ASCENDING_WEST;
-            }
-        }
+        railshape = getRailShape(blockpos, blockpos1, blockpos2, blockpos3, railshape);
 
         if (railshape == null) {
             railshape = RailShape.NORTH_SOUTH;
@@ -211,17 +154,7 @@ public class ConveyorBeltState {
         this.level.setBlock(this.pos, this.state, 3);
     }
 
-    private boolean hasNeighborRail(BlockPos pos) {
-        ConveyorBeltState ConveyorBeltState = this.getConveyorBelt(pos);
-        if (ConveyorBeltState == null) {
-            return false;
-        } else {
-            ConveyorBeltState.removeSoftConnections();
-            return ConveyorBeltState.canConnectTo(this);
-        }
-    }
-
-    public ConveyorBeltState place(boolean powered, boolean alwaysPlace, RailShape shape) {
+    public ConveyorBeltState place(boolean alwaysPlace, RailShape shape) {
         RailShape railshape = shape;
 
         BlockPos blockpos = this.pos.north();
@@ -229,25 +162,7 @@ public class ConveyorBeltState {
         BlockPos blockpos2 = this.pos.west();
         BlockPos blockpos3 = this.pos.east();
 
-        if (railshape == RailShape.NORTH_SOUTH && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos.above())) {
-                railshape = RailShape.ASCENDING_NORTH;
-            }
-
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos1.above())) {
-                railshape = RailShape.ASCENDING_SOUTH;
-            }
-        }
-
-        if (railshape == RailShape.EAST_WEST && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos3.above())) {
-                railshape = RailShape.ASCENDING_EAST;
-            }
-
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos2.above())) {
-                railshape = RailShape.ASCENDING_WEST;
-            }
-        }
+        railshape = getRailShape(blockpos, blockpos1, blockpos2, blockpos3, railshape);
 
         this.updateConnections(railshape);
         this.state = this.state.setValue(this.block.getShapeProperty(), railshape);
@@ -266,6 +181,29 @@ public class ConveyorBeltState {
         }
 
         return this;
+    }
+
+    private RailShape getRailShape(BlockPos blockpos, BlockPos blockpos1, BlockPos blockpos2, BlockPos blockpos3, RailShape railshape) {
+        if (railshape == RailShape.NORTH_SOUTH && canMakeSlopes) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos.above())) {
+                railshape = RailShape.ASCENDING_NORTH;
+            }
+
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos1.above())) {
+                railshape = RailShape.ASCENDING_SOUTH;
+            }
+        }
+
+        if (railshape == RailShape.EAST_WEST && canMakeSlopes) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos3.above())) {
+                railshape = RailShape.ASCENDING_EAST;
+            }
+
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos2.above())) {
+                railshape = RailShape.ASCENDING_WEST;
+            }
+        }
+        return railshape;
     }
 
     public BlockState getState() {

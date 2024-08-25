@@ -1,10 +1,8 @@
 package com.ccteam.cursedcomponents.block.custom.conveyor_belt;
 
 import com.ccteam.cursedcomponents.util.ModTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -30,12 +28,10 @@ public class ConveyorBeltBlock extends Block {
     public static final BooleanProperty REVERSED = BooleanProperty.create("reversed");
 
     private final double speedMultiplier;
-    private final boolean isStraight;
 
     public ConveyorBeltBlock(Properties properties, double speedMultiplier) {
         super(properties);
         this.speedMultiplier = speedMultiplier;
-        this.isStraight = true;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(SHAPE, RailShape.NORTH_SOUTH));
     }
@@ -56,10 +52,7 @@ public class ConveyorBeltBlock extends Block {
             case ASCENDING_SOUTH -> new Vec3(0, -1, -1);
             case ASCENDING_EAST -> new Vec3(1, 1, 0);
             case ASCENDING_WEST -> new Vec3(1, -1, 0);
-            case NORTH_EAST -> new Vec3(1, 0, -1);
-            case NORTH_WEST -> new Vec3(-1, 0, -1);
-            case SOUTH_EAST -> new Vec3(1, 0, 1);
-            case SOUTH_WEST -> new Vec3(-1, 0, 1);
+            default -> Vec3.ZERO;
         };
         if (state.getValue(REVERSED)) {
             dir = dir.multiply(-1, -1, -1);
@@ -92,7 +85,7 @@ public class ConveyorBeltBlock extends Block {
             return state;
         } else {
             RailShape railshape = state.getValue(this.getShapeProperty());
-            return new ConveyorBeltState(level, pos, state).place(level.hasNeighborSignal(pos), alwaysPlace, railshape).getState();
+            return new ConveyorBeltState(level, pos, state).place(alwaysPlace, railshape).getState();
         }
     }
 
@@ -141,18 +134,14 @@ public class ConveyorBeltBlock extends Block {
                 level.updateNeighborsAt(pos.above(), this);
             }
 
-            if (this.isStraight) {
-                level.updateNeighborsAt(pos, this);
-                level.updateNeighborsAt(pos.below(), this);
-            }
+            level.updateNeighborsAt(pos, this);
+            level.updateNeighborsAt(pos.below(), this);
         }
     }
 
     protected BlockState updateState(BlockState state, Level level, BlockPos pos, boolean movedByPiston) {
         state = this.updateDir(level, pos, state, true);
-        if (this.isStraight) {
-            level.neighborChanged(state, pos, this, pos, movedByPiston);
-        }
+        level.neighborChanged(state, pos, this, pos, movedByPiston);
         return state;
     }
 
@@ -175,14 +164,6 @@ public class ConveyorBeltBlock extends Block {
                         yield RailShape.ASCENDING_SOUTH;
                     case ASCENDING_SOUTH:
                         yield RailShape.ASCENDING_NORTH;
-                    case SOUTH_EAST:
-                        yield RailShape.NORTH_WEST;
-                    case SOUTH_WEST:
-                        yield RailShape.NORTH_EAST;
-                    case NORTH_WEST:
-                        yield RailShape.SOUTH_EAST;
-                    case NORTH_EAST:
-                        yield RailShape.SOUTH_WEST;
                     default:
                         throw new MatchException(null, null);
                 }
@@ -201,14 +182,6 @@ public class ConveyorBeltBlock extends Block {
                         yield RailShape.ASCENDING_WEST;
                     case ASCENDING_SOUTH:
                         yield RailShape.ASCENDING_EAST;
-                    case SOUTH_EAST:
-                        yield RailShape.NORTH_EAST;
-                    case SOUTH_WEST:
-                        yield RailShape.SOUTH_EAST;
-                    case NORTH_WEST:
-                        yield RailShape.SOUTH_WEST;
-                    case NORTH_EAST:
-                        yield RailShape.NORTH_WEST;
                     default:
                         throw new MatchException(null, null);
                 }
@@ -227,14 +200,6 @@ public class ConveyorBeltBlock extends Block {
                         yield RailShape.ASCENDING_EAST;
                     case ASCENDING_SOUTH:
                         yield RailShape.ASCENDING_WEST;
-                    case SOUTH_EAST:
-                        yield RailShape.SOUTH_WEST;
-                    case SOUTH_WEST:
-                        yield RailShape.NORTH_WEST;
-                    case NORTH_WEST:
-                        yield RailShape.NORTH_EAST;
-                    case NORTH_EAST:
-                        yield RailShape.SOUTH_EAST;
                     default:
                         throw new MatchException(null, null);
                 }
@@ -253,14 +218,6 @@ public class ConveyorBeltBlock extends Block {
                         return state.setValue(SHAPE, RailShape.ASCENDING_SOUTH);
                     case ASCENDING_SOUTH:
                         return state.setValue(SHAPE, RailShape.ASCENDING_NORTH);
-                    case SOUTH_EAST:
-                        return state.setValue(SHAPE, RailShape.NORTH_EAST);
-                    case SOUTH_WEST:
-                        return state.setValue(SHAPE, RailShape.NORTH_WEST);
-                    case NORTH_WEST:
-                        return state.setValue(SHAPE, RailShape.SOUTH_WEST);
-                    case NORTH_EAST:
-                        return state.setValue(SHAPE, RailShape.SOUTH_EAST);
                     default:
                         return super.mirror(state, mirror);
                 }
@@ -274,15 +231,7 @@ public class ConveyorBeltBlock extends Block {
                     case ASCENDING_SOUTH:
                     default:
                         break;
-                    case SOUTH_EAST:
-                        return state.setValue(SHAPE, RailShape.SOUTH_WEST);
-                    case SOUTH_WEST:
-                        return state.setValue(SHAPE, RailShape.SOUTH_EAST);
-                    case NORTH_WEST:
-                        return state.setValue(SHAPE, RailShape.NORTH_EAST);
-                    case NORTH_EAST:
-                        return state.setValue(SHAPE, RailShape.NORTH_WEST);
-                    case NORTH_SOUTH: //Forge fix: MC-196102
+                    case NORTH_SOUTH:
                     case EAST_WEST:
                         return state;
                 }
@@ -331,10 +280,6 @@ public class ConveyorBeltBlock extends Block {
 
     public boolean isValidConveyorBeltShape() {
         return true;
-    }
-
-    public boolean isStraight() {
-        return this.isStraight;
     }
 
 }

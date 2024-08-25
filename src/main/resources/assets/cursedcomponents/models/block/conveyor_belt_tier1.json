@@ -8,7 +8,7 @@
 	"elements": [
 		{
 			"from": [14, 0, 0],
-			"to": [16, 2, 16],
+			"to": [16, 1, 16],
 			"rotation": {"angle": 0, "axis": "y", "origin": [14, 0, 10]},
 			"faces": {
 				"north": {"uv": [4.5, 5.5, 5, 6], "texture": "#0"},
@@ -21,7 +21,7 @@
 		},
 		{
 			"from": [0, 0, 0],
-			"to": [2, 2, 16],
+			"to": [2, 1, 16],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 10]},
 			"faces": {
 				"north": {"uv": [1.5, 5.75, 2, 6.25], "texture": "#0"},
@@ -33,8 +33,8 @@
 			}
 		},
 		{
-			"from": [2, 0, 0],
-			"to": [14, 1, 16],
+			"from": [2, 0.1, 0],
+			"to": [14, 0.1, 16],
 			"rotation": {"angle": 0, "axis": "y", "origin": [4, 0, 0]},
 			"faces": {
 				"north": {"uv": [1.5, 5.5, 4.5, 5.75], "texture": "#0"},
@@ -46,6 +46,32 @@
 			}
 		}
 	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [105, 0, 0],
+			"translation": [0, 3, 5.25],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [94, 0, 0],
+			"translation": [0, 3, 4.75],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"firstperson_righthand": {
+			"rotation": [46, 13, 25],
+			"translation": [0.13, 6.7, 4.13],
+			"scale": [0.68, 0.68, 0.68]
+		},
+		"firstperson_lefthand": {
+			"rotation": [42, 4, 26],
+			"translation": [-0.62, 7.45, 1.38],
+			"scale": [0.68, 0.68, 0.68]
+		},
+		"ground": {
+			"translation": [0, 2, 0],
+			"scale": [0.5, 0.5, 0.5]
+		}
+	},
 	"groups": [
 		{
 			"name": "conveyor_belt",

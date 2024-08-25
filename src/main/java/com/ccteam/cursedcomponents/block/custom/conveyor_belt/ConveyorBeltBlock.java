@@ -50,18 +50,20 @@ public class ConveyorBeltBlock extends Block {
 
         RailShape shape = state.getValue(SHAPE);
         Vec3 dir = switch (shape) {
-            case NORTH_SOUTH -> new Vec3(0, 0, 1);
+            case NORTH_SOUTH -> new Vec3(0, 0, -1);
             case EAST_WEST -> new Vec3(1, 0, 0);
             case ASCENDING_NORTH -> new Vec3(0, 1, -1);
-            case ASCENDING_SOUTH -> new Vec3(0, 1, 1);
+            case ASCENDING_SOUTH -> new Vec3(0, -1, -1);
             case ASCENDING_EAST -> new Vec3(1, 1, 0);
-            case ASCENDING_WEST -> new Vec3(-1, 1, 0);
+            case ASCENDING_WEST -> new Vec3(1, -1, 0);
             case NORTH_EAST -> new Vec3(1, 0, -1);
             case NORTH_WEST -> new Vec3(-1, 0, -1);
             case SOUTH_EAST -> new Vec3(1, 0, 1);
             case SOUTH_WEST -> new Vec3(-1, 0, 1);
         };
-
+        if (state.getValue(REVERSED)) {
+            dir = dir.multiply(-1, -1, -1);
+        }
         Vec3 vel = dir.multiply(speedMultiplier, speedMultiplier, speedMultiplier);
         entity.push(vel);
     }
@@ -332,7 +334,7 @@ public class ConveyorBeltBlock extends Block {
     }
 
     public boolean isStraight() {
-        return isStraight;
+        return this.isStraight;
     }
 
 }

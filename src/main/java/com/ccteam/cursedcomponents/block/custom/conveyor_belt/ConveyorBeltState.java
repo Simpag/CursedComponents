@@ -25,7 +25,7 @@ public class ConveyorBeltState {
         this.state = state;
         this.block = (ConveyorBeltBlock)state.getBlock();
         RailShape railshape = this.block.getConveyorBeltShape(state);
-        this.isStraight = !this.block.isStraight();
+        this.isStraight = this.block.isStraight();
         this.canMakeSlopes = true;
         this.updateConnections(railshape);
     }
@@ -222,92 +222,12 @@ public class ConveyorBeltState {
     }
 
     public ConveyorBeltState place(boolean powered, boolean alwaysPlace, RailShape shape) {
+        RailShape railshape = shape;
+
         BlockPos blockpos = this.pos.north();
         BlockPos blockpos1 = this.pos.south();
         BlockPos blockpos2 = this.pos.west();
         BlockPos blockpos3 = this.pos.east();
-        boolean flag = this.hasNeighborRail(blockpos);
-        boolean flag1 = this.hasNeighborRail(blockpos1);
-        boolean flag2 = this.hasNeighborRail(blockpos2);
-        boolean flag3 = this.hasNeighborRail(blockpos3);
-        RailShape railshape = null;
-        boolean flag4 = flag || flag1;
-        boolean flag5 = flag2 || flag3;
-        if (flag4 && !flag5) {
-            railshape = RailShape.NORTH_SOUTH;
-        }
-
-        if (flag5 && !flag4) {
-            railshape = RailShape.EAST_WEST;
-        }
-
-        boolean flag6 = flag1 && flag3;
-        boolean flag7 = flag1 && flag2;
-        boolean flag8 = flag && flag3;
-        boolean flag9 = flag && flag2;
-        if (!this.isStraight) {
-            if (flag6 && !flag && !flag2) {
-                railshape = RailShape.SOUTH_EAST;
-            }
-
-            if (flag7 && !flag && !flag3) {
-                railshape = RailShape.SOUTH_WEST;
-            }
-
-            if (flag9 && !flag1 && !flag3) {
-                railshape = RailShape.NORTH_WEST;
-            }
-
-            if (flag8 && !flag1 && !flag2) {
-                railshape = RailShape.NORTH_EAST;
-            }
-        }
-
-        if (railshape == null) {
-            if (flag4 && flag5) {
-                railshape = shape;
-            } else if (flag4) {
-                railshape = RailShape.NORTH_SOUTH;
-            } else if (flag5) {
-                railshape = RailShape.EAST_WEST;
-            }
-
-            if (!this.isStraight) {
-                if (powered) {
-                    if (flag6) {
-                        railshape = RailShape.SOUTH_EAST;
-                    }
-
-                    if (flag7) {
-                        railshape = RailShape.SOUTH_WEST;
-                    }
-
-                    if (flag8) {
-                        railshape = RailShape.NORTH_EAST;
-                    }
-
-                    if (flag9) {
-                        railshape = RailShape.NORTH_WEST;
-                    }
-                } else {
-                    if (flag9) {
-                        railshape = RailShape.NORTH_WEST;
-                    }
-
-                    if (flag8) {
-                        railshape = RailShape.NORTH_EAST;
-                    }
-
-                    if (flag7) {
-                        railshape = RailShape.SOUTH_WEST;
-                    }
-
-                    if (flag6) {
-                        railshape = RailShape.SOUTH_EAST;
-                    }
-                }
-            }
-        }
 
         if (railshape == RailShape.NORTH_SOUTH && canMakeSlopes) {
             if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos.above())) {
@@ -327,10 +247,6 @@ public class ConveyorBeltState {
             if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos2.above())) {
                 railshape = RailShape.ASCENDING_WEST;
             }
-        }
-
-        if (railshape == null || !this.block.isValidConveyorBeltShape()) { // Forge: allow rail block to decide if the new shape is valid
-            railshape = shape;
         }
 
         this.updateConnections(railshape);

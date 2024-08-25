@@ -39,7 +39,7 @@ public class ModBlocks {
             () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
                     .strength(0.7f)
                     .noCollission()
-                    .sound(SoundType.METAL), 0.3));
+                    .sound(SoundType.METAL), 0.2));
 
 
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(

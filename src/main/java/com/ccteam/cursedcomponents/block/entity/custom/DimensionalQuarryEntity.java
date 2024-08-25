@@ -293,7 +293,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         } else if (efficiencyLevel < 6) {
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.get(efficiencyLevel);
         } else {
-            // If any mods add higher unbreaking levels
+            // If any mods add higher efficiency levels
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.getLast();
         }
     }
@@ -301,22 +301,54 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private void updateEnergyConsumption() {
         ItemStack pick = this.getPickaxeSlot();
 
-        if (pick.isEmpty()) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
+        this.currentEnergyConsumption = Config.dimensionalQuarryBaseConsumption;
+
+        if (pick.isEmpty())
             return;
-        }
 
         int unbreakingLevel = 0;
         if (this.level != null && this.level.holder(Enchantments.UNBREAKING).isPresent())
             unbreakingLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.UNBREAKING).get(), pick);
 
-        if (unbreakingLevel < 0) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
-        } else if (unbreakingLevel < 4) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.get(unbreakingLevel);
-        } else {
+        int efficiencyLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.EFFICIENCY).isPresent())
+            efficiencyLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.EFFICIENCY).get(), pick);
+
+        boolean hasSilkTouch = this.level != null &&
+                this.level.holder(Enchantments.SILK_TOUCH).isPresent() &&
+                EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.SILK_TOUCH).get(), pick) > 0;
+
+        int fortuneLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.FORTUNE).isPresent())
+            fortuneLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.FORTUNE).get(), pick);
+
+        LogUtils.getLogger().debug("Unbreaking: " + unbreakingLevel + ", efficiency: " + efficiencyLevel + ", silk: " + hasSilkTouch + ", fortune: " + fortuneLevel);
+        LogUtils.getLogger().debug("Unbreaking: " + Config.dimensionalQuarryUnbreakingConsumptionDecrease);
+        LogUtils.getLogger().debug("efficiency: " + Config.dimensionalQuarryEfficiencyConsumptionIncrease);
+        LogUtils.getLogger().debug("silk: " + Config.dimensionalQuarrySilkTouchConsumptionIncrease);
+        LogUtils.getLogger().debug("fortune: " + Config.dimensionalQuarryFortuneConsumptionIncrease);
+
+        if (unbreakingLevel > 0 && unbreakingLevel < 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryUnbreakingConsumptionDecrease.get(unbreakingLevel - 1);
+        } else if (unbreakingLevel > 4) {
             // If any mods add higher unbreaking levels
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getLast();
+            this.currentEnergyConsumption *= Config.dimensionalQuarryUnbreakingConsumptionDecrease.getLast();
+        }
+
+        if (efficiencyLevel > 0 && efficiencyLevel < 6) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryEfficiencyConsumptionIncrease.get(efficiencyLevel - 1);
+        } else if (efficiencyLevel > 6) {
+            // If any mods add higher efficiency levels
+            this.currentEnergyConsumption *= Config.dimensionalQuarryEfficiencyConsumptionIncrease.getLast();
+        }
+
+        if (hasSilkTouch)
+            this.currentEnergyConsumption *= Config.dimensionalQuarrySilkTouchConsumptionIncrease;
+
+        if (fortuneLevel > 0 && fortuneLevel < 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryFortuneConsumptionIncrease.get(fortuneLevel - 1);
+        } else if (fortuneLevel > 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryFortuneConsumptionIncrease.getLast();
         }
     }
 

@@ -22,10 +22,12 @@ The parallel dimension is an exact replica of the corresponding dimensions, thus
 Dimensional Quarry requires a Netherite Pickaxe and a Mini Chunk in order to operate. The choice
 of [Mini Chunk](#mini-chunk)
 determines which dimension the Dimensional Quarry mines from. In its base form it uses 40'000 FE/t mining one block
-every 15 ticks. Upgrading the Dimensional Quarry is as easy as enchanting the Netherite Pickaxe with efficiency,
-unbreaking and/or fortune/silk touch. Efficiency V increases the mining speed up to one block per tick, unbreaking III
-reduces the energy usage down to 25'000 FE/t while fortune and silk touch work like normal. In case you do not want your
-Dimensional Quarry to mine a certain block, add a [Dimensional Quarry Blacklist](#dimensional-quarry-blacklist) item.
+every 10 ticks. Upgrading the Dimensional Quarry is as easy as enchanting the Netherite Pickaxe with efficiency,
+unbreaking and/or fortune/silk touch. Efficiency V increases the mining speed up to one block per tick but increases the
+energy consumption by 250%. Unbreaking reduces the energy consumption, down to 50%, while fortune and silk touch work
+like normal. Silk touch and fortune III increases the energy consumption by 150%. A max upgraded Dimensional Quarry
+consumes 75'000 FE/t. In case you do not want your Dimensional Quarry to mine a certain block, add
+a [Dimensional Quarry Blacklist](#dimensional-quarry-blacklist) item.
 
 The Dimensional Quarry is lag friendly, occasional lag spikes (once ~20 minutes at full speed) due to chunk generation.
 

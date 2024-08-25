@@ -69,6 +69,11 @@ public class ModBlocks {
             () -> new AutoShearerBlock(BlockBehaviour.Properties.of().strength(4f).noOcclusion().noCollission())
     );
 
+    public static final DeferredBlock<Block> SPIKE = registerBlock(
+            "spike",
+            () -> new SpikeBlock(BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().noOcclusion())
+    );
+
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn, new Item.Properties());

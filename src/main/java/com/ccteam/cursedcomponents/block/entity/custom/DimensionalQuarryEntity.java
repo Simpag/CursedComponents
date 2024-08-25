@@ -322,12 +322,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (this.level != null && this.level.holder(Enchantments.FORTUNE).isPresent())
             fortuneLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.FORTUNE).get(), pick);
 
-        LogUtils.getLogger().debug("Unbreaking: " + unbreakingLevel + ", efficiency: " + efficiencyLevel + ", silk: " + hasSilkTouch + ", fortune: " + fortuneLevel);
-        LogUtils.getLogger().debug("Unbreaking: " + Config.dimensionalQuarryUnbreakingConsumptionDecrease);
-        LogUtils.getLogger().debug("efficiency: " + Config.dimensionalQuarryEfficiencyConsumptionIncrease);
-        LogUtils.getLogger().debug("silk: " + Config.dimensionalQuarrySilkTouchConsumptionIncrease);
-        LogUtils.getLogger().debug("fortune: " + Config.dimensionalQuarryFortuneConsumptionIncrease);
-
         if (unbreakingLevel > 0 && unbreakingLevel < 4) {
             this.currentEnergyConsumption *= Config.dimensionalQuarryUnbreakingConsumptionDecrease.get(unbreakingLevel - 1);
         } else if (unbreakingLevel > 4) {
@@ -648,7 +642,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return null;
 
         if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
-            LOGGER.debug("Type: " + block.chunkType);
             return switch (block.chunkType) {
                 case MiniChunkBlock.MiniChunkType.overworld -> ModRegistries.Dimension.OVERWORLD_SAMPLE_DIMENSION_KEY;
                 case MiniChunkBlock.MiniChunkType.nether -> ModRegistries.Dimension.NETHER_SAMPLE_DIMENSION_KEY;

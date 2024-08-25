@@ -27,7 +27,7 @@ unbreaking and/or fortune/silk touch. Efficiency V increases the mining speed up
 energy consumption by 250%. Unbreaking reduces the energy consumption, down to 50%, while fortune and silk touch work
 like normal. Silk touch and fortune III increases the energy consumption by 150%. A max upgraded Dimensional Quarry
 consumes 75'000 FE/t. In case you do not want your Dimensional Quarry to mine a certain block, add
-a [Dimensional Quarry Blacklist](#dimensional-quarry-blacklist) item.
+a [Dimensional Quarry Item Filter](#dimensional-quarry-item-filter).
 
 The Dimensional Quarry is lag friendly, occasional lag spikes (once ~20 minutes at full speed) due to chunk generation.
 
@@ -37,22 +37,35 @@ The Dimensional Quarry is lag friendly, occasional lag spikes (once ~20 minutes 
 
 ### Mini Chunk
 
-Three Mini Chunk blocks are added; one for the overworld, one for the nether and one for the end. These are used to
+Three Mini Chunk blocks are added; one for the overworld, the nether and the end. These are used to
 select which dimension the [Dimensional Quarry](#dimensional-quarry) operates in, or simply as decoration pieces.
+
+### Lucky Block
+
+Inspired by previous Lucky Block mods, the Cursed Components Lucky Block functions similarly to the classics, with a few
+twists. New animations, structure generation and loot have been added in order to elevate and incorporate the lucky
+block into your world. Unique structures can be found in the world, containing Lucky Blocks, with the ability to reward
+or punish whoever dare to open them.
 
 ## Items
 
-### Dimensional Quarry Blacklist
+### Dimensional Quarry Item Filter
 
 A simple item used in the [Dimensional Quarry](#dimensional-quarry) in order to blacklist certain items to be mined. It
 supports up to 5 blacklisted items. The [Dimensional Quarry](#dimensional-quarry) will still mine at the same speed as
 if the blacklist was not present but the blocks will not be added to the
 internal [Dimensional Quarry](#dimensional-quarry) inventory.
 
+### Sponge On a Stick
+
+Sponge On a Stick is an item which works just like the normal sponge, except that it's attached to a stick! The Sponge
+On a Stick runs on energy (FE) and consumes 500 FE per use with a total capacity of 10'000 FE.
+
 ### Crafting Ingredients
 
 * ``Warden Infusion`` New drop from killing the Warden with a drop rate of 1-3
 * ``Warden Infused Diamond``
+* ``Dimensional Core``
 
 ## Supported Versions
 

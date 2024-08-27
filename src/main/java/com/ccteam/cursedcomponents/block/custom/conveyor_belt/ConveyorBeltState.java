@@ -123,24 +123,21 @@ public class ConveyorBeltState {
 
     private void connectTo(ConveyorBeltState state) {
         this.connections.add(state.pos);
-        BlockPos blockpos = this.pos.north();
-        BlockPos blockpos1 = this.pos.south();
-        BlockPos blockpos2 = this.pos.west();
-        BlockPos blockpos3 = this.pos.east();
-        boolean flag = this.hasConnection(blockpos);
-        boolean flag1 = this.hasConnection(blockpos1);
-        boolean flag2 = this.hasConnection(blockpos2);
-        boolean flag3 = this.hasConnection(blockpos3);
+        BlockPos north = this.pos.north();
+        BlockPos south = this.pos.south();
+        BlockPos west = this.pos.west();
+        BlockPos east = this.pos.east();
+
         RailShape railshape = null;
-        if (flag || flag1) {
+        if (this.hasConnection(north) || this.hasConnection(south)) {
             railshape = RailShape.NORTH_SOUTH;
         }
 
-        if (flag2 || flag3) {
+        if (this.hasConnection(west) || this.hasConnection(east)) {
             railshape = RailShape.EAST_WEST;
         }
 
-        railshape = getRailShape(blockpos, blockpos1, blockpos2, blockpos3, railshape);
+        railshape = getRailShape(north, south, west, east, railshape);
 
         if (railshape == null) {
             railshape = RailShape.NORTH_SOUTH;
@@ -157,12 +154,12 @@ public class ConveyorBeltState {
     public ConveyorBeltState place(boolean alwaysPlace, RailShape shape) {
         RailShape railshape = shape;
 
-        BlockPos blockpos = this.pos.north();
-        BlockPos blockpos1 = this.pos.south();
-        BlockPos blockpos2 = this.pos.west();
-        BlockPos blockpos3 = this.pos.east();
+        BlockPos north = this.pos.north();
+        BlockPos south = this.pos.south();
+        BlockPos west = this.pos.west();
+        BlockPos east = this.pos.east();
 
-        railshape = getRailShape(blockpos, blockpos1, blockpos2, blockpos3, railshape);
+        railshape = getRailShape(north, south, west, east, railshape);
 
         this.updateConnections(railshape);
         this.state = this.state.setValue(this.block.getShapeProperty(), railshape);
@@ -170,11 +167,11 @@ public class ConveyorBeltState {
             this.level.setBlock(this.pos, this.state, 3);
 
             for (int i = 0; i < this.connections.size(); i++) {
-                ConveyorBeltState ConveyorBeltState = this.getConveyorBelt(this.connections.get(i));
-                if (ConveyorBeltState != null) {
-                    ConveyorBeltState.removeSoftConnections();
-                    if (ConveyorBeltState.canConnectTo(this)) {
-                        ConveyorBeltState.connectTo(this);
+                ConveyorBeltState conveyorBeltState = this.getConveyorBelt(this.connections.get(i));
+                if (conveyorBeltState != null) {
+                    conveyorBeltState.removeSoftConnections();
+                    if (conveyorBeltState.canConnectTo(this)) {
+                        conveyorBeltState.connectTo(this);
                     }
                 }
             }
@@ -183,23 +180,23 @@ public class ConveyorBeltState {
         return this;
     }
 
-    private RailShape getRailShape(BlockPos blockpos, BlockPos blockpos1, BlockPos blockpos2, BlockPos blockpos3, RailShape railshape) {
+    private RailShape getRailShape(BlockPos north, BlockPos south, BlockPos west, BlockPos east, RailShape railshape) {
         if (railshape == RailShape.NORTH_SOUTH && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos.above())) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, north.above())) {
                 railshape = RailShape.ASCENDING_NORTH;
             }
 
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos1.above())) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, south.above())) {
                 railshape = RailShape.ASCENDING_SOUTH;
             }
         }
 
         if (railshape == RailShape.EAST_WEST && canMakeSlopes) {
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos3.above())) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, east.above())) {
                 railshape = RailShape.ASCENDING_EAST;
             }
 
-            if (ConveyorBeltBlock.isConveyorBelt(this.level, blockpos2.above())) {
+            if (ConveyorBeltBlock.isConveyorBelt(this.level, west.above())) {
                 railshape = RailShape.ASCENDING_WEST;
             }
         }

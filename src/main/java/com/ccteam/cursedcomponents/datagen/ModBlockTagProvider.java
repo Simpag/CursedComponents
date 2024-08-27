@@ -20,9 +20,11 @@ public class ModBlockTagProvider extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider provider) {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(ModBlocks.DIMENSIONAL_QUARRY.get());
+                .add(ModBlocks.DIMENSIONAL_QUARRY.get())
+                .add(ModBlocks.SPIKE.get());
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.DIMENSIONAL_QUARRY.get());
+                .add(ModBlocks.DIMENSIONAL_QUARRY.get())
+                .add(ModBlocks.SPIKE.get());
     }
 }

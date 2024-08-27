@@ -52,12 +52,24 @@ public class Config {
     private static final ModConfigSpec.IntValue DIMENSIONAL_QUARRY_TPB_5 = BUILDER
             .defineInRange("efficiencyV", 1, 1, Integer.MAX_VALUE);
 
+    private static final ModConfigSpec.DoubleValue SPIKE_DAMAGE = BUILDER
+            .pop()
+            .comment("Spike Settings")
+            .push("spike")
+            .comment("Damage per hit")
+            .defineInRange("damage", 3.0, 0, Double.MAX_VALUE);
+
+    private static final ModConfigSpec.BooleanValue SPIKE_DROP_XP = BUILDER
+            .comment("Should killed entities drop xp")
+            .define("drop_xp", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
     /* CONFIG VALUES */
     public static List<Integer> dimensionalQuarryConsumptions;
     public static List<Integer> dimensionalQuarrySpeed;
+    public static Double spikeDamage;
+    public static boolean spikeDropXp;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -76,5 +88,8 @@ public class Config {
                 DIMENSIONAL_QUARRY_TPB_4.get(),
                 DIMENSIONAL_QUARRY_TPB_5.get()
         );
+
+        spikeDamage = SPIKE_DAMAGE.get();
+        spikeDropXp = SPIKE_DROP_XP.get();
     }
 }

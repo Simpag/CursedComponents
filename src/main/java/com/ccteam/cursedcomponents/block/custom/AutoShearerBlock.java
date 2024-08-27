@@ -52,7 +52,8 @@ public class AutoShearerBlock extends BaseEntityBlock {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.cursedcomponents.auto_shearer"));
+        tooltip.add(Component.translatable("tooltip.cursedcomponents.auto_shearer.1"));
+        tooltip.add(Component.translatable("tooltip.cursedcomponents.auto_shearer.2"));
     }
 
     @Override

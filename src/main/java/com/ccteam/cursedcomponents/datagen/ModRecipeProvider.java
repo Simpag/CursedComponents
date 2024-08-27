@@ -83,6 +83,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE.get())
                 ).save(recipeOutput);
 
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.AUTO_SHEARER.get(), 1)
+                .pattern("III")
+                .pattern("SDS")
+                .pattern("III")
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DIAMOND)
+                .define('S', Items.SHEARS)
+                .unlockedBy("has_slime_ball", has(Items.SHEARS)
+                ).save(recipeOutput, "auto_shearer");
+
         ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, ModBlocks.CONVEYOR_BELT_TIER1.get(), 8)
                 .pattern("SIS")
                 .pattern("III")

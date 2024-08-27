@@ -9,6 +9,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.List;
@@ -116,6 +117,16 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('B', ModBlocks.CONVEYOR_BELT_TIER1.get())
                 .define('G', Items.GOLD_INGOT)
                 .unlockedBy("has_conveyor_belt_tier1", has(ModBlocks.CONVEYOR_BELT_TIER1.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModBlocks.SPIKE.get())
+                .pattern(" S ")
+                .pattern(" I ")
+                .pattern(" R ")
+                .define('S', Items.IRON_SWORD)
+                .define('I', Blocks.IRON_BARS)
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_redstone", has(Items.REDSTONE)
                 ).save(recipeOutput);
     }
 

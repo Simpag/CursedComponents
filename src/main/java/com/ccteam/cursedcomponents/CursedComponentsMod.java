@@ -1,14 +1,15 @@
 package com.ccteam.cursedcomponents;
 
+import com.ccteam.cursedcomponents.block.ModBlockCapabilities;
 import com.ccteam.cursedcomponents.block.ModBlocks;
-import com.ccteam.cursedcomponents.block.capabilities.ModBlockCapabilities;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.codec.ModCodecs;
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.gui.containers.ModContainers;
-import com.ccteam.cursedcomponents.gui.screens.ModScreens;
+import com.ccteam.cursedcomponents.glm.ModGlobalLootModifierCodecs;
+import com.ccteam.cursedcomponents.gui.container.ModContainers;
+import com.ccteam.cursedcomponents.gui.screen.ModScreens;
 import com.ccteam.cursedcomponents.item.ModCreativeModeTabs;
+import com.ccteam.cursedcomponents.item.ModItemCapabilities;
 import com.ccteam.cursedcomponents.item.ModItems;
+import com.ccteam.cursedcomponents.item.data_component.ModDataComponents;
 import com.ccteam.cursedcomponents.network.PacketHandler;
 import com.ccteam.cursedcomponents.structure.ModStructures;
 import net.neoforged.bus.api.IEventBus;
@@ -22,7 +23,6 @@ public class CursedComponentsMod {
     public static final String MOD_ID = "cursedcomponents";
 
     public CursedComponentsMod(IEventBus modEventBus, ModContainer modContainer) {
-
         // Register creative mode tabs
         ModCreativeModeTabs.register(modEventBus);
 
@@ -38,8 +38,8 @@ public class CursedComponentsMod {
         // Register mod block entities
         ModBlockEntities.register(modEventBus);
 
-        // Register the block capabilities
-        modEventBus.addListener(ModBlockCapabilities::registerCapabilities);
+        // Register block capabilities
+        modEventBus.addListener(ModBlockCapabilities::registerBlockCapabilities);
 
         // Register Container Menus
         ModContainers.register(modEventBus);
@@ -51,12 +51,15 @@ public class CursedComponentsMod {
         modEventBus.addListener(PacketHandler::register);
 
         // Register custom CODECS
-        ModCodecs.register(modEventBus);
+        ModGlobalLootModifierCodecs.register(modEventBus);
 
         // Register custom data components
         ModDataComponents.register(modEventBus);
 
+        // Register item capabilities
+        modEventBus.addListener(ModItemCapabilities::registerItemCapabilities);
+
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC, MOD_ID + ".toml");
+        modContainer.registerConfig(ModConfig.Type.SERVER, Config.SPEC, MOD_ID + ".toml");
     }
 }

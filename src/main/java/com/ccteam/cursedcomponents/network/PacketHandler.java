@@ -1,9 +1,9 @@
 package com.ccteam.cursedcomponents.network;
 
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryMinMaxYLevelPayload;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryYLevelPayload;
-import com.ccteam.cursedcomponents.network.toClient.LuckyBlockInteractionPayload;
-import com.ccteam.cursedcomponents.network.toServer.GUIButtonPayload;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryMinMaxYLevelPayload;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryYLevelPayload;
+import com.ccteam.cursedcomponents.network.to_client.LuckyBlockInteractionPayload;
+import com.ccteam.cursedcomponents.network.to_server.GUIButtonPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 

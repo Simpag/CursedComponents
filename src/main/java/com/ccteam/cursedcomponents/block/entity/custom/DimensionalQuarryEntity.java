@@ -4,13 +4,11 @@ import com.ccteam.cursedcomponents.Config;
 import com.ccteam.cursedcomponents.ModRegistries;
 import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.data_component.ModDataComponents;
-import com.ccteam.cursedcomponents.data_component.custom.ItemFilterData;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryMinMaxYLevelPayload;
-import com.ccteam.cursedcomponents.network.toClient.DimensionalQuarryYLevelPayload;
-import com.ccteam.cursedcomponents.stack_handler.DimensionalQuarryItemStackHandler;
-import com.ccteam.cursedcomponents.stack_handler.ItemFilterItemStackHandler;
-import com.ccteam.cursedcomponents.threading.DimensionalQuarrySearcher;
+import com.ccteam.cursedcomponents.block.stack_handler.DimensionalQuarryItemStackHandler;
+import com.ccteam.cursedcomponents.block.threading.DimensionalQuarrySearcher;
+import com.ccteam.cursedcomponents.item.base.InventoryItem;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryMinMaxYLevelPayload;
+import com.ccteam.cursedcomponents.network.to_client.DimensionalQuarryYLevelPayload;
 import com.ccteam.cursedcomponents.util.ModTags;
 import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -132,6 +130,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         super.onLoad();
 
         this.updateUpgrades();
+        this.updateBlacklistedItems();
 
         if (level != null && !level.isClientSide) {
             createItemHandlerCapCaches((ServerLevel) level);
@@ -294,7 +293,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
         } else if (efficiencyLevel < 6) {
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.get(efficiencyLevel);
         } else {
-            // If any mods add higher unbreaking levels
+            // If any mods add higher efficiency levels
             this.currentTicksPerBlock = Config.dimensionalQuarrySpeed.getLast();
         }
     }
@@ -302,22 +301,48 @@ public class DimensionalQuarryEntity extends BlockEntity {
     private void updateEnergyConsumption() {
         ItemStack pick = this.getPickaxeSlot();
 
-        if (pick.isEmpty()) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
+        this.currentEnergyConsumption = Config.dimensionalQuarryBaseConsumption;
+
+        if (pick.isEmpty())
             return;
-        }
 
         int unbreakingLevel = 0;
         if (this.level != null && this.level.holder(Enchantments.UNBREAKING).isPresent())
             unbreakingLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.UNBREAKING).get(), pick);
 
-        if (unbreakingLevel < 0) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getFirst();
-        } else if (unbreakingLevel < 4) {
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.get(unbreakingLevel);
-        } else {
+        int efficiencyLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.EFFICIENCY).isPresent())
+            efficiencyLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.EFFICIENCY).get(), pick);
+
+        boolean hasSilkTouch = this.level != null &&
+                this.level.holder(Enchantments.SILK_TOUCH).isPresent() &&
+                EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.SILK_TOUCH).get(), pick) > 0;
+
+        int fortuneLevel = 0;
+        if (this.level != null && this.level.holder(Enchantments.FORTUNE).isPresent())
+            fortuneLevel = EnchantmentHelper.getTagEnchantmentLevel(this.level.holder(Enchantments.FORTUNE).get(), pick);
+
+        if (unbreakingLevel > 0 && unbreakingLevel < 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryUnbreakingConsumptionDecrease.get(unbreakingLevel - 1);
+        } else if (unbreakingLevel > 4) {
             // If any mods add higher unbreaking levels
-            this.currentEnergyConsumption = Config.dimensionalQuarryConsumptions.getLast();
+            this.currentEnergyConsumption *= Config.dimensionalQuarryUnbreakingConsumptionDecrease.getLast();
+        }
+
+        if (efficiencyLevel > 0 && efficiencyLevel < 6) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryEfficiencyConsumptionIncrease.get(efficiencyLevel - 1);
+        } else if (efficiencyLevel > 6) {
+            // If any mods add higher efficiency levels
+            this.currentEnergyConsumption *= Config.dimensionalQuarryEfficiencyConsumptionIncrease.getLast();
+        }
+
+        if (hasSilkTouch)
+            this.currentEnergyConsumption *= Config.dimensionalQuarrySilkTouchConsumptionIncrease;
+
+        if (fortuneLevel > 0 && fortuneLevel < 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryFortuneConsumptionIncrease.get(fortuneLevel - 1);
+        } else if (fortuneLevel > 4) {
+            this.currentEnergyConsumption *= Config.dimensionalQuarryFortuneConsumptionIncrease.getLast();
         }
     }
 
@@ -325,15 +350,20 @@ public class DimensionalQuarryEntity extends BlockEntity {
         if (this.level == null)
             return;
 
+        setChanged();
         ItemStack filter = this.getItemFilterSlot();
-        ItemFilterItemStackHandler inv = filter.getOrDefault(ModDataComponents.ITEM_FILTER_DATA, new ItemFilterData(null)).getInventory(this.level.registryAccess());
-        Set<Item> items = new HashSet<>();
-        for (int i = 0; i < inv.getSlots(); i++) {
-            items.add(inv.getStackInSlot(i).getItem());
+        if (filter.getItem() instanceof InventoryItem ii) {
+            IItemHandler inv = ii.getInventory(filter);
+            Set<Item> items = new HashSet<>();
+            for (int i = 0; i < inv.getSlots(); i++) {
+                items.add(inv.getStackInSlot(i).getItem());
+            }
+
+            this.blacklistedItems = items;
+            return;
         }
 
-        this.blacklistedItems = items;
-        setChanged();
+        this.blacklistedItems.clear();
     }
 
     // Checkers
@@ -612,7 +642,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
             return null;
 
         if (Block.byItem(miniChunk.getItem()) instanceof MiniChunkBlock block) {
-            LOGGER.debug("Type: " + block.chunkType);
             return switch (block.chunkType) {
                 case MiniChunkBlock.MiniChunkType.overworld -> ModRegistries.Dimension.OVERWORLD_SAMPLE_DIMENSION_KEY;
                 case MiniChunkBlock.MiniChunkType.nether -> ModRegistries.Dimension.NETHER_SAMPLE_DIMENSION_KEY;

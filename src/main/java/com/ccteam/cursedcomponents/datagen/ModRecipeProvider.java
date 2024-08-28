@@ -66,7 +66,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
                 ).save(recipeOutput);
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.WARDEN_INFUSED_DIAMOND.get(), 1)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.WARDEN_INFUSED_DIAMOND.get())
                 .requires(ModItems.WARDEN_INFUSION.get(), 1)
                 .requires(Items.DIAMOND, 1)
                 .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
@@ -83,6 +83,25 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('D', ModItems.WARDEN_INFUSED_DIAMOND.get())
                 .unlockedBy("has_dimensional_core", has(ModItems.DIMENSIONAL_CORE.get())
                 ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DIMENSIONAL_QUARRY_ITEM_FILTER.get())
+                .pattern("PPP")
+                .pattern("PWP")
+                .pattern("PPP")
+                .define('P', Items.PAPER)
+                .define('W', ModItems.WARDEN_INFUSION.get())
+                .unlockedBy("has_warden_infusion", has(ModItems.WARDEN_INFUSION.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SPONGE_ON_STICK.get())
+                .pattern("  S")
+                .pattern(" D ")
+                .pattern("W  ")
+                .define('S', Items.SPONGE)
+                .define('D', Items.DIAMOND)
+                .define('W', Items.STICK)
+                .unlockedBy("has_sponge", has(Items.SPONGE))
+                .save(recipeOutput);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.AUTO_SHEARER.get(), 1)
                 .pattern("III")

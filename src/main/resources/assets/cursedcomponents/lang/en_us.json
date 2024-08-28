@@ -13,7 +13,10 @@
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
-  "tooltip.cursedcomponents.dimensional_quarry.1": "Dimensional Quarry go brrr",
+  "tooltip.cursedcomponents.dimensional_quarry.shift": "Press §eShift§r for description",
+  "tooltip.cursedcomponents.dimensional_quarry.1": "Dimensional Quarry is a quarry that mines in a parallel",
+  "tooltip.cursedcomponents.dimensional_quarry.2": "dimension of your choice. You chose the dimension by",
+  "tooltip.cursedcomponents.dimensional_quarry.3": "inserting a §dMini Chunk§r of the corresponding dimension.",
   "tooltip.cursedcomponents.dimensional_quarry.energy_consumption.1": "Energy Capacity: %s FE",
   "tooltip.cursedcomponents.dimensional_quarry.energy_consumption.2": "Energy Consumption: %s FE/t",
   "tooltip.cursedcomponents.dimensional_quarry_item_filter.1": "Blacklists items from being mined in the §dDimensional Quarry§r",
@@ -33,8 +36,8 @@
   "menu.cursedcomponents.dimensional_quarry_item_filter.title": "Blacklist",
 
   "status.cursedcomponents.dimensional_quarry.not_enough_energy": "Not enough energy!",
-  "status.cursedcomponents.dimensional_quarry.no_pickaxe": "Missing §5Netherite§r pickaxe!",
-  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing §5Mini Chunk§r!",
+  "status.cursedcomponents.dimensional_quarry.no_pickaxe": "Missing §dNetherite§r pickaxe!",
+  "status.cursedcomponents.dimensional_quarry.no_dimension": "Missing §dMini Chunk§r!",
   "status.cursedcomponents.dimensional_quarry.ok": "OK",
   "status.cursedcomponents.dimensional_quarry.inventory_full": "Inventory is full!"
 }

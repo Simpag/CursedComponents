@@ -63,7 +63,7 @@ public class SpongeOnStick extends BasePoweredItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.sponge_on_stick.1", this.getEnergyStored(stack), this.getCapacity()));
 
         if (Screen.hasShiftDown()) {

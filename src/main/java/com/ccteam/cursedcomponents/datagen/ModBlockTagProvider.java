@@ -25,7 +25,7 @@ public class ModBlockTagProvider extends BlockTagsProvider {
                 .add(ModBlocks.SPIKE.get());
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.DIMENSIONAL_QUARRY.get());
+                .add(ModBlocks.DIMENSIONAL_QUARRY.get())
                 .add(ModBlocks.SPIKE.get());
 
         this.tag(ModTags.Blocks.CONVEYOR_BELT)

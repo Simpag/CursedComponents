@@ -1,14 +1,14 @@
 package com.ccteam.cursedcomponents.block;
 
 import com.ccteam.cursedcomponents.CursedComponentsMod;
-import com.ccteam.cursedcomponents.block.custom.DimensionalQuarryBlock;
-import com.ccteam.cursedcomponents.block.custom.LuckyBlock;
-import com.ccteam.cursedcomponents.block.custom.MiniChunkBlock;
+import com.ccteam.cursedcomponents.block.custom.*;
+import com.ccteam.cursedcomponents.block.custom.conveyor_belt.ConveyorBeltBlock;
 import com.ccteam.cursedcomponents.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -28,6 +28,20 @@ public class ModBlocks {
                     .lightLevel((s) -> 15)
                     .noOcclusion()
             ));
+
+    public static final DeferredBlock<Block> CONVEYOR_BELT_TIER1 = registerBlock("conveyor_belt_tier1",
+            () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
+                    .strength(0.7f)
+                    .noCollission()
+                    .sound(SoundType.METAL), 0.1));
+
+    public static final DeferredBlock<Block> CONVEYOR_BELT_TIER2 = registerBlock("conveyor_belt_tier2",
+            () -> new ConveyorBeltBlock(BlockBehaviour.Properties.of()
+                    .strength(0.7f)
+                    .noCollission()
+                    .sound(SoundType.METAL), 0.2));
+
+
     public static final DeferredBlock<Block> DIMENSIONAL_QUARRY = registerBlock(
             "dimensional_quarry",
             () -> new DimensionalQuarryBlock(
@@ -52,6 +66,16 @@ public class ModBlocks {
             "mini_chunk_end",
             () -> new MiniChunkBlock(BlockBehaviour.Properties.of().strength(2f).noOcclusion(), MiniChunkBlock.MiniChunkType.end),
             new Item.Properties().rarity(Rarity.EPIC)
+    );
+
+    public static final DeferredBlock<Block> AUTO_SHEARER = registerBlock(
+            "auto_shearer",
+            () -> new AutoShearerBlock(BlockBehaviour.Properties.of().strength(4f).noOcclusion().noCollission())
+    );
+
+    public static final DeferredBlock<Block> SPIKE = registerBlock(
+            "spike",
+            () -> new SpikeBlock(BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().noOcclusion())
     );
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {

@@ -5,6 +5,9 @@
   "item.cursedcomponents.warden_infusion": "Warden Infusion",
   "item.cursedcomponents.sponge_on_stick": "Sponge On a Stick",
 
+  "block.cursedcomponents.auto_shearer": "Auto Shearer",
+  "block.cursedcomponents.conveyor_belt_tier1": "Conveyor Belt Tier 1",
+  "block.cursedcomponents.conveyor_belt_tier2": "Conveyor Belt Tier 2",
   "block.cursedcomponents.dimensional_quarry": "Dimensional Quarry",
   "block.cursedcomponents.lucky_block": "Lucky Block",
   "block.cursedcomponents.mini_chunk_end": "Mini Chunk End",
@@ -13,6 +16,8 @@
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
+  "tooltip.cursedcomponents.auto_shearer.1": "This block shears entities passing through it",
+  "tooltip.cursedcomponents.auto_shearer.2": "Grass can grow under this block",
   "tooltip.cursedcomponents.dimensional_quarry.shift": "Press §eShift§r for description",
   "tooltip.cursedcomponents.dimensional_quarry.1": "Dimensional Quarry is a quarry that mines in a parallel",
   "tooltip.cursedcomponents.dimensional_quarry.2": "dimension of your choice. You chose the dimension by",

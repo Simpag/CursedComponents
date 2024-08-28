@@ -90,6 +90,16 @@ public class Config {
             .comment("Energy usage per use")
             .defineInRange("usage", 500, 0, Integer.MAX_VALUE);
 
+    private static final ModConfigSpec.DoubleValue SPIKE_DAMAGE = BUILDER
+            .pop()
+            .comment("Spike Settings")
+            .push("spike")
+            .comment("Damage per hit")
+            .defineInRange("damage", 3.0, 0, Double.MAX_VALUE);
+
+    private static final ModConfigSpec.BooleanValue SPIKE_DROP_XP = BUILDER
+            .comment("Should killed entities drop xp")
+            .define("drop_xp", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
@@ -102,6 +112,8 @@ public class Config {
     public static List<Integer> dimensionalQuarrySpeed;
     public static Integer spongeOnStickCapacity;
     public static Integer spongeOnStickUsage;
+    public static Double spikeDamage;
+    public static boolean spikeDropXp;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -140,5 +152,8 @@ public class Config {
 
         spongeOnStickCapacity = SPONGE_ON_STICK_CAPACITY.get();
         spongeOnStickUsage = SPONGE_ON_STICK_USAGE.get();
+
+        spikeDamage = SPIKE_DAMAGE.get();
+        spikeDropXp = SPIKE_DROP_XP.get();
     }
 }

@@ -9,6 +9,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
 import java.util.List;
@@ -101,6 +102,51 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('W', Items.STICK)
                 .unlockedBy("has_sponge", has(Items.SPONGE))
                 .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.AUTO_SHEARER.get(), 1)
+                .pattern("III")
+                .pattern("SDS")
+                .pattern("III")
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DIAMOND)
+                .define('S', Items.SHEARS)
+                .unlockedBy("has_slime_ball", has(Items.SHEARS)
+                ).save(recipeOutput, "auto_shearer");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, ModBlocks.CONVEYOR_BELT_TIER1.get(), 8)
+                .pattern("SIS")
+                .pattern("III")
+                .define('I', Items.IRON_INGOT)
+                .define('S', Items.SLIME_BALL)
+                .unlockedBy("has_slime_ball", has(Items.SLIME_BALL)
+                ).save(recipeOutput, "conveyor_belt_tier1_variant1");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, ModBlocks.CONVEYOR_BELT_TIER1.get(), 8)
+                .pattern("SCS")
+                .pattern("CCC")
+                .define('C', Items.COPPER_INGOT)
+                .define('S', Items.SLIME_BALL)
+                .unlockedBy("has_slime_ball", has(Items.SLIME_BALL)
+                ).save(recipeOutput, "conveyor_belt_tier1_variant2");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, ModBlocks.CONVEYOR_BELT_TIER2.get(), 8)
+                .pattern("BBB")
+                .pattern("BGB")
+                .pattern("BBB")
+                .define('B', ModBlocks.CONVEYOR_BELT_TIER1.get())
+                .define('G', Items.GOLD_BLOCK)
+                .unlockedBy("has_conveyor_belt_tier1", has(ModBlocks.CONVEYOR_BELT_TIER1.get())
+                ).save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModBlocks.SPIKE.get())
+                .pattern(" S ")
+                .pattern(" I ")
+                .pattern(" R ")
+                .define('S', Items.IRON_SWORD)
+                .define('I', Blocks.IRON_BARS)
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_redstone", has(Items.REDSTONE)
+                ).save(recipeOutput);
     }
 
     protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> ingredients, RecipeCategory category, ItemLike result,

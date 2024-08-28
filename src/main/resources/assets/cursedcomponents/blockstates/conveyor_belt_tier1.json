@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "shape=ascending_north,reversed=false": {
+    "model": "cursedcomponents:block/conveyor_belt_tier1_ascending"
+    },
+    "shape=ascending_north,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_descending"
+    },
+    "shape=ascending_south,reversed=false": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_descending",
+      "y": 180
+    },
+    "shape=ascending_south,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_ascending",
+      "y": 180
+    },
+    "shape=ascending_east,reversed=false": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_ascending",
+      "y": 90
+    },
+    "shape=ascending_east,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_descending",
+      "y": 90
+    },
+    "shape=ascending_west,reversed=false": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_descending",
+      "y": 270
+    },
+    "shape=ascending_west,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1_ascending",
+      "y": 270
+    },
+    "shape=east_west,reversed=false": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1",
+      "y": 90
+    },
+    "shape=east_west,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1",
+      "y": 270
+    },
+    "shape=north_south,reversed=false": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1"
+    },
+    "shape=north_south,reversed=true": {
+      "model": "cursedcomponents:block/conveyor_belt_tier1",
+      "y": 180
+    }
+  }
+}

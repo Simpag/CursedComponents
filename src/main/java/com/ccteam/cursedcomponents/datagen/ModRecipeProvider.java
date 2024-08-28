@@ -111,11 +111,11 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 ).save(recipeOutput, "conveyor_belt_tier1_variant2");
 
         ShapedRecipeBuilder.shaped(RecipeCategory.TRANSPORTATION, ModBlocks.CONVEYOR_BELT_TIER2.get(), 8)
-                .pattern("GGG")
-                .pattern("GBG")
-                .pattern("GGG")
+                .pattern("BBB")
+                .pattern("BGB")
+                .pattern("BBB")
                 .define('B', ModBlocks.CONVEYOR_BELT_TIER1.get())
-                .define('G', Items.GOLD_INGOT)
+                .define('G', Items.GOLD_BLOCK)
                 .unlockedBy("has_conveyor_belt_tier1", has(ModBlocks.CONVEYOR_BELT_TIER1.get())
                 ).save(recipeOutput);
 

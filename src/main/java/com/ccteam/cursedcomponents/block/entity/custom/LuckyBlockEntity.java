@@ -9,6 +9,7 @@ import com.ccteam.cursedcomponents.villager.CustomVillagerManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.FastColor;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -85,7 +87,7 @@ public class LuckyBlockEntity extends BlockEntity {
     }
 
     public void rollAndSetDropRunnable(Level world, Player player, BlockPos pos) {
-        if (world.isClientSide || this.isSpinning)
+        if (world.isClientSide || this.isSpinning || this.level == null)
             return;
 
         float luck = 1.0f; // TODO: Use luck modifiers
@@ -107,8 +109,8 @@ public class LuckyBlockEntity extends BlockEntity {
             case NORMAL -> () -> dropNormal(world, pos);
             case LUCKY -> () -> dropLucky(world, player, pos);
         };
-
-        PacketDistributor.sendToPlayer((ServerPlayer) player, new LuckyBlockInteractionPayload(rollOutcome, pos));
+        
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) this.level, new ChunkPos(pos), new LuckyBlockInteractionPayload(rollOutcome, pos));
     }
 
     public void runDrop() {

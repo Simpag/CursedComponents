@@ -3,7 +3,6 @@ package com.ccteam.cursedcomponents.event;
 import com.ccteam.cursedcomponents.CursedComponentsMod;
 import com.ccteam.cursedcomponents.additional.ModAdditionalModels;
 import com.ccteam.cursedcomponents.block.entity.ModBlockEntities;
-import com.ccteam.cursedcomponents.block.entity.renderer.AutoShearerEntityRenderer;
 import com.ccteam.cursedcomponents.block.entity.renderer.DimensionalQuarryEntityRenderer;
 import com.ccteam.cursedcomponents.block.entity.renderer.LuckyBlockEntityRenderer;
 import net.neoforged.api.distmarker.Dist;
@@ -19,7 +18,6 @@ public class ModClientEventBusEvents {
     public static void registerRenderer(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.LUCKY_BLOCK_BE.get(), LuckyBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.DIMENSIONAL_QUARRY_BE.get(), DimensionalQuarryEntityRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.AUTO_SHEARER_BE.get(), AutoShearerEntityRenderer::new);
     }
 
     @SubscribeEvent

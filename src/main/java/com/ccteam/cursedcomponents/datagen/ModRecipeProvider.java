@@ -143,7 +143,7 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .pattern(" I ")
                 .pattern(" R ")
                 .define('S', Items.IRON_SWORD)
-                .define('I', Blocks.IRON_BARS)
+                .define('I', Blocks.IRON_BLOCK)
                 .define('R', Items.REDSTONE)
                 .unlockedBy("has_redstone", has(Items.REDSTONE)
                 ).save(recipeOutput);

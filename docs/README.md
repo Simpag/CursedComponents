@@ -41,11 +41,27 @@ Three Mini Chunk blocks are added; one for the overworld, the nether and the end
 select which dimension the [Dimensional Quarry](#dimensional-quarry) operates in, or simply as decoration pieces.
 
 ### Lucky Block
+<p align="center">
+    <img src="img/lucky_block.png" width="500">
 
 Inspired by previous Lucky Block mods, the Cursed Components Lucky Block functions similarly to the classics, with a few
 twists. New animations, structure generation and loot have been added in order to elevate and incorporate the lucky
 block into your world. Unique structures can be found in the world, containing Lucky Blocks, with the ability to reward
 or punish whoever dare to open them.
+
+### Conveyor Belt
+<p align="center">
+    <img src="img/conveyor_belts.png" width="500">
+
+CursedComponents offers two tiers of conveyor belts, each capable of transporting items and entities at different speeds. Additionally, grass grows beneath conveyor belts, 
+making them ideal for automated farming setups that require grass blocks, such as sheep farms.
+
+### Auto Shearer
+<p align="center">
+    <img src="img/auto_shearer.png" width="500">
+
+The Auto Shearer is a non-collidable block that automatically shears entities that come into contact with it. It is particularly useful for automating sheep shearing or handling other shearable entities. Grass also grows beneath the Auto Shearer, 
+allowing for convenient and efficient integration into farming systems.
 
 ## Items
 

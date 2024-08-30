@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.EntityType;
@@ -63,6 +62,7 @@ public class LuckyBlockEntity extends BlockEntity {
         this.isSpinning = true;
         this.spinTicks = MAX_SPIN_TICKS;
         this.activatingPlayer = activatingPlayer;
+        setChanged();
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, LuckyBlockEntity entity) {
@@ -354,6 +354,8 @@ public class LuckyBlockEntity extends BlockEntity {
 
     public void setRollOutcome(RollOutcome rollOutcome) {
         this.rollOutcome = rollOutcome;
+        this.startSpinning(null);
+        setChanged();
     }
 
     public float getDiceRotation() {

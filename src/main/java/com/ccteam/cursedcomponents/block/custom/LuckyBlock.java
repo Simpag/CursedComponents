@@ -61,7 +61,6 @@ public class LuckyBlock extends BaseEntityBlock {
             if (!level.isClientSide) {
                 LuckyBlockEntity entity = (LuckyBlockEntity) blockEntity;
                 entity.rollAndSetDropRunnable(level, player, pos);
-                level.sendBlockUpdated(pos, blockEntity.getBlockState(), entity.getBlockState(), 2);
             }
             luckyBlockEntity.startSpinning(player);
 

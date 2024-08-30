@@ -13,6 +13,7 @@
   "block.cursedcomponents.mini_chunk_end": "Mini Chunk End",
   "block.cursedcomponents.mini_chunk_nether": "Mini Chunk Nether",
   "block.cursedcomponents.mini_chunk_overworld": "Mini Chunk Overworld",
+  "block.cursedcomponents.spike": "Spike",
 
   "itemGroup.cursedcomponents.cursed_components_item_tab": "Cursed Components",
 
@@ -33,6 +34,8 @@
   "tooltip.cursedcomponents.sponge_on_stick.1": "§aEnergy:§r %s / %s FE",
   "tooltip.cursedcomponents.sponge_on_stick.2": "Absorbs water in exchange for energy when you\nright click just like a sponge!",
   "tooltip.cursedcomponents.sponge_on_stick.shift": "Press §eShift§r for description",
+  "tooltip.cursedcomponents.spike.1": "Hurts entities over time",
+  "tooltip.cursedcomponents.spike.2": "Requires redstone input to operate",
 
   "menu.cursedcomponents.dimensional_quarry.current_y_level": "Current Y: %s",
   "menu.cursedcomponents.dimensional_quarry.start_button": "Start",

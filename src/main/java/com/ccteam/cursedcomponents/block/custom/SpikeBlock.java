@@ -3,11 +3,15 @@ package com.ccteam.cursedcomponents.block.custom;
 import com.ccteam.cursedcomponents.Config;
 import com.ccteam.cursedcomponents.util.VoxelShapeUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -21,6 +25,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SpikeBlock extends Block {
     public static final VoxelShape SHAPE = VoxelShapeUtils.combineShapes(
@@ -51,6 +57,12 @@ public class SpikeBlock extends Block {
                 }
             }
         }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.spike.1"));
+        tooltipComponents.add(Component.translatable("tooltip.cursedcomponents.spike.2"));
     }
 
     @Override

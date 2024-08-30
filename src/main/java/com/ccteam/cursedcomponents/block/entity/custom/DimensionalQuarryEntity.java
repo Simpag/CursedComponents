@@ -425,7 +425,7 @@ public class DimensionalQuarryEntity extends BlockEntity {
 
         for (int i = from; i < to; i++) {
             ItemStack stack = storage.getStackInSlot(i);
-            if (stack.getCount() < stack.getMaxStackSize()) {
+            if (stack.isEmpty() || stack.getCount() < stack.getMaxStackSize()) {
                 return false;
             }
         }
@@ -564,7 +564,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
     }
 
     public void tryEject() {
-        // TODO update this, cache the eject inventory and only look for more if the inventory is full or gets destroyed
         this.ejectCooldown++;
         if (this.ejectCooldown <= EJECTION_COOLDOWN) {
             return;
@@ -579,7 +578,6 @@ public class DimensionalQuarryEntity extends BlockEntity {
         }
 
         int cnt = 0;
-
         for (IItemHandler storage : attachedStorages) {
             if (isStorageFull(storage)) {
                 // Go to next container if full
@@ -589,17 +587,17 @@ public class DimensionalQuarryEntity extends BlockEntity {
             for (int i = UPGRADE_SLOTS; i < this.getInventory().getSlots(); i++) {
                 ItemStack itemStack = this.getInventory().getStackInSlot(i);
                 if (!itemStack.isEmpty()) {
-                    ItemStack itemStack1 = ItemHandlerHelper.insertItemStacked(storage, itemStack, false); //addItem(blockEntity, container, blockEntity.removeItem(i, 1), direction);
+                    ItemStack itemStack1 = ItemHandlerHelper.insertItemStacked(storage, itemStack, false);
 
                     if (itemStack1.isEmpty()) {
                         inventory.setStackInSlot(i, ItemStack.EMPTY);
+                        cnt++;
                     } else if (itemStack.getCount() != itemStack1.getCount()) {
                         // If we could not eject all items, set the new count and try the next storage
                         this.getInventory().setStackInSlot(i, itemStack1);
                         break;
                     }
 
-                    cnt++;
                     if (cnt >= EJECTION_ATTEMPTS_PER_CYCLE)
                         return;
                 }

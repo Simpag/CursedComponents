@@ -81,7 +81,7 @@ public class Config {
     // Sponge on Stick
     private static final ModConfigSpec.IntValue SPONGE_ON_STICK_CAPACITY = BUILDER
             .pop(2)
-            .comment("Sponge On a Stick")
+            .comment("Sponge On a Stick Settings")
             .push("sponge_on_a_stick")
             .comment("Energy capacity")
             .defineInRange("capacity", 10_000, 1, Integer.MAX_VALUE);
